@@ -1,0 +1,13 @@
+Package: CorrBin
+Type: Package
+Title: Nonparametric trend test with correlated binary data
+Version: 1.0
+Date: 2008-07-02
+Author: Aniko Szabo
+Maintainer: Aniko Szabo <aszabo@mcw.edu>
+Description: This package implements a nonparametric trend test for clustered 
+binary data based on stochastic ordering. The elements of the cluster are
+assumed exchangeable, and identical joint distribution (also known as marginal compatibility,
+or reproducibility) is assumed for clusters of different sizes.
+License: GPL 
+LazyLoad: yes
