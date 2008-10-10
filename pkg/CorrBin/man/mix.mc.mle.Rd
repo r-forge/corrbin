@@ -1,84 +1,47 @@
 \name{mix.mc.mle}
 \alias{mix.mc.mle}
-\title{}
+\title{Order-restricted MLE assuming marginal compatibility}
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
-}
+  \code{mix.mc.mle} computes the nonparametric maximum likelihood estimate
+  of the distribution of the number of responses in a cluster \eqn{P(R=r|n)}{P(R=r|n)}
+  under a stochastic ordering constraint. Umbrella ordering can be specified using
+  the \code{turn} parameter.}
 \usage{
-mix.reprod.mle(cbdata, turn = 1, control = list())
+mix.reprod.mle(cbdata, turn = 1, control = mixControl())
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cbdata}{ ~~Describe \code{cbdata} here~~ }
-  \item{turn}{ ~~Describe \code{turn} here~~ }
-  \item{control}{ ~~Describe \code{control} here~~ }
+  \item{cbdata}{an object of class \code{\link{CBData}}.}
+  \item{turn}{integer specifying the peak of the umbrella ordering (see Details). The
+  default corresponds to a non-decreasing order.}
+  \item{control}{a list of control parameters, usually a call to \code{\link{mixControl}}.}
 }
 \details{
-  ~~ If necessary, more details than the description above ~~
+  
 }
 \value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of 'comp1'}
-  \item{comp2 }{Description of 'comp2'}
-  ...
+  A list with components:
+  \item{MLest }{data frame with the maximum likelihood estimates of  P(R_i=r|n)}
+  \item{Q }{numeric matrix; estimated weights for the mixing distribution}
+  \item{D }{numeric matrix; directional derivative of the log-likelihood}
+  \item{loglik }{the achieved value of the log-likelihood}
+  \item{converge }{a 2-element vector with the achived relative error and the
+  performed number of iterations}
+Components \code{Q} and \code{D} are unlikely to be needed for the user. 
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ 
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\references{Szabo A, George EO. (2008) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}
+\author{Aniko Szabo, aszabo@mcw.edu}
+\seealso{\code{\link{mixControl}}}
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (cbdata, turn = 1, control = list()) 
-{
-    attach(control)
-    on.exit(detach(control))
-    tab <- xtabs(Freq ~ factor(ClusterSize, levels = 1:max(ClusterSize)) + 
-        factor(NResp, levels = 0:max(ClusterSize)) + Trt, data = cbdata)
-    size <- dim(tab)[1]
-    ntrt <- dim(tab)[3]
-    ntot <- sum(tab)
-    storage.mode(tab) <- "double"
-    Q <- array(0, dim = rep(size + 1, ntrt))
-    storage.mode(Q) <- "double"
-    S <- DownUpMatrix(size, ntrt, turn)
-    storage.mode(S) <- "integer"
-    if ((start == "H0") & (method == "EM")) {
-        warning("The EM algorithm can only use 'start=uniform'. Switching options.")
-        start <- "uniform"
-    }
-    if (start == "H0") {
-        const.row <- matrix(0:size, nr = size + 1, nc = ntrt)
-        Q[const.row + 1] <- 1/(size + 1)
-    }
-    else {
-        Q[S + 1] <- 1/(nrow(S))
-    }
-    res <- switch(method, EM = .Call("MixReprodQ", Q, S, tab, 
-        as.integer(max.iter), as.double(eps), as.integer(verbose)), 
-        ISDM = .Call("ReprodISDM", Q, S, tab, as.integer(max.iter), 
-            as.integer(max.directions), as.double(eps), as.integer(verbose)))
-    names(res) <- c("MLest", "Q", "D", "loglik", "converge")
-    dimnames(res$MLest) <- list(NResp = 0:size, ClusterSize = 1:size, 
-        Trt = 1:ntrt)
-    res$MLest <- as.data.frame.table(res$MLest)
-    names(res$MLest) <- c("NResp", "ClusterSize", "Trt", "Prob")
-    res$MLest$NResp <- as.numeric(as.character(res$MLest$NResp))
-    res$MLest$ClusterSize <- as.numeric(as.character(res$MLest$ClusterSize))
-    res$MLest <- subset(res$MLest, NResp <= ClusterSize)
-    levels(res$MLest$Trt) <- levels(cbdata$Trt)
-    names(res$converge) <- c("rel.error", "n.iter")
-    res
-  }
+  data(shelltox)
+  ml <- mix.mc.mle(shelltox, control=mixControl(eps=0.01, method="ISDM")))
+  ml$converge
+  
+  require(lattice)
+  xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=ml$MLest, type="s",
+       panel=panel.superpose, panel.groups=panel.cumsum,
+       as.table=T, auto.key=list(columns=4, lines=T, points=F),
+			 xlab="Number of responses", ylab="Cumulative Probability R(R>=r|N=n)",
+			 ylim=c(0,1.1), main="Stochastically ordered estimates\n with marginal compatibility")
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ nonparametric }
+\keyword{ models }

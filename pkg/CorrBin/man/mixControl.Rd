@@ -1,56 +1,36 @@
 \name{mixControl}
 \alias{mixControl}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\title{Control values for order-constrained fit}
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
+  The values supplied in the function call replace the defaults and a list with all possible arguments is returned. 
+  The returned list is used as the control argument to the \code{\link{mix.mc.est}}, \code{\link{null.LRT}}, 
+  and \code{\link{perm.LRT}} functions. 
 }
 \usage{
-mixControl(method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000, max.directions = 0, start = ifelse(method == "ISDM", "H0", "uniform"), verbose = FALSE)
+mixControl(method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000, max.directions = 0, 
+           start = ifelse(method == "ISDM", "H0", "uniform"), verbose = FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{method}{ ~~Describe \code{method} here~~ }
-  \item{eps}{ ~~Describe \code{eps} here~~ }
-  \item{max.iter}{ ~~Describe \code{max.iter} here~~ }
-  \item{max.directions}{ ~~Describe \code{max.directions} here~~ }
-  \item{start}{ ~~Describe \code{start} here~~ }
-  \item{verbose}{ ~~Describe \code{verbose} here~~ }
-}
-\details{
-  ~~ If necessary, more details than the description above ~~
+  \item{method}{a string specifying the maximization method}
+  \item{eps}{a numeric value giving the maximum absolute error in the log-likelihood}
+  \item{max.iter}{an interger specifying the maximal number of iterations}
+  \item{max.directions}{an integer giving the maximal number of directions considered at one step of the ISDM method.
+  If zero or negative, it is set to the number of non-empty cells. A value of 1
+  corresponds to the VDM algorithm. }
+  \item{start}{a string specifying the starting setup of the mixing distribution; "H0" puts weight
+  only on constant vectors (corresponding to the null hypothesis of no change),
+  "uniform" puts equal weight on all elements. Only a "uniform" start can be used
+  for the "EM" algorithm.}
+  \item{verbose}{a logical value; if TRUE details of the optimization are shown.}
 }
 \value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of 'comp1'}
-  \item{comp2 }{Description of 'comp2'}
-  ...
+  a list with components for each of the possible arguments.
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ 
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\author{Aniko Szabo aszabo@mcw.edu}
+\seealso{\code{\link{mix.mc.est}}, \code{\link{null.LRT}}, \code{\link{perm.LRT}}}
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000, 
-    max.directions = 0, start = ifelse(method == "ISDM", "H0", 
-        "uniform"), verbose = FALSE) 
-{
-    method <- match.arg(method)
-    start <- match.arg(start, c("uniform", "H0"))
-    list(method = match.arg(method), eps = eps, max.iter = max.iter, 
-        max.directions = max.directions, start = start, verbose = verbose)
-  }
+# decrease the maximum number iterations and
+# request the "EM" algorithm
+ mixControl(method="EM", max.iter=100)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ model }
