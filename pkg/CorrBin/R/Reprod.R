@@ -51,7 +51,7 @@ mc.test.chisq <- function(cbdata){
 }
 
 
-mix.mc.mle <- function(cbdata, turn=1, control=list()){ 
+mix.mc.mle <- function(cbdata, turn=1, control=mixControl()){ 
   attach(control)
   on.exit(detach(control))
   tab <- xtabs(Freq~factor(ClusterSize,levels=1:max(ClusterSize))+
@@ -99,6 +99,40 @@ mix.mc.mle <- function(cbdata, turn=1, control=list()){
   res
 }
 
+
+DownUpMatrix <- function(size, ntrt, turn){
+  if ((turn<1)|(turn>ntrt)) stop("turn should be between 1 and ntrt")
+  
+    if (turn==1){
+       res <- .Call("makeSmatrix", as.integer(size), as.integer(ntrt))
+       return(res)
+    }
+    if (turn==ntrt){
+       res <- .Call("makeSmatrix", as.integer(size), as.integer(ntrt))
+       return(size - res)
+    }
+  
+  
+    res1 <- .Call("makeSmatrix", as.integer(size), as.integer(turn))
+    res1 <- size - res1;
+  
+  res2list <- list()
+  for (sq in 0:size){
+    
+      S <- .Call("makeSmatrix", as.integer(size-sq), as.integer(ntrt-turn))
+      res2list <- c(res2list, list(sq+S))
+    
+  }
+  
+    res1list <- by(res1, res1[,turn], function(x)x)
+    res <- mapply(merge, res1list, res2list, MoreArgs=list(by=NULL), SIMPLIFY=FALSE)
+    res <- data.matrix(do.call(rbind, res))
+    rownames(res) <- NULL
+    colnames(res) <- NULL
+    res
+  
+}
+
 mixControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000, 
       max.directions=0, start=ifelse(method=="ISDM", "H0", "uniform"), verbose=FALSE){
   method <- match.arg(method)
@@ -107,7 +141,7 @@ mixControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000,
        max.directions = max.directions, start=start, verbose = verbose)
 }
 
-null.LRT <- function(cbdata, control=list()){
+null.LRT <- function(cbdata, control=mixControl()){
    # LL under null hypothesis of equality (+ marginal compatibility)
    a <- with(cbdata, aggregate(Freq, list(ClusterSize=ClusterSize,NResp=NResp), sum))
    names(a)[names(a)=="x"] <- "Freq"
@@ -129,7 +163,8 @@ null.LRT <- function(cbdata, control=list()){
  }
   
 
-perm.LRT <- function(cbdata, R=100, control=list()){
+perm.LRT <- function(cbdata, R=100, control=mixControl()){
+   require(boot)
    dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
    dat2$Freq <- NULL
    
