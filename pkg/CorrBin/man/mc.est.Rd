@@ -19,14 +19,13 @@ The EM algorithm given by Stefanescu and Turnbull (2003) is used.
 \value{
   A data frame giving the estimated pdf for each treatment and clustersize. It
   has the following columns:
-  \describe{
   \item{Prob}{numeric, the probability of \code{NResp} responses in a cluster
-  of size \code{ClusterSize} in group \code{Trt}}
+    of size \code{ClusterSize} in group \code{Trt}}.  The probabilities add up to 1 for each 
+    \code{Trt}/\code{ClusterSize} combination.
   \item{Trt}{factor, the treatment group}
   \item{ClusterSize}{numeric, the cluster size}
   \item{NResp}{numeric, the number of responses}
-  }
- The probabilities add up to 1 for each \code{Trt}/\code{ClusterSize} combination.
+
 }
 \references{Stefanescu, C. & Turnbull, B. W. Likelihood inference for exchangeable binary data with varying cluster sizes. 
 \emph{Biometrics}, 2003, 59, 18-24 }

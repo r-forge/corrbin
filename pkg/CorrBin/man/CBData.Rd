@@ -21,12 +21,10 @@ CBData(x, trt, clustersize, nresp, freq = NULL)
 \value{
   A data frame with each row representing all the clusters with the same trt/size/number of responses,
   and standardized variable names:
-  \describe{
   \item{Trt}{factor, the treatment group}
   \item{ClusterSize}{numeric, the cluster size}
   \item{NResp}{numeric, the number of responses}
   \item{Freq}{numeric, number of clusters with the same values}
-  }
 }
 \author{Aniko Szabo}
 
