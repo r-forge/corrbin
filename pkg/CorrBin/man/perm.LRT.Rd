@@ -1,65 +1,52 @@
 \name{perm.LRT}
 \alias{perm.LRT}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\title{Likelihood ratio test of stochastic ordering}
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
+Performs a likelihood ratio test of stochastic ordering versus equality using 
+permutations to estimate the null-distribution and the p-value.  If only the value
+of the test statistic is needed, use \code{\link{null.LRT}} instead.
 }
 \usage{
 perm.LRT(cbdata, R = 100, control = list())
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cbdata}{ ~~Describe \code{cbdata} here~~ }
-  \item{R}{ ~~Describe \code{R} here~~ }
-  \item{control}{ ~~Describe \code{control} here~~ }
+  \item{cbdata}{a \code{CBData} object.}
+  \item{R}{an integer -- the number of random permutations for estimating the null distribution.}
+  \item{control}{an optional list of control settings, usually a call to \code{\link{mixControl}}.
+    See there for the names of the settable control values and their effect.}
 }
 \details{
-  ~~ If necessary, more details than the description above ~~
+The test is valid only under the assumption that the cluster-size distribution does not
+depend on group. During the estimation of the null-distribution the group assignments of the clusters 
+are permuted keeping the group sizes constant; the within-group distribution of the cluster-sizes will 
+vary randomly during the permutation test.
+
+The default value of \code{R} is probably too low for the final data analysis, and should be increased.
 }
 \value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of 'comp1'}
-  \item{comp2 }{Description of 'comp2'}
-  ...
+  A list with the following components
+  \item{LRT }{the value of the likelihood ratio test statistic. It has two attributes: \code{ll0} and \code{ll1} -
+      the values of the log-likelihood under \eqn{H_0}{H0} and \eqn{h_a}{Ha} respectively.}
+  \item{p.val }{the estimated p-value.}
+  \item{boot.res }{an objecto of class "boot" with the detailed results of the permutations. 
+       See \code{\link[boot]{boot}} for details. }
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ 
+\references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}
+\author{Aniko Szabo, aszabo@mcw.edu}
 
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\seealso{\code{\link{null.LRT}}, \code{\link{mixControl}} }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+data(shelltox)
+set.seed(45742)
+sh.test <- perm.LRT(shelltox, R=10, control=mixControl(eps=0.1, max.directions=25)) 
+sh.test
 
-## The function is currently defined as
-function (cbdata, R = 100, control = list()) 
-{
-    dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq), ]
-    dat2$Freq <- NULL
-    boot.LRT.fun <- function(dat, idx) {
-        dat.new <- cbind(dat[idx, c("ClusterSize", "NResp")], 
-            Trt = dat$Trt)
-        dat.f <- aggregate(dat.new$Trt, list(Trt = dat.new$Trt, 
-            ClusterSize = dat.new$ClusterSize, NResp = dat.new$NResp), 
-            length)
-        names(dat.f)[names(dat.f) == "x"] <- "Freq"
-        dat.f$ClusterSize <- as.numeric(as.character(dat.f$ClusterSize))
-        dat.f$NResp <- as.numeric(as.character(dat.f$NResp))
-        stat <- null.LRT(dat.f, control = control)
-        stat
-    }
-    res <- boot(dat2, boot.LRT.fun, R = R, sim = "permutation")
-    p <- mean(res$t[, 1] >= res$t0)
-    LRT <- res$t0
-    list(LRT = LRT, p.val = p, boot.res = res)
-  }
+#a plot of the resampled LRT values
+#would look better with a reasonable value of R
+ null.vals <- sh.test$boot.res$t[,1]
+ hist(null.vals, breaks=10,  freq=F,xlab="Test statistic", ylab="Density", 
+      main="Simulated null-distribution", xlim=range(c(0,20,null.vals)))
+ points(sh.test$LRT, 0, pch="*",col="red", cex=3)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{htest}
+\keyword{nonparametric}

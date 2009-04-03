@@ -1,61 +1,35 @@
 \name{null.LRT}
 \alias{null.LRT}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\title{Likelihood-ratio test statistic}
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
+\code{null.LRT} computes the likelihood ratio test statistic for stochastic ordering against equality
+assuming marginal compatibility for both alternatives. Note that this statistic does not have
+a \eqn{\chi^2}{chi-squared} distribution, so the p-value computation is not straightforward.
+The \code{\link{perm.LRT}} function implements a permutation-based evaluation of the p-value for the 
+likelihood-ratio test.
 }
 \usage{
 null.LRT(cbdata, control = list())
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cbdata}{ ~~Describe \code{cbdata} here~~ }
-  \item{control}{ ~~Describe \code{control} here~~ }
+  \item{cbdata}{a \code{CBData} object}
+  \item{control}{an optional list of control settings, usually a call to \code{\link{mixControl}}.
+    See there for the names of the settable control values and their effect.}
 }
 \details{
-  ~~ If necessary, more details than the description above ~~
+
 }
 \value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of 'comp1'}
-  \item{comp2 }{Description of 'comp2'}
-  ...
+  The value of the likelihood ratio test statistic is returned with two attributes:
+  \item{ll0 }{the log-likelihood under \eqn{H_0}{H0} (equality)}
+  \item{ll1 }{the log-likelihood under \eqn{H_a}{Ha} (stochastic order)}
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ 
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\author{Aniko Szabo}
+\seealso{\code{\link{perm.lrt}},\code{\link{mixControl}}}
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (cbdata, control = list()) 
-{
-    a <- with(cbdata, aggregate(Freq, list(ClusterSize = ClusterSize, 
-        NResp = NResp), sum))
-    names(a)[names(a) == "x"] <- "Freq"
-    a$ClusterSize <- as.integer(as.character(a$ClusterSize))
-    a$NResp <- as.integer(as.character(a$NResp))
-    a$Trt <- 1
-    b <- reprod.est(a)
-    b <- merge(cbdata, b, all.x = T, by = c("ClusterSize", "NResp"))
-    ll0 <- with(b, sum(Freq * log(Prob)))
-    res <- mix.reprod.mle(cbdata, control = control)
-    ll1 <- res$loglik
-    lrt <- 2 * (ll1 - ll0)
-    attr(lrt, "ll0") <- ll0
-    attr(lrt, "ll1") <- ll1
-    lrt
-  }
+data(shelltox)
+LRT <- lrt.null(shelltox, control=mixControl(max.iter = 100, max.directions = 50))
+LRT
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{htest}
+\keyword{nonparametric}

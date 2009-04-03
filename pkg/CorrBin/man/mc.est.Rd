@@ -32,8 +32,8 @@ The EM algorithm given by Stefanescu and Turnbull (2003) is used.
 \emph{Biometrics}, 2003, 59, 18-24 }
 \author{Aniko Szabo}
 \examples{
-data(sh)
-sh.mc <- mc.est(sh)
+data(shelltox)
+sh.mc <- mc.est(shelltox)
 
 library(lattice)
 xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=sh.reprod, subset=ClusterSize>0, type="l",

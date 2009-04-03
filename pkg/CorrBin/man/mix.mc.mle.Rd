@@ -28,7 +28,7 @@ mix.reprod.mle(cbdata, turn = 1, control = mixControl())
   performed number of iterations}
 Components \code{Q} and \code{D} are unlikely to be needed for the user. 
 }
-\references{Szabo A, George EO. (2008) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}
+\references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}
 \author{Aniko Szabo, aszabo@mcw.edu}
 \seealso{\code{\link{mixControl}}}
 \examples{
