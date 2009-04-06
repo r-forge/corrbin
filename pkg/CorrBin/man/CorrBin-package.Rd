@@ -3,39 +3,47 @@
 \alias{CorrBin}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+Nonparameterics for correlated binary data
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+This package implements nonparametric methods for analysing exchangeable binary data with variable cluster sizes with emphasis on trend testing.
+The input should specify the treatment group, cluster-size, and the number of responses (i.e. the number of cluster elements with the
+outcome of interest) for each cluster.
 }
 \details{
 \tabular{ll}{
 Package: \tab CorrBin\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
-Date: \tab 2008-07-02\cr
-License: \tab What license is it under?\cr
+Date: \tab 2009-04-06\cr
+License: \tab GPL 2\cr
 LazyLoad: \tab yes\cr
 }
-~~ An overview of how to use the package, including the most important functions ~~
+\itemize{
+  \item The \code{\link{CBData}} and \code{\link{read.CBData}} functions create a `CBData'
+  object used by the analysis functions.
+  \item  \code{\link{mc.test.chisq}} tests the assumption of marginal compatibility underlying
+  all the methods, while \code{\link{mc.est}} estimates the distribution of the number of responses
+  under marginal compatibility.
+  \item  Finally, \code{\link{perm.LRT}} performs a nonparametric likelihood-ratio test for trend
+  along the treatment groups.
+}
+
+
 }
 \author{
-Who wrote it
+Aniko Szabo
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
-~~ The author and/or maintainer of the package ~~
+Maintainer: Aniko Szabo <aszabo@mcw.edu>
 }
 \references{
-~~ Literature or other references for background information ~~
+Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data. \emph{Biometrika}
+
+Stefanescu, C. & Turnbull, B. W. Likelihood inference for exchangeable binary data with varying cluster sizes. \emph{Biometrics}, 2003, 59, 18-24
+
+Pang, Z. & Kuk, A. Test of marginal compatibility and smoothing methods for exchangeable binary data with unequal cluster sizes. \emph{Biometrics}, 2007, 63, 218-227
+
 }
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
+
 \keyword{ package }
-\seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
-\examples{
-~~ simple examples of the most important functions ~~
-}
+\keyword{ nonparametric }

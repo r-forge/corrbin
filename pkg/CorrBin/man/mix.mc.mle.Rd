@@ -7,16 +7,13 @@
   under a stochastic ordering constraint. Umbrella ordering can be specified using
   the \code{turn} parameter.}
 \usage{
-mix.reprod.mle(cbdata, turn = 1, control = mixControl())
+mix.mc.mle(cbdata, turn = 1, control = mixControl())
 }
 \arguments{
   \item{cbdata}{an object of class \code{\link{CBData}}.}
   \item{turn}{integer specifying the peak of the umbrella ordering (see Details). The
   default corresponds to a non-decreasing order.}
   \item{control}{a list of control parameters, usually a call to \code{\link{mixControl}}.}
-}
-\details{
-  
 }
 \value{
   A list with components:
@@ -28,7 +25,7 @@ mix.reprod.mle(cbdata, turn = 1, control = mixControl())
   performed number of iterations}
 Components \code{Q} and \code{D} are unlikely to be needed for the user. 
 }
-\references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}
+\references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data. \emph{Biometrika}}
 \author{Aniko Szabo, aszabo@mcw.edu}
 \seealso{\code{\link{mixControl}}}
 \examples{

@@ -1,6 +1,6 @@
 \name{read.CBData}
 \alias{read.CBData}
-\title{Read data from external file into a \code{CBData} object}
+\title{Read data from external file into a CBData object}
 \description{
 A convinience function to read data from specially structured file directly
 into a \code{CBData} object.}
@@ -20,6 +20,6 @@ give the number of times the given combination occurs in the data.}
 }
 \author{Aniko Szabo}
 
-\seealso{\code{CBData} }
+\seealso{\code{\link{CBData}} }
 \keyword{ IO }
 \keyword{ file }

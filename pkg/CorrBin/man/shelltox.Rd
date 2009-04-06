@@ -12,7 +12,7 @@ by the treatment was recorded.
 
 \usage{data(shelltox)}
 \format{
-  A "cbdata" object, that is a data frame  with the following variables
+  A 'CBData' object, that is a data frame  with the following variables
     \item{Trt}{factor giving treatment group.}
     \item{ClusterSize}{the size of the litter.}
     \item{NResp}{the number of affected fetuses.}

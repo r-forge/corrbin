@@ -28,7 +28,7 @@ The default value of \code{R} is probably too low for the final data analysis, a
   \item{LRT }{the value of the likelihood ratio test statistic. It has two attributes: \code{ll0} and \code{ll1} -
       the values of the log-likelihood under \eqn{H_0}{H0} and \eqn{h_a}{Ha} respectively.}
   \item{p.val }{the estimated p-value.}
-  \item{boot.res }{an objecto of class "boot" with the detailed results of the permutations. 
+  \item{boot.res }{an object of class "boot" with the detailed results of the permutations. 
        See \code{\link[boot]{boot}} for details. }
 }
 \references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}

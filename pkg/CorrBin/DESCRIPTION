@@ -1,7 +1,7 @@
 Package: CorrBin
 Title: Nonparametrics with clustered binary data
 Version: 1.0
-Date: 2008-07-02
+Date: 2009-04-06
 Author: Aniko Szabo
 Maintainer: Aniko Szabo <aszabo@mcw.edu>
 Description: This package implements non-parametric analysis for clustered
@@ -9,5 +9,5 @@ Description: This package implements non-parametric analysis for clustered
  assumed exchangeable, and identical joint distribution (also known as marginal compatibility,
  or reproducibility) is assumed for clusters of different sizes.
  A trend test based on stochastic ordering is implemented.
-License: GPL
+License: GPL 2
 LazyLoad: yes

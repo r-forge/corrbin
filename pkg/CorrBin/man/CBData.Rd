@@ -2,7 +2,7 @@
 \alias{CBData}
 \title{Create a `CBdata' object from a data frame.}
 \description{
-The \code{CBData} function creates an object of class \texttt{CBData} that is
+The \code{CBData} function creates an object of class \dfn{CBData} that is
 used in further analyses. It identifies the variables that define treatment
 group, clustersize and the number of responses. 
 }

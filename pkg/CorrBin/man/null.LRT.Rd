@@ -16,16 +16,13 @@ null.LRT(cbdata, control = list())
   \item{control}{an optional list of control settings, usually a call to \code{\link{mixControl}}.
     See there for the names of the settable control values and their effect.}
 }
-\details{
-
-}
 \value{
   The value of the likelihood ratio test statistic is returned with two attributes:
   \item{ll0 }{the log-likelihood under \eqn{H_0}{H0} (equality)}
   \item{ll1 }{the log-likelihood under \eqn{H_a}{Ha} (stochastic order)}
 }
 \author{Aniko Szabo}
-\seealso{\code{\link{perm.lrt}},\code{\link{mixControl}}}
+\seealso{\code{\link{perm.LRT}},\code{\link{mixControl}}}
 \examples{
 data(shelltox)
 LRT <- lrt.null(shelltox, control=mixControl(max.iter = 100, max.directions = 50))

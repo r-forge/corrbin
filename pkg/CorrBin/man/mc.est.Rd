@@ -8,7 +8,7 @@ from all cluster sizes is pooled. The estimation is performed independently for
 each treatment group.
 }
 \usage{
-reprod.est(cbdata)
+mc.est(cbdata)
 }
 \arguments{
   \item{cbdata}{a \code{CBData} object}

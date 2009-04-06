@@ -30,7 +30,7 @@ Stefanescu, C. & Turnbull, B. W. Likelihood inference for exchangeable binary da
 Pang, Z. & Kuk, A. Test of marginal compatibility and smoothing methods for exchangeable binary data with unequal cluster sizes. \emph{Biometrics}, 2007, 63, 218-227
 }
 \author{Aniko Szabo}
-\seealso{\code{CBData}, \code{mc.est} }
+\seealso{\code{\link{CBData}}, \code{\link{mc.est}} }
 \examples{
 data(sh)
 mc.test.chisq(sh)
