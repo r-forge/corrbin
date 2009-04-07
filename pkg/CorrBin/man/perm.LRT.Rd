@@ -1,13 +1,13 @@
-\name{perm.LRT}
-\alias{perm.LRT}
+\name{SO.trend.test}
+\alias{SO.trend.test}
 \title{Likelihood ratio test of stochastic ordering}
 \description{
 Performs a likelihood ratio test of stochastic ordering versus equality using 
 permutations to estimate the null-distribution and the p-value.  If only the value
-of the test statistic is needed, use \code{\link{null.LRT}} instead.
+of the test statistic is needed, use \code{\link{SO.LRT}} instead.
 }
 \usage{
-perm.LRT(cbdata, R = 100, control = list())
+SO.trend.test(cbdata, R = 100, control = mixControl())
 }
 \arguments{
   \item{cbdata}{a \code{CBData} object.}
@@ -34,17 +34,17 @@ The default value of \code{R} is probably too low for the final data analysis, a
 \references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}
 \author{Aniko Szabo, aszabo@mcw.edu}
 
-\seealso{\code{\link{null.LRT}}, \code{\link{mixControl}} }
+\seealso{\code{\link{SO.LRT}}, \code{\link{mixControl}} }
 \examples{
 data(shelltox)
 set.seed(45742)
-sh.test <- perm.LRT(shelltox, R=10, control=mixControl(eps=0.1, max.directions=25)) 
+sh.test <- SO.trend.test(shelltox, R=10, control=mixControl(eps=0.1, max.directions=25)) 
 sh.test
 
 #a plot of the resampled LRT values
 #would look better with a reasonable value of R
  null.vals <- sh.test$boot.res$t[,1]
- hist(null.vals, breaks=10,  freq=F,xlab="Test statistic", ylab="Density", 
+ hist(null.vals, breaks=10,  freq=FALSE, xlab="Test statistic", ylab="Density", 
       main="Simulated null-distribution", xlim=range(c(0,20,null.vals)))
  points(sh.test$LRT, 0, pch="*",col="red", cex=3)
 }

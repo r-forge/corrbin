@@ -32,7 +32,7 @@ Pang, Z. & Kuk, A. Test of marginal compatibility and smoothing methods for exch
 \author{Aniko Szabo}
 \seealso{\code{\link{CBData}}, \code{\link{mc.est}} }
 \examples{
-data(sh)
-mc.test.chisq(sh)
+data(shelltox)
+mc.test.chisq(shelltox)
 }
 \keyword{htest}

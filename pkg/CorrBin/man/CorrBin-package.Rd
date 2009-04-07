@@ -25,7 +25,7 @@ LazyLoad: \tab yes\cr
   \item  \code{\link{mc.test.chisq}} tests the assumption of marginal compatibility underlying
   all the methods, while \code{\link{mc.est}} estimates the distribution of the number of responses
   under marginal compatibility.
-  \item  Finally, \code{\link{perm.LRT}} performs a nonparametric likelihood-ratio test for trend
+  \item  Finally, \code{\link{SO.trend.test}} performs a nonparametric likelihood-ratio test for trend
   along the treatment groups.
 }
 

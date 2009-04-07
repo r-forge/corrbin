@@ -30,8 +30,8 @@ CBData(x, trt, clustersize, nresp, freq = NULL)
 
 \seealso{\code{\link{read.CBData}} for creating a \code{CBData} object directly from a file.}
 \examples{
-data(shell)
-sh <- CBData(shell, trt="Trt", clustersize="ClusterSize", nresp="NResp")
+data(shelltox)
+sh <- CBData(shelltox, trt="Trt", clustersize="ClusterSize", nresp="NResp")
 str(sh)
 }
 \keyword{ classes }

@@ -31,7 +31,7 @@ A list with components
 Rao, J. N. K. & Scott, A. J. A  (1992) Simple Method for the Analysis of Clustered Data \emp{Biometrics}, 48, 577-586.
  }
 \author{Aniko Szabo, aszabo@mcw.edu}
-\seealso{ \code{\link{perm.LRT}}, \code{\link{GEE.trend.test}} for alternative tests;
+\seealso{ \code{\link{SO.trend.test}}, \code{\link{GEE.trend.test}} for alternative tests;
 \code{\link{CBData}} for constructing a CBData object.}
 \examples{
 data(shelltox)

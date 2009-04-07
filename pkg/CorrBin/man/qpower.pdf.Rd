@@ -42,4 +42,4 @@ Williams, D. A. (1975) The Analysis of Binary Responses from Toxicological Exper
 plot(0:10, betabin.pdf(0.3, 0.4, 10), type="o", ylim=c(0,0.34), ylab="Density", xlab="Number of responses out of 10")
 lines(0:10, qpower.pdf(0.3, 0.4, 10), type="o", col="red")
 }
-\keyword{ distribtuion }
+\keyword{ distribution }

@@ -13,7 +13,8 @@ mix.mc.mle(cbdata, turn = 1, control = mixControl())
   \item{cbdata}{an object of class \code{\link{CBData}}.}
   \item{turn}{integer specifying the peak of the umbrella ordering (see Details). The
   default corresponds to a non-decreasing order.}
-  \item{control}{a list of control parameters, usually a call to \code{\link{mixControl}}.}
+  \item{control}{an optional list of control settings, usually a call to \code{\link{mixControl}}.
+    See there for the names of the settable control values and their effect.}
 }
 \value{
   A list with components:
@@ -30,13 +31,17 @@ Components \code{Q} and \code{D} are unlikely to be needed for the user.
 \seealso{\code{\link{mixControl}}}
 \examples{
   data(shelltox)
-  ml <- mix.mc.mle(shelltox, control=mixControl(eps=0.01, method="ISDM")))
+  ml <- mix.mc.mle(shelltox, control=mixControl(eps=0.01, method="ISDM"))
   ml$converge
   
   require(lattice)
+  panel.cumsum <- function(x,y,...){
+    x.ord <- order(x)
+    panel.xyplot(x[x.ord], cumsum(y[x.ord]), ...)}
+
   xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=ml$MLest, type="s",
        panel=panel.superpose, panel.groups=panel.cumsum,
-       as.table=T, auto.key=list(columns=4, lines=T, points=F),
+       as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
 			 xlab="Number of responses", ylab="Cumulative Probability R(R>=r|N=n)",
 			 ylim=c(0,1.1), main="Stochastically ordered estimates\n with marginal compatibility")
 }

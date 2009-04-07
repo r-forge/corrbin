@@ -373,6 +373,10 @@ SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections,
     for (i=0; i<npar; i++) sum += par[i];
     res -= ntot*log1p(sum);  //log1p(sum)=log(1+sum)
     
+    if (!R_FINITE(res)){
+      res = 1e60;
+    }
+    
     return (-res); }
  
  void NegLogLikDeriv(int npar, double *par, double *gr, void *ex){
@@ -547,9 +551,10 @@ SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections,
    REAL(tmp)[1] = niter;
   SET_VECTOR_ELT(res, 4, tmp);
  UNPROTECT(4);   //tmp, res, margSXP, D
- 
- Rprintf("Limit=%d; %d Iterations; Limit enforced %d times (%4.2f percent)\n", 
-         limit, niter, nenforced, nenforced*100.0/niter);
+
+ if (asInteger(verbose)==1) 
+   Rprintf("Limit=%d; %d Iterations; Limit enforced %d times (%4.2f percent)\n", 
+           limit, niter, nenforced, nenforced*100.0/niter);
 
  return res;
 

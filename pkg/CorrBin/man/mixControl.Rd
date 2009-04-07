@@ -3,8 +3,8 @@
 \title{Control values for order-constrained fit}
 \description{
   The values supplied in the function call replace the defaults and a list with all possible arguments is returned. 
-  The returned list is used as the control argument to the \code{\link{mc.est}}, \code{\link{null.LRT}}, 
-  and \code{\link{perm.LRT}} functions. 
+  The returned list is used as the control argument to the \code{\link{mc.est}}, \code{\link{SO.LRT}}, 
+  and \code{\link{SO.trend.test}} functions. 
 }
 \usage{
 mixControl(method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000, max.directions = 0, 
@@ -27,10 +27,10 @@ mixControl(method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000, max.direction
   a list with components for each of the possible arguments.
 }
 \author{Aniko Szabo aszabo@mcw.edu}
-\seealso{\code{\link{mc.est}}, \code{\link{null.LRT}}, \code{\link{perm.LRT}}}
+\seealso{\code{\link{mc.est}}, \code{\link{SO.LRT}}, \code{\link{SO.trend.test}}}
 \examples{
 # decrease the maximum number iterations and
 # request the "EM" algorithm
  mixControl(method="EM", max.iter=100)
 }
-\keyword{ model }
+\keyword{ models }

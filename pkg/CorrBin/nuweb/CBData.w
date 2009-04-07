@@ -1,4 +1,43 @@
+\documentclass[reqno]{amsart}
+\usepackage[margin=1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue]{hyperref}
+\renewcommand{\NWtarget}[2]{\hypertarget{#1}{#2}}
+\renewcommand{\NWlink}[2]{\hyperlink{#1}{#2}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\bpi}{\text{\boldmath $\pi$}}
+\newcommand{\leqst}{\mathrel{\preceq^{st}}}
+\newcommand{\geqst}{\mathrel{\succeq^{st}}}
 
+\title{Correlated binary data}
+\author{Aniko Szabo}
+\date{\today}
+
+
+\begin{document}
+\begin{abstract} We define a class for describing data from toxicology experiments
+and implement fitting of a variety of existing models and trend tests.
+\end{abstract}
+\maketitle
+
+\section{Defining \texttt{CBData} -- a class for \textbf{C}lustered \textbf{B}inary \textbf{Data}}
+We start with defining an S3 class describing data from toxicology experiments. The
+class is a data frame with the following columns:
+
+\begin{description}
+\item[Trt] a factor defining (treatment) groups
+\item[ClusterSize] an integer-valued variable defining the cluster size
+\item[NResp] an integer-valued variable defining the number of responses (1s)
+\item[Freq]  an integer-valued  variable defining frequency for each
+Trt/ClusterSize/NResp combination
+\end{description}
+
+\texttt{CBData} converts a data frame to a CBData object. \texttt{x}
+is the input data frame; \texttt{trt}, \texttt{clustersize}, \texttt{nresp} and
+\texttt{freq} could be strings or column indices defining the appropriate
+variable in \texttt{x} (\texttt{freq} can also be NULL, in which case it is 
+assumed that each combination has frequency 1).
+@O ../R/CBData.R @{
 CBData <- function(x, trt, clustersize, nresp, freq=NULL){
   if (!is.data.frame(x)) stop("x has to be a data frame")
   nms <- names(x)
@@ -28,7 +67,16 @@ CBData <- function(x, trt, clustersize, nresp, freq=NULL){
   d$NResp <- as.numeric(as.character(d$NResp))
   class(d) <- c("CBData", "data.frame")
   d}
+@| CBdata.data.frame  @}
 
+
+The \texttt{read.CBData} function reads in clustered binary data from a tab-delimited
+text file. The first column should give the treatment group, the second the size of the cluster,
+the third the number of responses in the cluster. Optionally, a fourth column could
+give the number of times the given combination occurs in the data.
+
+@o ../R/CBData.R
+@{
 read.CBData <- function(file, with.freq=TRUE, ...){
   d <- read.table(file, col.names=c("Trt","ClusterSize","NResp", if (with.freq) "Freq"), ...)
   if (!with.freq) d$Freq <- 1
@@ -38,7 +86,13 @@ read.CBData <- function(file, with.freq=TRUE, ...){
   d$NResp <- as.numeric(as.character(d$NResp))
   d <- CBData(d, "Trt", "ClusterSize", "NResp", "Freq")
   d}
+@| read.CBdata @}
 
+\texttt{unwrap.CBData} is a utility function that reformats a CBData object so that
+each row is one observation (instead of one cluster). A new `ID' variable is added
+to indicate clusters. 
+
+@O ../R/CBData.R @{
 
 unwrap.CBData <- function(cbdata){
   freqs <- rep(1:nrow(cbdata), cbdata$Freq)
@@ -56,10 +110,15 @@ unwrap.CBData <- function(cbdata){
   res <- rbind(cb.pos, cb.neg)
   res[order(res$ID),]
   }
+@| unwrap.CBData @}
 
+\section{Rao-Scott adjusted Cochran-Armitage test}
+The RS-adjusted CA test for trend is based on design-effect adjustment.
+
+@O ../R/CBData.R @{
 RS.trend.test <- function(cbdata){  
-   dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
-   dat2$Trt <- factor(dat2$Trt)  #remove unused levels
+	dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
+	dat2$Trt <- factor(dat2$Trt)  #remove unused levels
   attach(dat2)
   on.exit(detach(dat2))
   x.i <- pmax(tapply(NResp, Trt, sum), 0.5)  #"continuity" adjustment to avoid RS=NaN
@@ -81,7 +140,11 @@ RS.trend.test <- function(cbdata){
   p.val <- pnorm(RS, lower.tail=FALSE)
   list(statistic=RS, p.val=p.val)
   }
+@| RS.trend.test @}
 
+\section{GEE based test}
+
+@O ../R/CBData.R @{
 
 GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
   require(geepack)
@@ -101,7 +164,19 @@ GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
   p <- pnorm(testres, lower.tail=FALSE)
   list(statistic=testres, p.val=p)
  }   
+@| GEE.trend.test @} 
 
+\section{Generating random data}
+\texttt{ran.CBData} generates a random CBData object from a given two-parameter
+distribution. \texttt{sample.sizes} is a dataset with variables Trt, ClusterSize and
+Freq giving the number of clusters to be generated for each Trt/ClusterSize combination.
+\texttt{p.gen.fun} and \texttt{rho.gen.fun} are functions that generate the parameter
+values for each treatment group ($g=1$ corresponds to the lowest group, $g=2$ to the
+second, etc). \texttt{pdf.fun} is a function(p, rho, n) generating the pdf of the
+number of responses given the two parameters \texttt{p} and \texttt{rho}, and the
+cluster size \texttt{n}.
+
+@O ../R/CBData.R @{
 ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
                            rho.gen.fun=function(g)0.2, pdf.fun=qpower.pdf){
    ran.gen <- function(d){
@@ -123,7 +198,14 @@ ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
    class(a) <-  c("CBData", "data.frame")
    a
  }
+@| ran.CBData @}
 
+\subsection{Parametric pdf generating functions}
+\texttt{betabin.pdf} and \texttt{qpower.pdf} provide two classic distributions --
+beta-binomial and q-power -- for generating correlated binary data. Either
+can be used in \texttt{ran.CBData}.
+@o ../R/CBData.R
+@{
  betabin.pdf <- function(p, rho, n){
    a <- p*(1/rho-1)
    b <- (1-p)*(1/rho-1)
@@ -131,7 +213,9 @@ ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
    res <- choose(n, idx)*beta(a+idx, b+n-idx)/beta(a,b)
    res
   } 
-
+@}
+@o ../R/CBData.R
+@{
  qpower.pdf <- function(p, rho, n){
    .q <- 1-p
    gamm <- log2(log(.q^2+rho*.q*(1-.q))/log(.q))
@@ -143,3 +227,5 @@ ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
    res <- pmax(pmin(res,1),0)  #to account for numerical imprecision
    res
  }
+@}
+\end{document}

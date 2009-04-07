@@ -1,15 +1,15 @@
-\name{null.LRT}
-\alias{null.LRT}
+\name{SO.LRT}
+\alias{SO.LRT}
 \title{Likelihood-ratio test statistic}
 \description{
-\code{null.LRT} computes the likelihood ratio test statistic for stochastic ordering against equality
+\code{SO.LRT} computes the likelihood ratio test statistic for stochastic ordering against equality
 assuming marginal compatibility for both alternatives. Note that this statistic does not have
 a \eqn{\chi^2}{chi-squared} distribution, so the p-value computation is not straightforward.
-The \code{\link{perm.LRT}} function implements a permutation-based evaluation of the p-value for the 
+The \code{\link{SO.trend.test}} function implements a permutation-based evaluation of the p-value for the 
 likelihood-ratio test.
 }
 \usage{
-null.LRT(cbdata, control = list())
+SO.LRT(cbdata, control = mixControl())
 }
 \arguments{
   \item{cbdata}{a \code{CBData} object}
@@ -22,10 +22,10 @@ null.LRT(cbdata, control = list())
   \item{ll1 }{the log-likelihood under \eqn{H_a}{Ha} (stochastic order)}
 }
 \author{Aniko Szabo}
-\seealso{\code{\link{perm.LRT}},\code{\link{mixControl}}}
+\seealso{\code{\link{SO.trend.test}},\code{\link{mixControl}}}
 \examples{
 data(shelltox)
-LRT <- lrt.null(shelltox, control=mixControl(max.iter = 100, max.directions = 50))
+LRT <- SO.LRT(shelltox, control=mixControl(max.iter = 100, max.directions = 50))
 LRT
 }
 \keyword{htest}

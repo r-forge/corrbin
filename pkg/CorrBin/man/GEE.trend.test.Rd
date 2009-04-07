@@ -26,11 +26,11 @@ A list with components
   \item{p.val }{numeric, asymptotic p-value of the test}
 }
 \author{Aniko Szabo, aszabo@mcw.edu}
-\seealso{\code{\link{RS.trend.test}}, \code{\link{perm.LRT}} for alternative tests;
+\seealso{\code{\link{RS.trend.test}}, \code{\link{SO.trend.test}} for alternative tests;
 \code{\link{CBData}} for constructing a CBData object. }
 \examples{
 data(shelltox)
 GEE.trend.test(shelltox, "trend")
 }
 \keyword{ htest }
-\keyword{ model }
+\keyword{ models }

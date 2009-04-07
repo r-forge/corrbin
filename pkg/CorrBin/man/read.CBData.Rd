@@ -5,7 +5,7 @@
 A convinience function to read data from specially structured file directly
 into a \code{CBData} object.}
 \usage{
-read.CBData(file, with.freq = TRUE)
+read.CBData(file, with.freq = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
