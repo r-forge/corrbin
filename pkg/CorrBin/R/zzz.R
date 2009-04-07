@@ -1,8 +1,8 @@
 .First.lib <- function(libname, pkgname){
-  library.dynam("ReprodCalcs", pkgname, libname)
+  library.dynam("CorrBin", pkgname, libname)
 }
 
 .Last.lib <- function(){
-  library.dynam.unload("ReprodCalcs")
+  library.dynam.unload("CorrBin")
 }
   

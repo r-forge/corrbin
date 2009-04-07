@@ -9,7 +9,7 @@
 \newcommand{\leqst}{\mathrel{\preceq^{st}}}
 \newcommand{\geqst}{\mathrel{\succeq^{st}}}
 
-\title{Parametric analysis of correlated binary data}
+\title{Correlated binary data}
 \author{Aniko Szabo}
 \date{\today}
 
@@ -145,9 +145,9 @@ RS.trend.test <- function(cbdata){
 \section{GEE based test}
 
 @O CBData.R @{
-require(geepack)
 
 GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
+  require(geepack)
   ucb <- unwrap.CBData(cbdata)
   scale.method <- match.arg(scale.method)
   if (scale.method=="fixed") {
@@ -167,7 +167,7 @@ GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
 @| GEE.trend.test @} 
 
 \section{Generating random data}
-\texttt{ran.mc.CBData} generates a random CBData object from a given two-parameter
+\texttt{ran.CBData} generates a random CBData object from a given two-parameter
 distribution. \texttt{sample.sizes} is a dataset with variables Trt, ClusterSize and
 Freq giving the number of clusters to be generated for each Trt/ClusterSize combination.
 \texttt{p.gen.fun} and \texttt{rho.gen.fun} are functions that generate the parameter
@@ -177,7 +177,7 @@ number of responses given the two parameters \texttt{p} and \texttt{rho}, and th
 cluster size \texttt{n}.
 
 @O CBData.R @{
-ran.mc.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
+ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
                            rho.gen.fun=function(g)0.2, pdf.fun=qpower.pdf){
    ran.gen <- function(d){
    # d is subset(sample.sizes, Trt==trt, ClusterSize==cs)
@@ -190,19 +190,20 @@ ran.mc.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
      tmp <- rmultinom(n=1, size=n, prob=probs)[,1]
      cbind(Freq=tmp, NResp=0:cs, ClusterSize=d$ClusterSize, Trt=d$Trt)}
 
-   a <- by(sample.sizes, list(Trt=sample.sizes$Trt, ClusterSize=sample.sizes$ClusterSize), ran.gen)
+   sst <- if (is.factor(sample.sizes$Trt)) sample.sizes$Trt else factor(sample.sizes$Trt)
+   a <- by(sample.sizes, list(Trt=sst, ClusterSize=sample.sizes$ClusterSize), ran.gen)
    a <- data.frame(do.call(rbind, a))
-   a$Trt <- factor(a$Trt, labels=levels(sample.sizes$Trt))
+   a$Trt <- factor(a$Trt, labels=levels(sst))
    a <- subset(a, Freq>0)
    class(a) <-  c("CBData", "data.frame")
    a
  }
-@| ran.mc.CBData @}
+@| ran.CBData @}
 
 \subsection{Parametric pdf generating functions}
 \texttt{betabin.pdf} and \texttt{qpower.pdf} provide two classic distributions --
 beta-binomial and q-power -- for generating correlated binary data. Either
-can be used in \texttt{ran.mc.CBData}.
+can be used in \texttt{ran.CBData}.
 @o CBData.R
 @{
  betabin.pdf <- function(p, rho, n){
@@ -223,127 +224,8 @@ can be used in \texttt{ran.mc.CBData}.
      idx <- 0:y
      res[y+1] <- choose(n,y) * sum( (-1)^idx * choose(y,idx) * .q^((n-y+idx)^gamm))
    }
-   #if (any(res<0, res>1)) print(c(p,rho))
    res <- pmax(pmin(res,1),0)  #to account for numerical imprecision
    res
  }
 @}
-\section{Fitting parametric dose-response models}
-To provide flexibility with selecting the parametric family we follow the approach 
-of \texttt{glm} in defining the appropriate lists containing the log-likelihood and
-its gradient.
-
-\subsection{Beta-binomial model}
-
-The beta-binomial distribution is parameterized by the marginal mean $p$ and 
-the intra-cluster correlation $r$. \texttt{X.p} and \texttt{X.r} are the 
-design matrices for modeling them as a function of the group, \texttt{param.p} and 
-\texttt{param.r} are the corresponding parameters.
-
-@o CBData.R @{
-betabinomial <- function(link.p="logit", link.r="logit"){ 
-  fam.name <- "beta-binomial"
-  @< Set up p-link function @>
-  @< Set up r-link function @>
-  @< Define betabinomial log-likelihood @>
-  @< Define betabinomial gradient @>
-
-
-  res <- list(name=fam.name, logl = logl, gr=gr)  
-  class(res) <- "CBfamily"
-  res}
-@| betabinomial @}
-  
-The code for setting up the link function is taken from the \texttt{binomial} 
-function.
-@D Set up p-link function @{
-    linktemp.p <- substitute(link.p)
-    if (!is.character(linktemp.p)) {
-        linktemp.p <- deparse(linktemp.p)
-    }
-    okLinks <- c("logit", "probit", "cloglog", "cauchit")
-    if (linktemp %in% okLinks) 
-        stats <- make.link(linktemp.p)
-    else if (is.character(link.p)) {
-        stats <- make.link(link.p)
-        linktemp.p <- link.p
-    }
-    else {
-        if (inherits(link.p, "link-glm")) {
-            stats <- link.p
-            if (!is.null(stats$name)) 
-                linktemp.p <- stats$name
-        }
-        else {
-            stop(gettextf("link \"%s\" not available for the %s family; available links are %s", 
-                linktemp.p, fam.name, paste(sQuote(okLinks), collapse = ", ")), 
-                domain = NA)
-        }
-    }
- 
-@}
-
-For the correlation coefficient the link function is actually for $2*(r+1)$. This way
-the usual links for 0 -- 1 data apply to the $-1$ -- 1 range of $r$.
-
-@D Set up r-link function @{
-   linktemp.r <- substitute(link.r)
-    if (!is.character(linktemp.r)) {
-        linktemp.r <- deparse(linktemp.r)
-    }
-    okLinks <- c("logit", "probit", "cloglog", "cauchit")
-    if (linktemp %in% okLinks) 
-        stats <- make.link(linktemp.r)
-    else if (is.character(link.r)) {
-        stats <- make.link(link.r)
-        linktemp.r <- link.r
-    }
-    else {
-        if (inherits(link.r, "link-glm")) {
-            stats <- link.r
-            if (!is.null(stats$name)) 
-                linktemp.r <- stats$name
-        }
-        else {
-            stop(gettextf("link \"%s\" not available for the %s family; available links are %s", 
-                linktemp.r, fam.name, paste(sQuote(okLinks), collapse = ", ")), 
-                domain = NA)
-        }
-    }
-@}
-
-The beta-binomial log-likelihood is
-\begin{equation}
-\log L_{bb}(x)=
-\end{equation}
-
-@D Define betabinomial log-likelihood @{
-  logl <- function(param.p, param.r, X.p, X.r){
-
-  b.p<-param[param.ind=="p"]
-  b.r<-param[param.ind=="r"]
-  
-  score.p <- Z%*%b.p
-  score.r <- Z%*%b.r
-  
-  p <- inv.logit(score.p)
-  r <- inv.logit(score.r)
-  
-  # compute log-Likelihood
-  logL <- 0  
-  for (i in 1:length(ClusterSize))
-    {
-      n <- ClusterSize[i]
-      y <- NResp[i]
-      vec1<-0:(y-1)
-      vec2<-0:(n-y-1)
-      vec3<-0:(n-1)
-      l<-ifelse(y>0,sum(log(p[i]+r[i]*vec1)),0) + ifelse(y<n,sum(log(1-p[i]+r[i]*vec2)),0) - sum(log(1+r[i]*vec3)) 
-    logL <- logL+l    
-    }
-  return(-logL)
-}
-
-@}
-
 \end{document}

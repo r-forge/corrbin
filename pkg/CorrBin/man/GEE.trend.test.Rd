@@ -1,0 +1,36 @@
+\name{GEE.trend.test}
+\alias{GEE.trend.test}
+\title{GEE-based trend test}
+\description{
+\code{GEE.trend.test} implements a GEE based test for linear increasing trend
+for correlated binary data.
+}
+\usage{
+GEE.trend.test(cbdata, scale.method = c("fixed", "trend", "all"))
+}
+\arguments{
+  \item{cbdata}{a \code{\link{CBData}} object}
+  \item{scale.method}{character string specifying the assumption about the change
+  in the overdispersion (scale) parameter across the treatment groups: 
+  "fixed" - constant scale parameter (default); "trend" - linear trend for the log of the scale parameter;
+  "all" - separate scale parameter for each group.}
+}
+\details{
+ The actual work is performed by the \code{\link[geepack]{geese}} function of the \code{geepack}
+ library. This function only provides a convenient wrapper to obtain the results in the
+ same format as \code{\link{RS.trend.test}} and \code{\link{GEE.trend.test}}.
+}
+\value{
+A list with components
+  \item{statistic }{numeric, the value of the test statistic}
+  \item{p.val }{numeric, asymptotic p-value of the test}
+}
+\author{Aniko Szabo, aszabo@mcw.edu}
+\seealso{\code{\link{RS.trend.test}}, \code{\link{perm.LRT}} for alternative tests;
+\code{\link{CBData}} for constructing a CBData object. }
+\examples{
+data(shelltox)
+GEE.trend.test(shelltox, "trend")
+}
+\keyword{ htest }
+\keyword{ model }
