@@ -7,14 +7,15 @@ at which no trend in the rate of response has been observed. It is often used to
 a safe dosage level for a potentially toxic compound.
 }
 \usage{
-NOSTASOT(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), exact = test == "SO", R = 100, sig.level = 0.05, control = mixControl())
+NOSTASOT(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), exact = test == "SO", 
+        R = 100, sig.level = 0.05, control = mixControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object}
   \item{test}{character string defining the desired test statistic. See \code{\link{trend.test}} for details.}
   \item{exact}{logical, should an exact permutation test be performed. See \code{\link{trend.test}} for details.}
   \item{R}{integer, number of permutations for the exact test}
-  \item{sig.level}{numeric between 0 and 1, significance level of test}
+  \item{sig.level}{numeric between 0 and 1, significance level of the test}
   \item{control}{an optional list of control settings for the stochastic order ("SO") test, 
      usually a call to \code{\link{mixControl}}.  See there for the names of the settable control 
      values and their effect.}

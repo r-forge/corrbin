@@ -10,7 +10,7 @@ of the test statistic is needed, use \code{\link{SO.LRT}} instead.
 SO.trend.test(cbdata, R = 100, control = mixControl())
 }
 \arguments{
-  \item{cbdata}{a \code{CBData} object.}
+  \item{cbdata}{a \code{\link{CBData}} object.}
   \item{R}{an integer -- the number of random permutations for estimating the null distribution.}
   \item{control}{an optional list of control settings, usually a call to \code{\link{mixControl}}.
     See there for the names of the settable control values and their effect.}
@@ -26,15 +26,15 @@ The default value of \code{R} is probably too low for the final data analysis, a
 \value{
   A list with the following components
   \item{LRT }{the value of the likelihood ratio test statistic. It has two attributes: \code{ll0} and \code{ll1} -
-      the values of the log-likelihood under \eqn{H_0}{H0} and \eqn{h_a}{Ha} respectively.}
-  \item{p.val }{the estimated p-value.}
+      the values of the log-likelihood under \eqn{H_0}{H0} and \eqn{H_a}{Ha} respectively.}
+  \item{p.val }{the estimated one-sided p-value.}
   \item{boot.res }{an object of class "boot" with the detailed results of the permutations. 
        See \code{\link[boot]{boot}} for details. }
 }
 \references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}
 \author{Aniko Szabo, aszabo@mcw.edu}
 
-\seealso{\code{\link{SO.LRT}}, \code{\link{mixControl}} }
+\seealso{\code{\link{SO.LRT}} for calculating only the test statistic, \code{\link{mixControl}} }
 \examples{
 data(shelltox)
 set.seed(45742)

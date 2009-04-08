@@ -12,7 +12,7 @@ RS.trend.test(cbdata)
   \item{cbdata}{a \code{\link{CBData}} object}
 }
 \details{
- The test is based on calculating a \defn{design effect} for each cluster by
+ The test is based on calculating a \dfn{design effect} for each cluster by
  dividing the observed variability by the one expected under independence. The
  number of responses and the cluster size are then divided by the design effect,
  and a Cochran-Armitage type test statistic is computed based on these adjusted
@@ -25,10 +25,10 @@ RS.trend.test(cbdata)
 \value{
 A list with components
   \item{statistic }{numeric, the value of the test statistic}
-  \item{p.val }{numeric, asymptotic p-value of the test}
+  \item{p.val }{numeric, asymptotic one-sided p-value of the test}
 }
 \references{
-Rao, J. N. K. & Scott, A. J. A  (1992) Simple Method for the Analysis of Clustered Data \emp{Biometrics}, 48, 577-586.
+Rao, J. N. K. & Scott, A. J. A  (1992) Simple Method for the Analysis of Clustered Data \emph{Biometrics}, 48, 577-586.
  }
 \author{Aniko Szabo, aszabo@mcw.edu}
 \seealso{ \code{\link{SO.trend.test}}, \code{\link{GEE.trend.test}} for alternative tests;

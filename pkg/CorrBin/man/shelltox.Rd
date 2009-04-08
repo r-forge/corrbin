@@ -13,10 +13,10 @@ by the treatment was recorded.
 \usage{data(shelltox)}
 \format{
   A 'CBData' object, that is a data frame  with the following variables
-    \item{Trt}{factor giving treatment group.}
-    \item{ClusterSize}{the size of the litter.}
-    \item{NResp}{the number of affected fetuses.}
-    \item{Freq}{the number of litters with the given ClusterSize/NResp combination.}
+    \item{Trt         }{factor giving treatment group.}
+    \item{ClusterSize }{the size of the litter.}
+    \item{NResp       }{the number of affected fetuses.}
+    \item{Freq        }{the number of litters with the given ClusterSize/NResp combination.}
 }
 \source{
 Paul, S. R. (1982) Analysis of proportions of affected foetuses in teratological experiments. Biometrics, 38, 361-370.  

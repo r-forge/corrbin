@@ -22,7 +22,7 @@ SO.LRT(cbdata, control = mixControl())
   \item{ll1 }{the log-likelihood under \eqn{H_a}{Ha} (stochastic order)}
 }
 \author{Aniko Szabo}
-\seealso{\code{\link{SO.trend.test}},\code{\link{mixControl}}}
+\seealso{\code{\link{SO.trend.test}}, \code{\link{mixControl}}}
 \examples{
 data(shelltox)
 LRT <- SO.LRT(shelltox, control=mixControl(max.iter = 100, max.directions = 50))

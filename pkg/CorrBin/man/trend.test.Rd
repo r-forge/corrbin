@@ -7,7 +7,8 @@ implemented in this package:  \code{\link{SO.trend.test}}, \code{\link{RS.trend.
  \code{\link{GEE.trend.test}}. The details of each test can be found on their help page.
 }
 \usage{
-trend.test(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), exact = test == "SO", R = 100, control = mixControl())
+trend.test(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), exact = test == "SO",
+           R = 100, control = mixControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object}
@@ -26,7 +27,7 @@ trend.test(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), exact = te
 A list with two components and an optional "boot" attribute that contains the detailed results
  of the permutation test as an object of class \code{\link[boot]{boot}} if an exact test was performed.
   \item{statistic }{numeric, the value of the test statistic}
-  \item{p.val }{numeric, asymptotic p-value of the test}
+  \item{p.val }{numeric, asymptotic one-sided p-value of the test}
 }
 \author{Aniko Szabo, aszabo@mcw.edu}
 \seealso{\code{\link{SO.trend.test}}, \code{\link{RS.trend.test}}, and

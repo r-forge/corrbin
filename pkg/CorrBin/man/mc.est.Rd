@@ -1,9 +1,9 @@
 \name{mc.est}
 \alias{mc.est}
-\title{Distribution of number of responses assuming marginal compatibility.}
+\title{Distribution of the number of responses assuming marginal compatibility.}
 \description{
 The \code{mc.est} function estimates the distribution of the number of
-responses in the cluster under the assumption of marginal compatibility: information
+responses in a cluster under the assumption of marginal compatibility: information
 from all cluster sizes is pooled. The estimation is performed independently for
 each treatment group.
 }
@@ -11,7 +11,7 @@ each treatment group.
 mc.est(cbdata)
 }
 \arguments{
-  \item{cbdata}{a \code{CBData} object}
+  \item{cbdata}{a \code{\link{CBData}} object}
 }
 \details{
 The EM algorithm given by Stefanescu and Turnbull (2003) is used.
@@ -27,8 +27,8 @@ The EM algorithm given by Stefanescu and Turnbull (2003) is used.
   \item{NResp}{numeric, the number of responses}
 
 }
-\references{Stefanescu, C. & Turnbull, B. W. Likelihood inference for exchangeable binary data with varying cluster sizes. 
-\emph{Biometrics}, 2003, 59, 18-24 }
+\references{Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for exchangeable binary data with varying cluster sizes. 
+\emph{Biometrics}, 59, 18-24 }
 \author{Aniko Szabo}
 \examples{
 data(shelltox)

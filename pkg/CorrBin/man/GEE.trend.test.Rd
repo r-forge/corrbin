@@ -18,12 +18,17 @@ GEE.trend.test(cbdata, scale.method = c("fixed", "trend", "all"))
 \details{
  The actual work is performed by the \code{\link[geepack]{geese}} function of the \code{geepack}
  library. This function only provides a convenient wrapper to obtain the results in the
- same format as \code{\link{RS.trend.test}} and \code{\link{GEE.trend.test}}.
+ same format as \code{\link{RS.trend.test}} and \code{\link{SO.trend.test}}.
+ 
+ The implementation aims for testing for \emph{increasing} trend, and a one-sided
+ p-value is reported. The test statistic is asymptotically normally distributed,
+ and a two-sided p-value can be easily computed if needed.
+
 }
 \value{
 A list with components
   \item{statistic }{numeric, the value of the test statistic}
-  \item{p.val }{numeric, asymptotic p-value of the test}
+  \item{p.val }{numeric, asymptotic one-sided p-value of the test}
 }
 \author{Aniko Szabo, aszabo@mcw.edu}
 \seealso{\code{\link{RS.trend.test}}, \code{\link{SO.trend.test}} for alternative tests;

@@ -6,13 +6,13 @@
 distribution. 
 
 \texttt{p.gen.fun} and \texttt{rho.gen.fun} are functions that generate the parameter
-values for each treatment group ($g=1$ corresponds to the lowest group, $g=2$ to the
-second, etc). \texttt{pdf.fun} is a function(p, rho, n) generating the pdf of the
+values for each treatment group; \texttt{pdf.fun} is a function generating the pdf of the
 number of responses given the two parameters \texttt{p} and \texttt{rho}, and the
 cluster size \texttt{n}.
 }
 \usage{
-ran.CBData(sample.sizes, p.gen.fun = function(g) 0.3, rho.gen.fun = function(g) 0.2, pdf.fun = qpower.pdf)
+ran.CBData(sample.sizes, p.gen.fun = function(g) 0.3, 
+           rho.gen.fun = function(g) 0.2, pdf.fun = qpower.pdf)
 }
 \arguments{
   \item{sample.sizes}{a dataset with variables Trt, ClusterSize and
@@ -24,7 +24,7 @@ Freq giving the number of clusters to be generated for each Trt/ClusterSize comb
   \item{pdf.fun}{a function of three parameters (\emph{p, rho, n}) giving the PDF of the
         number of responses in a cluster given the two parameters (\emph{p, rho}), and 
         the cluster size (\emph{n}). Functions implementing two common distributions: the
-        beta-binomial (\code{betabin.pdf}) and q-power (\code{qpower.pdf}) are provided in
+        beta-binomial (\code{\link{betabin.pdf}}) and q-power (\code{\link{qpower.pdf}}) are provided in
         the package.}
 }
 \details{
@@ -36,7 +36,7 @@ group, 2 - the second group, etc.
  in the call.
 }
 \author{ Aniko Szabo, aszabo@mcw.edu}
-\seealso{\code{betabin.pdf} and \code{qpower.pdf} }
+\seealso{\code{\link{betabin.pdf}} and \code{\link{qpower.pdf}} }
 \examples{
  set.seed(3486)
  ss <- expand.grid(Trt=0:3, ClusterSize=5, Freq=4)

@@ -10,7 +10,7 @@ to indicate clusters. This form can be useful for setting up the data for a diff
 unwrap.CBData(cbdata)
 }
 \arguments{
-  \item{cbdata}{a CBData object}
+  \item{cbdata}{a \code{\link{CBData}} object}
 }
 \value{
 A data frame with one row for each cluster element (having a binary outcome) with the

@@ -13,7 +13,7 @@ read.CBData(file, with.freq = TRUE, ...)
 the third the number of responses in the cluster. Optionally, a fourth column could
 give the number of times the given combination occurs in the data.}
   \item{with.freq}{logical indicator of whether a frequency variable is present in the file}
-  \item{...}{additonal arguments passed to \code{read.table}}
+  \item{...}{additonal arguments passed to \code{\link[utils]{read.table}}}
 }
 \value{
   a \code{CBData} object 
