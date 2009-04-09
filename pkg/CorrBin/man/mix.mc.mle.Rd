@@ -33,7 +33,7 @@ none of the other functions can handle umbrella orderings.}
   \item{loglik }{the achieved value of the log-likelihood}
   \item{converge }{a 2-element vector with the achived relative error and the
   performed number of iterations}
-  \item{} Components \code{Q} and \code{D} are unlikely to be needed by the user. 
+Components \code{Q} and \code{D} are unlikely to be needed by the user. 
 }
 \references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data. \emph{Biometrika}}
 \author{Aniko Szabo, aszabo@mcw.edu}

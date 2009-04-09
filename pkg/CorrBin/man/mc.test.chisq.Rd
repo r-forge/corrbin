@@ -8,7 +8,7 @@
 mc.test.chisq(cbdata)
 }
 \arguments{
-  \item{cbdata}{a \code{CBData} object}
+  \item{cbdata}{a \code{\link{CBData}} object}
 }
 \details{
 The assumption of marginal compatibility (AKA interpretability) implies that the marginal probability
