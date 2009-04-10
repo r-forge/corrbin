@@ -5,10 +5,10 @@
 \code{ran.mc.CBData} generates a random \code{\link{CBData}} object from a given two-parameter
 distribution. 
 
-\texttt{p.gen.fun} and \texttt{rho.gen.fun} are functions that generate the parameter
-values for each treatment group; \texttt{pdf.fun} is a function generating the pdf of the
-number of responses given the two parameters \texttt{p} and \texttt{rho}, and the
-cluster size \texttt{n}.
+\dfn{p.gen.fun} and \dfn{rho.gen.fun} are functions that generate the parameter
+values for each treatment group; \dfn{pdf.fun} is a function generating the pdf of the
+number of responses given the two parameters \dfn{p} and \dfn{rho}, and the
+cluster size \dfn{n}.
 }
 \usage{
 ran.CBData(sample.sizes, p.gen.fun = function(g) 0.3, 
