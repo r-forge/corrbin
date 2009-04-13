@@ -51,8 +51,8 @@ Components \code{Q} and \code{D} are unlikely to be needed by the user.
   xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=ml$MLest, type="s",
        panel=panel.superpose, panel.groups=panel.cumsum,
        as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
-			 xlab="Number of responses", ylab="Cumulative Probability R(R>=r|N=n)",
-			 ylim=c(0,1.1), main="Stochastically ordered estimates\n with marginal compatibility")
+       xlab="Number of responses", ylab="Cumulative Probability R(R>=r|N=n)",
+       ylim=c(0,1.1), main="Stochastically ordered estimates\n with marginal compatibility")
 }
 \keyword{ nonparametric }
 \keyword{ models }

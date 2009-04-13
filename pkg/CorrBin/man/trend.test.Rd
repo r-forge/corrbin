@@ -7,8 +7,8 @@ implemented in this package:  \code{\link{SO.trend.test}}, \code{\link{RS.trend.
  \code{\link{GEE.trend.test}}. The details of each test can be found on their help page.
 }
 \usage{
-trend.test(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), exact = test == "SO",
-           R = 100, control = mixControl())
+trend.test(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), 
+           exact = test == "SO", R = 100, control = mixControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object}

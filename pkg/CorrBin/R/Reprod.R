@@ -33,7 +33,6 @@ mc.test.chisq <- function(cbdata){
       T.stat <-  sum(cl.sizes * K.r * scores[cl.sizes]*p.hat.r)
       E.T.stat <- p.hat * sum(cl.sizes * K.r * scores[cl.sizes])
       rho.hat <- 1-sum(x$Freq*(x$ClusterSize-x$NResp)*x$NResp/x$ClusterSize)/((N-K)*p.hat*(1-p.hat))
-      cat("rho=",rho.hat, "\n")
       Var0.T.stat <- p.hat*(1-p.hat)*sum(cl.sizes*K.r*scores[cl.sizes]^2*
                        (1+(cl.sizes-1)*rho.hat))
       b.r <- sum(cl.sizes * K.r * scores[cl.sizes])/N

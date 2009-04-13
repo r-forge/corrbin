@@ -7,8 +7,8 @@ at which no trend in the rate of response has been observed. It is often used to
 a safe dosage level for a potentially toxic compound.
 }
 \usage{
-NOSTASOT(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), exact = test == "SO", 
-        R = 100, sig.level = 0.05, control = mixControl())
+NOSTASOT(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), 
+        exact = test == "SO", R = 100, sig.level = 0.05, control = mixControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object}
