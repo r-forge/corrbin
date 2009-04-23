@@ -198,6 +198,22 @@ defined for one group and the test statistic was compared to $\chi^2_1$ (or more
 precisely, it was a z-test), however the test is easily generalized by adding 
 the test statistics for the $G$ separate groups and using a $\chi^2_G$ distribution.
 
+\begin{equation}
+Z_g = \Big[\sum_{i=1}^{N_g} (c_{n_{g,i}} - \bar{c}_g) r_{g,i}\Big] \bigg/
+  \Big[\hat{p}_g(1-\hat{p}_g)\sum_{i=1}^{N_g}n_{g,i}(c_{n_{g,i}} - \bar{c}_g)^2 \{1+(n_{g,i}-1)\hat{\rho}_g\}\Big]^{1/2},
+\end{equation}
+where $c_n$ are the scores for the Cochran-Armitage test usually chosen as $c_n=n-(M+1)/2$, 
+$\bar{c}_g=\big(\sum_{i=1}^{N_g}n_{g,i}c_{n_{g,i}}\big) \big/ \big(\sum_{i=1}^{N_g}n_{g,i}\big)$ is a weighted
+average of the scores; $\hat{p}_g=\big(\sum_{i=1}^{N_g}r_{g,i}\big) \big/ \big(\sum_{i=1}^{N_g}n_{g,i}\big)$ 
+is the raw response probability, and 
+$\hat{\rho}_g=1-\big[\sum_{i=1}^{N_g}(n_{g,i}-r_{g,i})r_{g,i}/n_{g,i}\big] \big/ 
+\big[\hat{p}_g(1-\hat{p}_g)\sum_{i=1}^{N_g}(n_{g,i}-1)\big]$ is the Fleiss-Cuzack estimate of the intra-cluster
+correlation for the $g$th treatment group. 
+
+\begin{equation}
+X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
+\end{equation}
+
 @O ../R/Reprod.R
 @{
   
@@ -206,27 +222,15 @@ mc.test.chisq <- function(cbdata){
  
   get.T <- function(x){
       max.size <- max(x$ClusterSize)
-      K <- sum(x$Freq)  
-      K.r <- xtabs(Freq~ClusterSize, data=x)
-      scores <- -(max.size - (2*(1:max.size)-1))/2
-      #n.t <- expected.n.unobserved(x)
-      #p.hat <- sum((0:max.size)*n.t)/(max.size*K)
-      a.r <- by(x, x$ClusterSize, function(z){sum(z$NResp*z$Freq)})[1:length(K.r)]
-      cl.sizes <- as.numeric(names(a.r))
-      N <- sum(cl.sizes*K.r)
-      p.hat <- sum(a.r)/N
-      p.hat.r <- a.r/(cl.sizes * K.r)
-      T.stat <-  sum(cl.sizes * K.r * scores[cl.sizes]*p.hat.r)
-      E.T.stat <- p.hat * sum(cl.sizes * K.r * scores[cl.sizes])
-      rho.hat <- 1-sum(x$Freq*(x$ClusterSize-x$NResp)*x$NResp/x$ClusterSize)/((N-K)*p.hat*(1-p.hat))
-      Var0.T.stat <- p.hat*(1-p.hat)*sum(cl.sizes*K.r*scores[cl.sizes]^2*
-			              (1+(cl.sizes-1)*rho.hat))
-      b.r <- sum(cl.sizes * K.r * scores[cl.sizes])/N
-      Var.E0T <- p.hat*(1-p.hat)*sum(cl.sizes*K.r*b.r^2*(1+(cl.sizes-1)*rho.hat))
-      cov.T.E0T <- p.hat*(1-p.hat)*sum(cl.sizes*K.r*b.r*scores[cl.sizes]*
-                  (1+(cl.sizes-1)*rho.hat))
-      Var.T.stat <- Var0.T.stat + Var.E0T - 2*cov.T.E0T
-      X.stat <- (T.stat - E.T.stat)^2/Var.T.stat
+      scores <- (1:max.size) - (max.size+1)/2
+      p.hat <- with(x, sum(Freq*NResp) / sum(Freq*ClusterSize))
+      rho.hat <- with(x, 1-sum(Freq*(ClusterSize-NResp)*NResp/ClusterSize) / 
+          (sum(Freq*(ClusterSize-1))*p.hat*(1-p.hat)))  #Fleiss-Cuzick estimate
+      c.bar <- with(x, sum(Freq*scores[ClusterSize]*ClusterSize) / sum(Freq*ClusterSize))
+      T.center <- with(x, sum(Freq*(scores[ClusterSize]-c.bar)*NResp))
+      Var.T.stat <-  with(x, 
+         p.hat*(1-p.hat)*sum(Freq*(scores[ClusterSize]-c.bar)^2*ClusterSize*(1+(ClusterSize-1)*rho.hat)))
+      X.stat <- (T.center)^2/Var.T.stat
       X.stat}
       
    chis <- by(cbdata, cbdata$Trt, get.T)
