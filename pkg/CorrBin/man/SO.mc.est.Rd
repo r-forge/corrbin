@@ -1,19 +1,19 @@
-\name{mix.mc.mle}
-\alias{mix.mc.mle}
+\name{SO.mc.est}
+\alias{SO.mc.est}
 \title{Order-restricted MLE assuming marginal compatibility}
 \description{
-  \code{mix.mc.mle} computes the nonparametric maximum likelihood estimate
+  \code{SO.mc.est} computes the nonparametric maximum likelihood estimate
   of the distribution of the number of responses in a cluster \eqn{P(R=r|n)}
   under a stochastic ordering constraint. Umbrella ordering can be specified using
   the \code{turn} parameter.}
 \usage{
-mix.mc.mle(cbdata, turn = 1, control = mixControl())
+SO.mc.est(cbdata, turn = 1, control = soControl())
 }
 \arguments{
   \item{cbdata}{an object of class \code{\link{CBData}}.}
   \item{turn}{integer specifying the peak of the umbrella ordering (see Details). The
   default corresponds to a non-decreasing order.}
-  \item{control}{an optional list of control settings, usually a call to \code{\link{mixControl}}.
+  \item{control}{an optional list of control settings, usually a call to \code{\link{soControl}}.
     See there for the names of the settable control values and their effect.}
 }
 \details{
@@ -21,7 +21,7 @@ Two different algorithms: EM and ISDM are implemented. In general, ISDM (the def
 should be faster, though its performance depends on the tuning parameter \code{max.directions}:
 values that are too low or too high slow the algorithm down.
 
-\code{mix.mc.mle} allows extension to an umbrella ordering: 
+\code{SO.mc.est} allows extension to an umbrella ordering: 
 \eqn{D_1 \geq^{st} \cdots \geq^{st} D_k \leq^{st} \cdots \leq^{st} D_n}{D_1 >= \ldots >= D_k <= \ldots <= D_n} by 
 specifying the value of \eqn{k} as the \code{turn} parameter. This is an experimental feature, and at this point 
 none of the other functions can handle umbrella orderings.}
@@ -37,18 +37,18 @@ Components \code{Q} and \code{D} are unlikely to be needed by the user.
 }
 \references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data. \emph{Biometrika}}
 \author{Aniko Szabo, aszabo@mcw.edu}
-\seealso{\code{\link{mixControl}}}
+\seealso{\code{\link{soControl}}}
 \examples{
   data(shelltox)
-  ml <- mix.mc.mle(shelltox, control=mixControl(eps=0.01, method="ISDM"))
-  ml$converge
+  ml <- SO.mc.est(shelltox, control=soControl(eps=0.01, method="ISDM"))
+  attr(ml, "converge")
   
   require(lattice)
   panel.cumsum <- function(x,y,...){
     x.ord <- order(x)
     panel.xyplot(x[x.ord], cumsum(y[x.ord]), ...)}
 
-  xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=ml$MLest, type="s",
+  xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=ml, type="s",
        panel=panel.superpose, panel.groups=panel.cumsum,
        as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
        xlab="Number of responses", ylab="Cumulative Probability R(R>=r|N=n)",

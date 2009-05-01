@@ -7,12 +7,12 @@ permutations to estimate the null-distribution and the p-value.  If only the val
 of the test statistic is needed, use \code{\link{SO.LRT}} instead.
 }
 \usage{
-SO.trend.test(cbdata, R = 100, control = mixControl())
+SO.trend.test(cbdata, R = 100, control = soControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object.}
   \item{R}{an integer -- the number of random permutations for estimating the null distribution.}
-  \item{control}{an optional list of control settings, usually a call to \code{\link{mixControl}}.
+  \item{control}{an optional list of control settings, usually a call to \code{\link{soControl}}.
     See there for the names of the settable control values and their effect.}
 }
 \details{
@@ -34,11 +34,11 @@ The default value of \code{R} is probably too low for the final data analysis, a
 \references{Szabo A, George EO. (2009) On the Use of Stochastic Ordering to Test for Trend with Clustered Binary Data.}
 \author{Aniko Szabo, aszabo@mcw.edu}
 
-\seealso{\code{\link{SO.LRT}} for calculating only the test statistic, \code{\link{mixControl}} }
+\seealso{\code{\link{SO.LRT}} for calculating only the test statistic, \code{\link{soControl}} }
 \examples{
 data(shelltox)
 set.seed(45742)
-sh.test <- SO.trend.test(shelltox, R=10, control=mixControl(eps=0.1, max.directions=25)) 
+sh.test <- SO.trend.test(shelltox, R=10, control=soControl(eps=0.1, max.directions=25)) 
 sh.test
 
 #a plot of the resampled LRT values

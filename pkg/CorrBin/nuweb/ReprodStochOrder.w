@@ -258,7 +258,7 @@ it is most easily achieved by creating a ``CBData'' object.
 
 The computational details are controlled by setting the \texttt{control} argument.
 It should be a list with parameter settings; the simplest way to generate a correct
-list is a call to the \texttt{mixControl()} function.
+list is a call to the \texttt{soControl()} function.
 \texttt{S} gives the basis of the mixing distribution -- its rows are all the
 possible non-decreasing vectors (see below for how it is obtained). \texttt{Q}
 is the mixing distribution, it is a $G$-dimensional matrix ($G$ is the number 
@@ -271,7 +271,7 @@ it changes $Q$ only multiplicatively.
 @O ../R/Reprod.R
 @{
 
-mix.mc.mle <- function(cbdata, turn=1, control=mixControl()){ 
+SO.mc.est <- function(cbdata, turn=1, control=soControl()){ 
   attach(control)
   on.exit(detach(control))
   tab <- xtabs(Freq~factor(ClusterSize,levels=1:max(ClusterSize))+
@@ -298,42 +298,44 @@ mix.mc.mle <- function(cbdata, turn=1, control=mixControl()){
 	  Q[S+1] <- 1/(nrow(S))
     }
 	 
-  res <- switch(method,
+  res0 <- switch(method,
       EM = .Call("MixReprodQ", Q, S, tab, as.integer(max.iter), as.double(eps), 
 			           as.integer(verbose),PACKAGE="CorrBin"),
       ISDM = .Call("ReprodISDM", Q, S, tab, as.integer(max.iter), as.integer(max.directions),
                    as.double(eps),  as.integer(verbose),PACKAGE="CorrBin"))
  
-  names(res) <- c("MLest","Q","D","loglik", "converge")
+  names(res0) <- c("MLest","Q","D","loglik", "converge")
+  names(res0$converge) <- c("rel.error", "n.iter")
+  res <- res0$MLest
  
-  dimnames(res$MLest) <- list(NResp=0:size, ClusterSize=1:size, Trt=1:ntrt)
-  res$MLest <- as.data.frame.table(res$MLest)
-  names(res$MLest) <- c("NResp","ClusterSize","Trt","Prob") 
-  res$MLest$NResp  <- as.numeric(as.character(res$MLest$NResp))
-  res$MLest$ClusterSize  <- as.numeric(as.character(res$MLest$ClusterSize))
-  res$MLest <- subset(res$MLest, NResp <= ClusterSize)
-  levels(res$MLest$Trt) <- levels(cbdata$Trt)
+  dimnames(res) <- list(NResp=0:size, ClusterSize=1:size, Trt=1:ntrt)
+  res <- as.data.frame.table(res)
+  names(res) <- c("NResp","ClusterSize","Trt","Prob") 
+  res$NResp  <- as.numeric(as.character(res$NResp))
+  res$ClusterSize  <- as.numeric(as.character(res$ClusterSize))
+  res <- subset(res, NResp <= ClusterSize)
+  levels(res$Trt) <- levels(cbdata$Trt)
   
-  names(res$converge) <- c("rel.error", "n.iter")
-
+  attr(res, "loglik") <- res0$loglik
+  attr(res, "converge") <- res0$converge
   res
 }
-@|mix.mc.mle @}
+@|SO.mc.est @}
 
-The values supplied in the call to \texttt{mixControl} replace the defaults and 
+The values supplied in the call to \texttt{soControl} replace the defaults and 
 a list with all possible arguments is returned. The returned list is used as 
-the control argument to the \texttt{mix.mc.mle} function.
+the control argument to the \texttt{SO.mc.est} function.
 
 The \texttt{method} argument allows to select either the EM, or the ISDM method.
 @O ../R/Reprod.R @{
-mixControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000, 
+soControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000, 
       max.directions=0, start=ifelse(method=="ISDM", "H0", "uniform"), verbose=FALSE){
   method <- match.arg(method)
   start <- match.arg(start, c("uniform","H0"))
   list(method = match.arg(method), eps = eps, max.iter = max.iter,
        max.directions = max.directions, start=start, verbose = verbose)
 }
-@| mixControl @}
+@| soControl @}
 
 
 The \texttt{makeSmatrix} function creates a matrix the rows of which are all the
@@ -1242,7 +1244,7 @@ We incorporate the \texttt{turn} parameter to allow fitting and testing umbrella
 The \texttt{SO.LRT} computes the likelihood-ratio test statistic.
 @O ../R/Reprod.R
 @{
-SO.LRT <- function(cbdata, control=mixControl()){
+SO.LRT <- function(cbdata, control=soControl()){
 	# LL under null hypothesis of equality (+ reproducibility)
 	a <- with(cbdata, aggregate(Freq, list(ClusterSize=ClusterSize,NResp=NResp), sum))
 	names(a)[names(a)=="x"] <- "Freq"
@@ -1255,8 +1257,8 @@ SO.LRT <- function(cbdata, control=mixControl()){
   ll0 <- with(b, sum(Freq*log(Prob)))
   
   # LL under alternative hypothesis of stoch ordering (+ reproducibility)
-  res <- mix.mc.mle(cbdata, control=control)
-  ll1 <- res$loglik
+  res <- SO.mc.est(cbdata, control=control)
+  ll1 <- attr(res, "loglik")
   lrt <- 2*(ll1 - ll0)
   attr(lrt, "ll0") <- ll0
   attr(lrt, "ll1") <- ll1
@@ -1273,7 +1275,7 @@ specifies the number of resamples, \texttt{method} could be either ``ISDM'' or
 
 @O ../R/Reprod.R
 @{
-SO.trend.test <- function(cbdata, R=100, control=mixControl()){
+SO.trend.test <- function(cbdata, R=100, control=soControl()){
     require(boot)
 	dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
 	dat2$Freq <- NULL
@@ -1305,7 +1307,7 @@ order based trend tests.
 
 @O ../R/Reprod.R @{
 trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=test=="SO", 
-                       R=100, control=mixControl()){ 
+                       R=100, control=soControl()){ 
    test <- match.arg(test)
    if (!exact && !(test=="SO")){
      res <- switch(test, RS=RS.trend.test(cbdata), 
@@ -1346,7 +1348,7 @@ at which no trend in the rate of adverse events has been observed.
 
 @O ../R/Reprod.R @{
 NOSTASOT <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=test=="SO",
-                     R=100, sig.level=0.05, control=mixControl()){
+                     R=100, sig.level=0.05, control=soControl()){
    ntrt <- nlevels(cbdata$Trt)
    control.gr <- levels(cbdata$Trt)[1]
    p.vec <- array(NA, ntrt-1)

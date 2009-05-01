@@ -8,7 +8,7 @@ implemented in this package:  \code{\link{SO.trend.test}}, \code{\link{RS.trend.
 }
 \usage{
 trend.test(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), 
-           exact = test == "SO", R = 100, control = mixControl())
+           exact = test == "SO", R = 100, control = soControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object}
@@ -20,7 +20,7 @@ trend.test(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"),
   performed for "SO". The default is to use the asymptotic p-values except for "SO".}
   \item{R}{integer, number of permutations for the exact test}
   \item{control}{an optional list of control settings for the stochastic order ("SO") test, 
-     usually a call to \code{\link{mixControl}}.  See there for the names of the settable control 
+     usually a call to \code{\link{soControl}}.  See there for the names of the settable control 
      values and their effect.}
 }
 \value{

@@ -41,7 +41,7 @@ mc.test.chisq <- function(cbdata){
 }
 
 
-mix.mc.mle <- function(cbdata, turn=1, control=mixControl()){ 
+SO.mc.est <- function(cbdata, turn=1, control=soControl()){ 
   attach(control)
   on.exit(detach(control))
   tab <- xtabs(Freq~factor(ClusterSize,levels=1:max(ClusterSize))+
@@ -68,28 +68,30 @@ mix.mc.mle <- function(cbdata, turn=1, control=mixControl()){
      Q[S+1] <- 1/(nrow(S))
     }
     
-  res <- switch(method,
+  res0 <- switch(method,
       EM = .Call("MixReprodQ", Q, S, tab, as.integer(max.iter), as.double(eps), 
                     as.integer(verbose),PACKAGE="CorrBin"),
       ISDM = .Call("ReprodISDM", Q, S, tab, as.integer(max.iter), as.integer(max.directions),
                    as.double(eps),  as.integer(verbose),PACKAGE="CorrBin"))
  
-  names(res) <- c("MLest","Q","D","loglik", "converge")
+  names(res0) <- c("MLest","Q","D","loglik", "converge")
+  names(res0$converge) <- c("rel.error", "n.iter")
+  res <- res0$MLest
  
-  dimnames(res$MLest) <- list(NResp=0:size, ClusterSize=1:size, Trt=1:ntrt)
-  res$MLest <- as.data.frame.table(res$MLest)
-  names(res$MLest) <- c("NResp","ClusterSize","Trt","Prob") 
-  res$MLest$NResp  <- as.numeric(as.character(res$MLest$NResp))
-  res$MLest$ClusterSize  <- as.numeric(as.character(res$MLest$ClusterSize))
-  res$MLest <- subset(res$MLest, NResp <= ClusterSize)
-  levels(res$MLest$Trt) <- levels(cbdata$Trt)
+  dimnames(res) <- list(NResp=0:size, ClusterSize=1:size, Trt=1:ntrt)
+  res <- as.data.frame.table(res)
+  names(res) <- c("NResp","ClusterSize","Trt","Prob") 
+  res$NResp  <- as.numeric(as.character(res$NResp))
+  res$ClusterSize  <- as.numeric(as.character(res$ClusterSize))
+  res <- subset(res, NResp <= ClusterSize)
+  levels(res$Trt) <- levels(cbdata$Trt)
   
-  names(res$converge) <- c("rel.error", "n.iter")
-
+  attr(res, "loglik") <- res0$loglik
+  attr(res, "converge") <- res0$converge
   res
 }
 
-mixControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000, 
+soControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000, 
       max.directions=0, start=ifelse(method=="ISDM", "H0", "uniform"), verbose=FALSE){
   method <- match.arg(method)
   start <- match.arg(start, c("uniform","H0"))
@@ -130,7 +132,7 @@ DownUpMatrix <- function(size, ntrt, turn){
   
 }
 
-SO.LRT <- function(cbdata, control=mixControl()){
+SO.LRT <- function(cbdata, control=soControl()){
    # LL under null hypothesis of equality (+ reproducibility)
    a <- with(cbdata, aggregate(Freq, list(ClusterSize=ClusterSize,NResp=NResp), sum))
    names(a)[names(a)=="x"] <- "Freq"
@@ -143,8 +145,8 @@ SO.LRT <- function(cbdata, control=mixControl()){
   ll0 <- with(b, sum(Freq*log(Prob)))
   
   # LL under alternative hypothesis of stoch ordering (+ reproducibility)
-  res <- mix.mc.mle(cbdata, control=control)
-  ll1 <- res$loglik
+  res <- SO.mc.est(cbdata, control=control)
+  ll1 <- attr(res, "loglik")
   lrt <- 2*(ll1 - ll0)
   attr(lrt, "ll0") <- ll0
   attr(lrt, "ll1") <- ll1
@@ -152,7 +154,7 @@ SO.LRT <- function(cbdata, control=mixControl()){
  }
   
 
-SO.trend.test <- function(cbdata, R=100, control=mixControl()){
+SO.trend.test <- function(cbdata, R=100, control=soControl()){
     require(boot)
    dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
    dat2$Freq <- NULL
@@ -175,7 +177,7 @@ SO.trend.test <- function(cbdata, R=100, control=mixControl()){
    list(LRT=LRT, p.val=p, boot.res=res)}           
 
 trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=test=="SO", 
-                       R=100, control=mixControl()){ 
+                       R=100, control=soControl()){ 
    test <- match.arg(test)
    if (!exact && !(test=="SO")){
      res <- switch(test, RS=RS.trend.test(cbdata), 
@@ -209,7 +211,7 @@ trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exac
    res}
 
 NOSTASOT <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=test=="SO",
-                     R=100, sig.level=0.05, control=mixControl()){
+                     R=100, sig.level=0.05, control=soControl()){
    ntrt <- nlevels(cbdata$Trt)
    control.gr <- levels(cbdata$Trt)[1]
    p.vec <- array(NA, ntrt-1)

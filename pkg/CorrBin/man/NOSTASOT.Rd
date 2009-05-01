@@ -8,7 +8,7 @@ a safe dosage level for a potentially toxic compound.
 }
 \usage{
 NOSTASOT(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"), 
-        exact = test == "SO", R = 100, sig.level = 0.05, control = mixControl())
+        exact = test == "SO", R = 100, sig.level = 0.05, control = soControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object}
@@ -17,7 +17,7 @@ NOSTASOT(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"),
   \item{R}{integer, number of permutations for the exact test}
   \item{sig.level}{numeric between 0 and 1, significance level of the test}
   \item{control}{an optional list of control settings for the stochastic order ("SO") test, 
-     usually a call to \code{\link{mixControl}}.  See there for the names of the settable control 
+     usually a call to \code{\link{soControl}}.  See there for the names of the settable control 
      values and their effect.}
 }
 \details{

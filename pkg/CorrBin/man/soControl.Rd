@@ -1,5 +1,5 @@
-\name{mixControl}
-\alias{mixControl}
+\name{soControl}
+\alias{soControl}
 \title{Control values for order-constrained fit}
 \description{
   The values supplied in the function call replace the defaults and a list with all possible arguments is returned. 
@@ -7,7 +7,7 @@
   and \code{\link{SO.trend.test}} functions. 
 }
 \usage{
-mixControl(method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000, max.directions = 0, 
+soControl(method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000, max.directions = 0, 
            start = ifelse(method == "ISDM", "H0", "uniform"), verbose = FALSE)
 }
 \arguments{
@@ -31,6 +31,6 @@ mixControl(method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000, max.direction
 \examples{
 # decrease the maximum number iterations and
 # request the "EM" algorithm
- mixControl(method="EM", max.iter=100)
+ soControl(method="EM", max.iter=100)
 }
 \keyword{ models }

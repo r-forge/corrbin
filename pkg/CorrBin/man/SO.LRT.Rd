@@ -9,11 +9,11 @@ The \code{\link{SO.trend.test}} function implements a permutation-based evaluati
 likelihood-ratio test.
 }
 \usage{
-SO.LRT(cbdata, control = mixControl())
+SO.LRT(cbdata, control = soControl())
 }
 \arguments{
   \item{cbdata}{a \code{CBData} object}
-  \item{control}{an optional list of control settings, usually a call to \code{\link{mixControl}}.
+  \item{control}{an optional list of control settings, usually a call to \code{\link{soControl}}.
     See there for the names of the settable control values and their effect.}
 }
 \value{
@@ -22,10 +22,10 @@ SO.LRT(cbdata, control = mixControl())
   \item{ll1 }{the log-likelihood under \eqn{H_a}{Ha} (stochastic order)}
 }
 \author{Aniko Szabo}
-\seealso{\code{\link{SO.trend.test}}, \code{\link{mixControl}}}
+\seealso{\code{\link{SO.trend.test}}, \code{\link{soControl}}}
 \examples{
 data(shelltox)
-LRT <- SO.LRT(shelltox, control=mixControl(max.iter = 100, max.directions = 50))
+LRT <- SO.LRT(shelltox, control=soControl(max.iter = 100, max.directions = 50))
 LRT
 }
 \keyword{htest}

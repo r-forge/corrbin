@@ -116,7 +116,7 @@ to limit running time, but in actual work larger values should be used.
 
 <<SOtest>>=
   set.seed(4461)
- (so.res <- trend.test(sh, test="SO", R=100, control=mixControl(eps=0.1, max.directions=40)))
+ (so.res <- trend.test(sh, test="SO", R=100, control=soControl(eps=0.1, max.directions=40)))
 @
 The \texttt{eps} parameter sets the limit on the absolute error of the log-likelihood (and thus, the
 test statistic), while \texttt{max.directions} is a tuning parameter for the default ISDM algorithm: it
@@ -140,14 +140,13 @@ The other tests also show the presence of a statistically significant trend:
 
 The stochastic ordering approach provides not only a test for trend, but also the estimated distribution
 of the number of responses under the alternative hypothesis of stochastic order. These can be obtained by the
-\texttt{mix.mc.mle} function:
+\texttt{SO.mc.est} function:
 <<SOmle>>=
-   sh.SO.est <- mix.mc.mle(sh, control=mixControl(eps=0.1, max.directions=40))
-   head(sh.SO.est$MLest)
+   sh.SO.est <- SO.mc.est(sh, control=soControl(eps=0.1, max.directions=40))
 @
 \begin{figure}
 <<SOmleplot, fig=true, width=8, height=6>>=
-   print(xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=sh.SO.est$MLest, 
+   print(xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=sh.SO.est, 
        subset=ClusterSize,13, type="s",
        panel=panel.superpose, panel.groups=panel.cumsum,
        as.table=T, auto.key=list(columns=4, lines=T, points=F),
