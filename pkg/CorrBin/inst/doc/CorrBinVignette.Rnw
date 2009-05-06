@@ -13,13 +13,17 @@ data}
 \setkeys{Gin}{width=0.5\textwidth}
 
 \maketitle
+<<Misc, echo=false, results=hide>>=
+options(useFancyQuotes=FALSE) 
+@
 
 \section{Overview}
 
 The \texttt{CorrBin} package focuses on non-parametric methods for correlated binary
 data with varying cluster sizes.
-<<LibLoad>>=
+<<LibLoad, results=hide>>=
   library(CorrBin)
+  library(lattice)
 @
 
 \section{Data input}
@@ -70,8 +74,7 @@ determine all the other estimates:
 where $h(r, t, n) = \binom{t}{r}\binom{M-t}{n-r}/\binom{M}{n}$ is the hypergeometric density function.
 Figure~\ref{F:MCest} shows the estimates. 
 \begin{figure}
-<<MCestfig, fig=true, width=8, height=6>>=
-  require(lattice)
+<<MCestfig, fig=true, width=8, height=6, echo=false>>=
   print(xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=sh.mc, subset=ClusterSize>0 & ClusterSize<13, 
     type="l", as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
     xlab="Number of responses", ylab="P(R=r|N=n)"))
@@ -79,6 +82,9 @@ Figure~\ref{F:MCest} shows the estimates.
 \caption{Density function of number of responses under MC by cluster-size estimated separately
 for each treatment group}\label{F:MCest}
 \end{figure}
+<<MCestfig2, results=hide, eval=false>>=
+<<MCestfig>>
+@
 
 The density functions in Figure~\ref{F:MCest} are difficult to compare (there is no
 obvious shift); distribution functions often provide a cleaner comparison, so
@@ -86,7 +92,7 @@ they are plotted in Figure~\ref{F:MCsurvest}. These plots show that curves for t
 ``Low'' groups tend to be above the ``Medium'' and ``High'' group, suggesting the 
 presence of a dose related trend.
 \begin{figure}
-<<MCsurvfig, fig=true, width=8, height=6>>=
+<<MCsurvfig, fig=true, width=8, height=6, echo=false>>=
   panel.cumsum <- function(x,y,...){
     x.ord <- order(x)
     panel.xyplot(x[x.ord], cumsum(y[x.ord]), ...)}
@@ -101,6 +107,9 @@ presence of a dose related trend.
 \caption{Distribution functions of number of responses under MC by cluster-size estimated separately
 for each treatment group}\label{F:MCsurvest}
 \end{figure}
+<<MCsurvfig2, results=hide, eval=false>>=
+<<MCsurvfig>>
+@
 
 \section{Testing for trend}
 
@@ -111,26 +120,28 @@ ordering (SO) based test. RS and GEE test for linear trend in the marginal proba
 
 The common interface for accessing the trend tests is the \texttt{trend.test} function. 
 It allows to pick the test, whether a permutation-test based exact or an asymptotic (only for RS and GEE)
-p-value should be used, and set algorithm options for the SO test. In this vignette we use $R=100$ permutations
+p-value should be used, and set algorithm options for the SO test. In this vignette we use $R=50$ permutations
 to limit running time, but in actual work larger values should be used.
 
 <<SOtest>>=
   set.seed(4461)
- (so.res <- trend.test(sh, test="SO", R=100, control=soControl(eps=0.1, max.directions=40)))
+ (so.res <- trend.test(sh, test="SO", R=50, control=soControl(eps=0.1, max.directions=40)))
 @
 The \texttt{eps} parameter sets the limit on the absolute error of the log-likelihood (and thus, the
 test statistic), while \texttt{max.directions} is a tuning parameter for the default ISDM algorithm: it
 affects only the running time, and, in general, larger values lead to fewer iterations that however take
 longer. The details of the permutation test are saved in the output object, so the null distribution of
 the test statistic can be extracted for, say, a plot as in Figure~\ref{F:SOboot}.
-
 \begin{figure}
-<<SOboot>>=
- hist(attr(so.res, "boot")$t[,1], freq=FALSE, xlab="Statistic", ylab="Density", main="Null distribution of the SO test statistic")
+<<SOboot,fig=true,width=5,height=5,echo=false>>=
+ hist(attr(so.res, "boot")$t[,1], freq=FALSE, xlab="Statistic", ylab="Density", main="")
  points(so.res$statistic, 0, pch="*",col="red", cex=3)
 @
-\caption{}\label{F:SOboot}
+\caption{Null distribution of the SO test statistic with the observed value marked with a red star.}\label{F:SOboot}
 \end{figure}
+<<SOboot2, results=hide, eval=false>>=
+<<SOboot>>
+@
 
 The other tests also show the presence of a statistically significant trend:
 <<RSGEEtest>>=
@@ -140,29 +151,42 @@ The other tests also show the presence of a statistically significant trend:
 
 The stochastic ordering approach provides not only a test for trend, but also the estimated distribution
 of the number of responses under the alternative hypothesis of stochastic order. These can be obtained by the
-\texttt{SO.mc.est} function:
+\texttt{SO.mc.est} function, with the value of the log-likelihood, and convergence information. The estimates are 
+then plotted (see Figure~\ref{F:MCsurvest}).
 <<SOmle>>=
    sh.SO.est <- SO.mc.est(sh, control=soControl(eps=0.1, max.directions=40))
+   str(sh.SO.est)
 @
 \begin{figure}
-<<SOmleplot, fig=true, width=8, height=6>>=
+<<SOmleplot, fig=true, width=8, height=6, echo=false>>=
    print(xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=sh.SO.est, 
-       subset=ClusterSize,13, type="s",
+       subset=ClusterSize<13, type="s",
        panel=panel.superpose, panel.groups=panel.cumsum,
        as.table=T, auto.key=list(columns=4, lines=T, points=F),
 			 xlab="Number of responses", ylab="Cumulative Probability R(R>=r|N=n)",
-			 ylim=c(0,1.1), main="Stochastically ordered estimates\n with marginal compatibility"))
+			 ylim=c(0,1.1), main=""))
 @
 \caption{Stochastically ordered distribution functions of the number of responses under MC by cluster-size.}\label{F:MCsurvest}
 \end{figure}
-
-
+<<SOmleplot2, results=hide, eval=false>>=
+<<SOmleplot>>
+@
 
 \section{Risk assessment}
 
+The No-Statistical-Significance-Of-Trend dose -- the largest dose  at which no trend in the rate of response has
+been observed -- is often used to determine a safe dosage level  for a potentially toxic compound.
+The \texttt{NOSTASOT} function computes this dose by a step-down approach of testing all doses, all but the last, etc.
+All three tests (stochastic order, Rao-Scott, and GEE) are available.
+
+<<nostasot>>=
+  NOSTASOT(sh, test="RS")
+@
+
+For the Shell toxicology data, the ``Low'' dose of the drug shows no trend, but all higher doses do, so that's the NOSTASOT
+dose.
 \end{document}
 
 setwd("c:/RForge/CorrBin/inst/doc")
-library(CorrBin)
 Sweave("CorrBinVignette.Rnw", stylepath=FALSE)
 
