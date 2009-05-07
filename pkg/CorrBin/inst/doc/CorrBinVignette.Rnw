@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Using Oncotree for the ovarian cancer CGH data}
+%\VignetteIndexEntry{Using CorrBin for the Shell Toxicology data}
 %\VignetteDepends{lattice}
 \documentclass[reqno]{amsart}
 \usepackage[margin=0.8in]{geometry}
@@ -17,10 +17,15 @@ data}
 options(useFancyQuotes=FALSE) 
 @
 
-\section{Overview}
 
-The \texttt{CorrBin} package focuses on non-parametric methods for correlated binary
-data with varying cluster sizes.
+The \texttt{CorrBin} package focuses on non-parametric methods for exchangeable correlated binary
+data with varying cluster sizes. Exchangeability implies that the order of responses within a
+cluster does not matter, only the total number of responses; the package uses the clustersize/
+number of responses combination as input. Currently only one categorical cluster-level predictor,
+treatment group, is allowed. Many of the functions are geared toward testing trend, so treatment
+groups are usually treated as ordered categories.
+
+
 <<LibLoad, results=hide>>=
   library(CorrBin)
   library(lattice)
@@ -31,10 +36,9 @@ All the analysis functions in the package work on \texttt{CBData} objects, so
 we start by setting up the data in the format needed for analysis. The Shell toxicology 
 data set is available in the CBData format in the package, however we will load
 it from a text file using the \texttt{read.CBData} function to show more typical usage. The
-``ShellTox.txt'' file contains four space-delimited columns (other delimiters can also
-be used). The first column contains an integer 1 -- 4 giving the treatment group, the second 
+``ShellTox.txt'' file contains four space-delimited columns. The first column contains an integer 1 -- 4 giving the treatment group, the second 
 column gives the size of the cluster, the third the number of responses in the cluster, and the
-last gives the number of times the given combination occured in the data.
+last gives the number of times the given combination occured in the data. 
 
 <<Intro, echo=false>>=
  options(width=100)
@@ -46,7 +50,9 @@ last gives the number of times the given combination occured in the data.
 @
 
 Alternatively, if the data is already in a data frame, the \texttt{CBData} function
-can be used to define the roles of the variables.
+can be used to define the roles of the variables. Both \texttt{read.CBData} and \texttt{CBData}
+can accomodate cluster-level data that has not been summarized to have frequencies of each 
+clustersize/number of responses combination.
 
 \section{Marginal compatibility}
 A basic assumption of all of the following analyses is that of \emph{marginal compatibility} (MC),
@@ -65,11 +71,11 @@ responses in the cluster under MC:
 <<MCest>>=
   sh.mc <- mc.est(sh)
 @ 
-The \texttt{mc.est} functions gives estimates for all cluster-sizes, due to the 
+Even though the \texttt{mc.est} functions gives estimates for all cluster-sizes, due to the 
 marginal compatibility assumption the estimates $\pi_{r,M}$ for the largest cluster-size $M$
 determine all the other estimates:
 \begin{equation}
-\pi_{r,n}  = \sum_{t=0}^{M}h(r,t,n)\pi_{t,M},
+P(\text{$r$ responses}\mid\text{cluster size $n$})=\pi_{r,n}  = \sum_{t=0}^{M}h(r,t,n)\pi_{t,M},
 \end{equation}
 where $h(r, t, n) = \binom{t}{r}\binom{M-t}{n-r}/\binom{M}{n}$ is the hypergeometric density function.
 Figure~\ref{F:MCest} shows the estimates. 
@@ -152,7 +158,7 @@ The other tests also show the presence of a statistically significant trend:
 The stochastic ordering approach provides not only a test for trend, but also the estimated distribution
 of the number of responses under the alternative hypothesis of stochastic order. These can be obtained by the
 \texttt{SO.mc.est} function, with the value of the log-likelihood, and convergence information. The estimates are 
-then plotted (see Figure~\ref{F:MCsurvest}).
+then plotted (see Figure~\ref{F:MCsoest}).
 <<SOmle>>=
    sh.SO.est <- SO.mc.est(sh, control=soControl(eps=0.1, max.directions=40))
    str(sh.SO.est)
@@ -166,7 +172,7 @@ then plotted (see Figure~\ref{F:MCsurvest}).
 			 xlab="Number of responses", ylab="Cumulative Probability R(R>=r|N=n)",
 			 ylim=c(0,1.1), main=""))
 @
-\caption{Stochastically ordered distribution functions of the number of responses under MC by cluster-size.}\label{F:MCsurvest}
+\caption{Stochastically ordered distribution functions of the number of responses under MC by cluster-size.}\label{F:MCsoest}
 \end{figure}
 <<SOmleplot2, results=hide, eval=false>>=
 <<SOmleplot>>
