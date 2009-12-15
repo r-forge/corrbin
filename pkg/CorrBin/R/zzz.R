@@ -3,6 +3,6 @@
   library.dynam("CorrBin", pkgname, libname)
 }
 
-.Last.lib <- function(){
-  library.dynam.unload("CorrBin")
+.Last.lib <- function(libpath){
+  library.dynam.unload("CorrBin", libpath)
 }
