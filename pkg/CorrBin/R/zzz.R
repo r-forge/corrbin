@@ -4,5 +4,5 @@
 }
 
 .Last.lib <- function(libpath){
-  library.dynam.unload("CorrBin", libpath)
+  library.dynam.unload("CorrBin",libpath)
 }

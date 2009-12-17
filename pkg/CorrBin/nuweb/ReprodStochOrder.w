@@ -346,48 +346,53 @@ $k$ sticks; each of the possible arrangements of theses $n+k$ objects into a row
 is a combination. We can transform it to a nondecreasing sequence by counting the
 number of balls to the left of the first stick, second stick, etc. For example,
 with $n=5$ and $k=4$, a possible arrangement is $\circ | \circ ||\circ\circ\circ|$; 
-this corresponds to the sequence (1,2,2,5). The \texttt{GEN} function generates
+this corresponds to the sequence (1,2,2,5). The \texttt{Comb} function generates
 all possible combinations of $k$ elements out of $N=n+k$ elements by recursion
-on $N$, while \texttt{InsertComb} transforms the resulting combination to a non-decreasing
+on $N$, and when a combination is ready, it transforms it to a non-decreasing
 sequence and puts it into the output matrix. The code for generating the combinations
 was written by  Joe Sawada, 1997  and obtained from the Combinatorial Object
-Server (http://theory.cs.uvic.ca/inf/comb/CombinationsInfo.html).
+Server (http://theory.cs.uvic.ca/inf/comb/CombinationsInfo.html), but was rewritten
+without nested functions.
 
-@O ..\src\ReprodCalcs.c
+@O ..\src\ReprodCalcs.c 
 @{
-SEXP makeSmatrix(SEXP size, SEXP ntrt){
-int *a, i, pos, nn, kk, nS;
-SEXP res;
-	
-	void InsertComb (void){
-		int i, val, step;
+void Comb(int j, int m, int nn, int kk, int nS, int* a, int* pos, SEXP res) {
+	int i, val, step;
+	if (j > nn) {  
+        @< Convert 'a' to non-decreasing sequence and insert into 'res' @>
+    }	    	
+	else {
+		if (kk-m < nn-j+1) {
+			a[j] = 0; Comb(j+1, m, nn, kk, nS, a, pos, res);
+		}
+		if (m<kk) {
+			a[j] = 1; Comb(j+1, m+1, nn, kk, nS, a, pos, res);
+		}
+	}
+}
+@| Comb @}
+
+
+@d Convert 'a' to non-decreasing sequence... @{
 		val = 0;
 		step = 0;
 		for (i=1; i<=nn; i++) {
 			if (a[i]==1){
-				INTEGER(res)[pos+step]=val;
+				INTEGER(res)[*pos+step]=val;
 				step += nS;
 			}
 			else { //a[i]=0;
 				val++;
 			}
 		}
-	    pos++;
-    }	    	
-	
-	void Comb(int j, int m) {
-		if (j > nn) InsertComb();
-		else {
-			if (kk-m < nn-j+1) {
-				a[j] = 0; Comb(j+1, m);
-			}
-			if (m<kk) {
-				a[j] = 1; Comb(j+1, m+1);
-			}
-		}
-	}
+	    *pos = *pos+1;
+@}
 
-	
+@o ..\src\ReprodCalcs.c
+@{
+SEXP makeSmatrix(SEXP size, SEXP ntrt){
+int *a, i, pos, nn, kk, nS;
+SEXP res;
    nn = asInteger(size) + asInteger(ntrt);
    kk = asInteger(ntrt);
    a = calloc(nn+1, sizeof(int));
@@ -397,7 +402,7 @@ SEXP res;
    PROTECT(res = allocMatrix(INTSXP, nS, kk));
    pos = 0;
    
-   Comb(1, 0);
+   Comb(1, 0, nn, kk, nS, a, &pos, res);
   
    UNPROTECT(1);
    free(a);
@@ -492,7 +497,7 @@ been to set up a C-style array of pointers to pointers to rows.
 @{
 double GetTabElem(SEXP tab, int size, int n, int r, int j){
 	 return REAL(tab)[(n-1)+size*(r+(size+1)*j)];
- };
+ }
 @}
 
 \texttt{HyperTable} makes a 3-dimensional C-style array with the hyper-geometric probabilities

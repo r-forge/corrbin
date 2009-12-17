@@ -96,39 +96,37 @@ SEXP ReprodEstimates(SEXP nvec, SEXP rvec, SEXP freqvec)
    
 }
 
+void Comb(int j, int m, int nn, int kk, int nS, int* a, int* pos, SEXP res) {
+   int i, val, step;
+   if (j > nn) {  
+        
+              val = 0;
+              step = 0;
+              for (i=1; i<=nn; i++) {
+                 if (a[i]==1){
+                    INTEGER(res)[*pos+step]=val;
+                    step += nS;
+                 }
+                 else { //a[i]=0;
+                    val++;
+                 }
+              }
+               *pos = *pos+1;
+        
+    }       
+   else {
+      if (kk-m < nn-j+1) {
+         a[j] = 0; Comb(j+1, m, nn, kk, nS, a, pos, res);
+      }
+      if (m<kk) {
+         a[j] = 1; Comb(j+1, m+1, nn, kk, nS, a, pos, res);
+      }
+   }
+}
+
 SEXP makeSmatrix(SEXP size, SEXP ntrt){
 int *a, i, pos, nn, kk, nS;
 SEXP res;
-   
-   void InsertComb (void){
-      int i, val, step;
-      val = 0;
-      step = 0;
-      for (i=1; i<=nn; i++) {
-         if (a[i]==1){
-            INTEGER(res)[pos+step]=val;
-            step += nS;
-         }
-         else { //a[i]=0;
-            val++;
-         }
-      }
-       pos++;
-    }       
-   
-   void Comb(int j, int m) {
-      if (j > nn) InsertComb();
-      else {
-         if (kk-m < nn-j+1) {
-            a[j] = 0; Comb(j+1, m);
-         }
-         if (m<kk) {
-            a[j] = 1; Comb(j+1, m+1);
-         }
-      }
-   }
-
-   
    nn = asInteger(size) + asInteger(ntrt);
    kk = asInteger(ntrt);
    a = calloc(nn+1, sizeof(int));
@@ -138,7 +136,7 @@ SEXP res;
    PROTECT(res = allocMatrix(INTSXP, nS, kk));
    pos = 0;
    
-   Comb(1, 0);
+   Comb(1, 0, nn, kk, nS, a, &pos, res);
   
    UNPROTECT(1);
    free(a);
@@ -148,7 +146,7 @@ SEXP res;
 
 double GetTabElem(SEXP tab, int size, int n, int r, int j){
     return REAL(tab)[(n-1)+size*(r+(size+1)*j)];
- };
+ }
 
 double ***HyperTable(int size){
 // dhyper(i, j, size-j, k), i=0:size; j=0:size; k=0:size 
