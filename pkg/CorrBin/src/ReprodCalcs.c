@@ -299,6 +299,44 @@ int **CalcTopD(SEXP D, SEXP S, int *idx, int limit, int *nselect, int ntrt, int 
      return res;   
  } 
 
+
+int ntrt, size, **lmS;
+double ntot, ***ht, ***marg;
+
+double NegLogLik(int npar, double *par, void *ex){
+    //par[j] = (alpha_(j+1)/alpha_0), j=0,...,nmax-1
+   int j, n, r, i, sj, x;
+   double res, sum;
+   SEXP tab;
+   
+   tab = (SEXP)ex;
+   res = 0;
+   
+   for (j=0; j<ntrt; j++){
+      for (n=1; n<=size; n++){
+         for (r=0; r<=n; r++){
+            x = GetTabElem(tab,size,n,r,j);
+            if (x>0){
+               sum = marg[j][n][r];
+               for (i=0; i<npar; i++){
+                  sj = lmS[i][j];
+                  sum += par[i]*ht[r][n][sj];
+               }
+               res += x*log(sum);    
+            }
+         }
+      }
+   }
+   sum = 0;
+   for (i=0; i<npar; i++) sum += par[i];
+   res -= ntot*log1p(sum);  //log1p(sum)=log(1+sum)
+   
+   if (!R_FINITE(res)){
+     res = 1e60;
+   }
+   
+   return (-res); }
+
 void UpdateQ(SEXP Q, double *g, int nS, int nmax, int *idx, int *lmS_idx){
    double alpha0;
    int i;
@@ -335,52 +373,20 @@ void UpdateQ(SEXP Q, double *g, int nS, int nmax, int *idx, int *lmS_idx){
    }   
 }
 
-
 SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections, 
                 SEXP eps, SEXP verbose){
  SEXP dims, D,  res, margSXP, tmp;
- int i, j, n, r, size, ntrt, *idx, nS, niter, **lmS, nmax, fncount, grcount, fail, 
+ int i, j, n, r, *idx, nS, niter, nmax, fncount, grcount, fail, 
      *boundtype,  limit, *lmS_idx, nenforced;
- double ***ht, ***marg, ntot, rel_error, *gamma, *lower, *upper, NLLmin;
+ double rel_error, *gamma, *lower, *upper, NLLmin;
  char msg[60];
 
- 
- double NegLogLik(int npar, double *par, void *ex){
-     //par[j] = (alpha_(j+1)/alpha_0), j=0,...,nmax-1
-    int j, n, r, i, sj, x;
-    double res, sum;
-    
-    res = 0;
-    
-    for (j=0; j<ntrt; j++){
-       for (n=1; n<=size; n++){
-          for (r=0; r<=n; r++){
-             x = GetTabElem(tab,size,n,r,j);
-             if (x>0){
-                sum = marg[j][n][r];
-                for (i=0; i<npar; i++){
-                   sj = lmS[i][j];
-                   sum += par[i]*ht[r][n][sj];
-                }
-                res += x*log(sum);    
-             }
-          }
-       }
-    }
-    sum = 0;
-    for (i=0; i<npar; i++) sum += par[i];
-    res -= ntot*log1p(sum);  //log1p(sum)=log(1+sum)
-    
-    if (!R_FINITE(res)){
-      res = 1e60;
-    }
-    
-    return (-res); }
  
  void NegLogLikDeriv(int npar, double *par, double *gr, void *ex){
     int j, n, r, i, sj, x;
     double alpha0, sum, ***denom;
        
+    tab = (SEXP)ex;
     //prepare the shared denominators
     denom = malloc(ntrt*sizeof(double*));
     for (j=0; j<ntrt; j++){
@@ -486,7 +492,7 @@ SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections,
     
     
     lbfgsb(nmax, 5, gamma, lower, upper, boundtype, &NLLmin, NegLogLik, NegLogLikDeriv,
-           &fail, 0, 1e5, 0, &fncount, &grcount, 1000, msg, asInteger(verbose), 10);
+           &fail, tab, 1e5, 0, &fncount, &grcount, 1000, msg, asInteger(verbose), 10);
            
     UpdateMarginals(marg, gamma, ht, lmS, ntrt, size, nmax);
    CalcD(D, S, tab, idx, ht, marg, ntrt, nS, size, ntot);

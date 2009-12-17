@@ -740,17 +740,19 @@ in treatment group $g$.
 
 
 \texttt{lmS} stores the $\bv^1_t, \ldots, \bv^m_t$ vectors calculated by \texttt{CalcTopD}.
-This function will be defined within the scope of the \texttt{ReprodISDM} function
-(because passing parameters through the \texttt{*ex} pointer is inconvenient),
-so all the variables \texttt{tab, marg, ntot}, etc are available.
+The required variables (ntrt, size, ntot, marg, ht, lmS) will be declared as global and will be available
+for the procedure, while \texttt{tab} will be passed through the \texttt{*ex} pointer.
 
-@D Define log-likelihood and its derivative
+@O ..\src\ReprodCalcs.c 
 @{
+@< Declare global variables @>
 double NegLogLik(int npar, double *par, void *ex){
 	 //par[j] = (alpha_(j+1)/alpha_0), j=0,...,nmax-1
    int j, n, r, i, sj, x;
    double res, sum;
+   SEXP tab;
    
+   tab = (SEXP)ex;
    res = 0;
    
    for (j=0; j<ntrt; j++){
@@ -791,6 +793,7 @@ void NegLogLikDeriv(int npar, double *par, double *gr, void *ex){
    int j, n, r, i, sj, x;
    double alpha0, sum, ***denom;
       
+   tab = (SEXP)ex;
    //prepare the shared denominators
    denom = malloc(ntrt*sizeof(double*));
    for (j=0; j<ntrt; j++){
@@ -905,17 +908,21 @@ method of Byrd95 that allows boundary constraints for optimization. It is
 actually a minimization routine, so the negative likelihood defined above is used.
 The \texttt{MaxDirection} parameter controls the number of directions which
 are considered at each step of the ISDM algorithm. Values of 0 (or less) mean
-setting it to the number of non-empty cells in the data.
+setting it to the number of non-empty cells in the data. The variables required
+by the log-likelihood function and its derivative are declared global.
 
+@D Declare global variables @{
+int ntrt, size, **lmS;
+double ntot, ***ht, ***marg;
+@}
 @O ..\src\ReprodCalcs.c
 @{
-
 SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections, 
                 SEXP eps, SEXP verbose){
  SEXP dims, D,  res, margSXP, tmp;
- int i, j, n, r, size, ntrt, *idx, nS, niter, **lmS, nmax, fncount, grcount, fail, 
+ int i, j, n, r, *idx, nS, niter, nmax, fncount, grcount, fail, 
      *boundtype,  limit, *lmS_idx, nenforced;
- double ***ht, ***marg, ntot, rel_error, *gamma, *lower, *upper, NLLmin;
+ double rel_error, *gamma, *lower, *upper, NLLmin;
  char msg[60];
 
  @<Define log-likelihood... @>
@@ -977,7 +984,7 @@ SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections,
 	 
 	 
  	 lbfgsb(nmax, 5, gamma, lower, upper, boundtype, &NLLmin, NegLogLik, NegLogLikDeriv,
- 	        &fail, 0, 1e5, 0, &fncount, &grcount, 1000, msg, asInteger(verbose), 10);
+ 	        &fail, tab, 1e5, 0, &fncount, &grcount, 1000, msg, asInteger(verbose), 10);
  	        
 	 UpdateMarginals(marg, gamma, ht, lmS, ntrt, size, nmax);
    CalcD(D, S, tab, idx, ht, marg, ntrt, nS, size, ntot);
