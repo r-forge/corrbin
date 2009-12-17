@@ -81,7 +81,7 @@ For \code{plot.oncotree}:
   
 For \code{pstree.oncotree}:
 
-  a character string with the LaTeX code needed to draw a tree. \code{\usepackage{pstricks,pst-tree}}
+  a character string with the LaTeX code needed to draw a tree. \code{\\usepackage{pstricks,pst-tree}}
   is required in the preamble of the LaTeX file, and it should be processed through
   a PostScript intermediary (DVIPS or similar) and not through PDFLaTeX.
 
@@ -92,9 +92,9 @@ For \code{pstree.oncotree}:
 is possible. \code{pstree.oncotree} provides some default settings for drawing
 trees, but they can be easily overridden: most options can be set in 
 \code{pstree.options}, while the appearance of the tree nodes can be controlled
-by defining a one-parameter \code{\lab} command that gives the desired appearance. 
+by defining a one-parameter \code{\\lab} command that gives the desired appearance. 
 For example, if red, non-mathematical test is desired in an oval, you could use
-\code{\newcommand{\lab}[1]{\Toval[name=#1]{{\red #1}}}}.
+\code{\\newcommand{\\lab}[1]{\\Toval[name=#1]{{\red #1}}}}.
 }
 
 \references{Szabo, A. and Boucher, K. (2002) Estimating an oncogenetic tree when false negative and positives are present. Mathematical Biosciences, 176/2, 219-236.}
