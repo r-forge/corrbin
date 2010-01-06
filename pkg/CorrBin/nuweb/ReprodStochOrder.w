@@ -788,10 +788,12 @@ function defined above.
 {Q_{gn}(r)+\tsum_i\gamma_ih(r,v^i_g,n)} - \frac{N}{1+\tsum_i\gamma_i}
 \end{equation}
 
-@D Define log-likelihood... @{
+@O ..\src\ReprodCalcs.c 
+@{
 void NegLogLikDeriv(int npar, double *par, double *gr, void *ex){
    int j, n, r, i, sj, x;
    double alpha0, sum, ***denom;
+   SEXP tab;
       
    tab = (SEXP)ex;
    //prepare the shared denominators
@@ -925,8 +927,7 @@ SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections,
  double rel_error, *gamma, *lower, *upper, NLLmin;
  char msg[60];
 
- @<Define log-likelihood... @>
-  
+
  PROTECT(dims = GET_DIM(tab));
    size = INTEGER(dims)[0];
    ntrt = INTEGER(dims)[2];

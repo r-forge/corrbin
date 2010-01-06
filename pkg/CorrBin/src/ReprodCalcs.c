@@ -337,6 +337,59 @@ double NegLogLik(int npar, double *par, void *ex){
    
    return (-res); }
 
+void NegLogLikDeriv(int npar, double *par, double *gr, void *ex){
+   int j, n, r, i, sj, x;
+   double alpha0, sum, ***denom;
+   SEXP tab;
+      
+   tab = (SEXP)ex;
+   //prepare the shared denominators
+   denom = malloc(ntrt*sizeof(double*));
+   for (j=0; j<ntrt; j++){
+      denom[j] = malloc((size+1)*sizeof(double*));
+      for (n=1; n<=size; n++) denom[j][n] = calloc(n+1, sizeof(double));
+   }
+   for (j=0; j<ntrt; j++){
+      for (n=1; n<=size; n++){
+         for (r=0; r<=n; r++){
+            sum = marg[j][n][r];
+            for (i=0; i<npar; i++){
+               sj = lmS[i][j];
+               sum += par[i]*ht[r][n][sj];
+            }
+            denom[j][n][r] = sum;    
+         }
+      }
+   }
+   
+   alpha0 = 1;
+   for (i=0; i<npar; i++)  alpha0 += par[i];
+   alpha0 = 1.0/alpha0;
+
+   //calc the gradients 
+   for (i=0; i<npar; i++){
+      sum = -ntot*alpha0;
+      for (j=0; j<ntrt; j++){
+         for (n=1; n<=size; n++){
+            for (r=0; r<=n; r++){
+               x = GetTabElem(tab,size,n,r,j);
+               if (x>0){
+                  sj = lmS[i][j];
+                  sum += x*ht[r][n][sj]/denom[j][n][r];
+               }
+            }
+         }
+      }
+      gr[i] = -sum;
+   }
+   
+   for (j=0; j<ntrt; j++){
+      for (n=1; n<=size; n++) free(denom[j][n]);
+      free(denom[j]);
+   }
+   free(denom); 
+}
+
 void UpdateQ(SEXP Q, double *g, int nS, int nmax, int *idx, int *lmS_idx){
    double alpha0;
    int i;
@@ -381,60 +434,7 @@ SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections,
  double rel_error, *gamma, *lower, *upper, NLLmin;
  char msg[60];
 
- 
- void NegLogLikDeriv(int npar, double *par, double *gr, void *ex){
-    int j, n, r, i, sj, x;
-    double alpha0, sum, ***denom;
-       
-    tab = (SEXP)ex;
-    //prepare the shared denominators
-    denom = malloc(ntrt*sizeof(double*));
-    for (j=0; j<ntrt; j++){
-       denom[j] = malloc((size+1)*sizeof(double*));
-       for (n=1; n<=size; n++) denom[j][n] = calloc(n+1, sizeof(double));
-    }
-    for (j=0; j<ntrt; j++){
-       for (n=1; n<=size; n++){
-          for (r=0; r<=n; r++){
-             sum = marg[j][n][r];
-             for (i=0; i<npar; i++){
-                sj = lmS[i][j];
-                sum += par[i]*ht[r][n][sj];
-             }
-             denom[j][n][r] = sum;    
-          }
-       }
-    }
-    
-    alpha0 = 1;
-    for (i=0; i<npar; i++)  alpha0 += par[i];
-    alpha0 = 1.0/alpha0;
- 
-    //calc the gradients 
-    for (i=0; i<npar; i++){
-       sum = -ntot*alpha0;
-       for (j=0; j<ntrt; j++){
-          for (n=1; n<=size; n++){
-             for (r=0; r<=n; r++){
-                x = GetTabElem(tab,size,n,r,j);
-                if (x>0){
-                   sj = lmS[i][j];
-                   sum += x*ht[r][n][sj]/denom[j][n][r];
-                }
-             }
-          }
-       }
-       gr[i] = -sum;
-    }
-    
-    for (j=0; j<ntrt; j++){
-       for (n=1; n<=size; n++) free(denom[j][n]);
-       free(denom[j]);
-    }
-    free(denom); 
- }
- 
-  
+
  PROTECT(dims = GET_DIM(tab));
    size = INTEGER(dims)[0];
    ntrt = INTEGER(dims)[2];
