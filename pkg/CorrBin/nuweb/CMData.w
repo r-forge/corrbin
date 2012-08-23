@@ -91,10 +91,10 @@ read.CMData <- function(file, with.clustersize=TRUE, with.freq=TRUE, ...){
   K <- ncol(d) - with.freq - 2  #subtracting Trt & either ClusterSize or last category column
   nrespvars <- paste("NResp", 1:K, sep=".")
   if (with.clustersize) 
-    names(d) <- c("Trt","ClusterSize", nrespvars, if (with.freq) "Freq"))
+    names(d) <- c("Trt","ClusterSize", nrespvars, if (with.freq) "Freq")
   else {
-   names(d) <- c("Trt", nrespvars, "LastCat", if (with.freq) "Freq"))
-   d$ClusterSize <- rowSums(d[, c(nrespvars, "LastCat")]
+   names(d) <- c("Trt", nrespvars, "LastCat", if (with.freq) "Freq")
+   d$ClusterSize <- rowSums(d[, c(nrespvars, "LastCat")])
    d$LastCat <- NULL
   }
   d <- CMData(d, trt="Trt", clustersize="ClusterSize", nresp=nrespvars, 
@@ -129,9 +129,12 @@ unwrap.CMData <- function(cmdata){
   #unwrap categories
   counts <- rep(1:nrow(cm2), cm2$Count)
   res <- cm2[counts,]
-  cm2$Count <- NULL
+  res$Count <- NULL
+  class(res) <- "data.frame"
+  res <- res[order(res$ID),c("Trt","ID","ClusterSize","Outcome")]
+  rownames(res) <- NULL
 
-  res[order(res$ID),]
+  res
   }
 @| unwrap.CMData @}
 
