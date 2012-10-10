@@ -5,6 +5,7 @@
 \renewcommand{\NWlink}[2]{\hyperlink{#1}{#2}}
 
 \providecommand{\tsum}{\textstyle\sum}
+\providecommand{\dsum}{\displaystyle\sum}
 \newcommand{\rvec}{\mathbf{r}}
 \newcommand{\svec}{\mathbf{s}}
 \newcommand{\tvec}{\mathbf{t}}
@@ -275,19 +276,23 @@ mc.est <- function(cmdata, eps=1E-6){
   res <- list()
   for (trt in levels(cmdata$Trt)){
     cm1 <- subset(cmdata, Trt==trt)
-    # observed freq lookup table
-    atab <- array(0, dim=rep(M+1, nc))
-    a.idx <- data.matrix(cm1[,nrespvars])
-    atab[a.idx + 1] <- atab[a.idx + 1] + cm1$Freq
-    Mn <- sum(cm1$Freq)
-    
-    @< MC estimates for given dose group @>
-    
-    # append treatment-specific result to result list
-    res.trt <- list(res.trt)
-    names(res.trt) <- trt
+    if (nrow(cm1) > 0){
+      # observed freq lookup table
+      atab <- array(0, dim=rep(M+1, nc))
+      a.idx <- data.matrix(cm1[,nrespvars])
+      atab[a.idx + 1] <- atab[a.idx + 1] + cm1$Freq
+      Mn <- sum(cm1$Freq)
+      
+      @< MC estimates for given dose group @>
+      
+      # append treatment-specific result to result list
+      res.trt <- list(res.trt)
+    } else {
+      res.trt <- list(c())
+    } 
     res <- c(res, res.trt) 
   }
+  names(res) <- levels(cmdata$Trt)
   res
 }@| mc.est@}
 
@@ -342,56 +347,181 @@ $\tvec = \rvec + \svec$, where $s_i\geq 0$ and $\sum s_i \leq M-\sum r_i$.
 @}
 
 
+\subsection{Manipulating estimates}
+It is helpful to have functions that can convert the marginally compatible estimates from the $\pi$-based
+form obtained in the estimates to the $\tau$'s and to extract the variance-covariance matrix and the 
+correlation parameters.
 
+The \texttt{tau.from.pi} function takes a $K$-dimensional array of $\pi_\rvec$ values, and returns a $K$-dimensional
+array of $\tau_\rvec$ values using
+\begin{equation} 
+ \tau_\rvec = \sum_{\svec}\frac{\binom{n-\sum r_i}{\svec}}%
+  {\binom{n}{\rvec+\svec}}\pi_{\rvec+\svec}.% 
+\end{equation}
+
+@O ..\R\ExchMultinomial.R
+@{ 
+tau.from.pi <- function(pimat){
+  K <- length(dim(pimat))
+  n <- dim(pimat)[1] - 1
+  res <- array(NA, dim=rep(n+1, K)) 
+  dimnames(res) <- rep.int(list(0:n), K) 
+  names(dimnames(res)) <- paste("R", 1:K, sep="")
+
+  # multinomial lookup table
+  mctab <- mChooseTable(n, K+1, log=FALSE)
+  
+  # indices for possible values of r
+  @<Simplex with sums @(idx @, n @, K @, idxsum @)@>
+  for (i in 1:nrow(idx)){
+    r <- idx[i,]
+    s.idx <- which(idxsum <= n-sum(r))
+    lower.idx <- idx[s.idx, , drop=FALSE]
+    upper.idx <- lower.idx + rep(r, each=nrow(lower.idx))
+    lower.mc.idx <- cbind(lower.idx, n-sum(r)-idxsum[s.idx])   #add implied last column
+    upper.mc.idx <- cbind(upper.idx, n-sum(r)-idxsum[s.idx])   #add implied last column
+    res[rbind(r)+1] <- 
+      sum(mctab[lower.mc.idx+1] / mctab[upper.mc.idx+1] * pimat[upper.idx+1])
+  } 
+  res
+}
+@| tau.from.pi @}
+
+The \texttt{p.from.tau} function function takes a $K$-dimensional array of $\tau_\rvec$ values, and returns a vector 
+of marginal probabilities of success $\tau_{\dvec_i}$.
+
+@o ..\R\ExchMultinomial.R
+@{
+p.from.tau <- function(taumat){
+  K <- length(dim(taumat))
+  idx <- diag(rep(1,K))
+  taumat[rbind(idx+1)]
+}    
+@} 
+
+The function \texttt{mc.corr} calculates the within- and between-outcome correlation coefficients for the
+exchangeable model. It takes a $K$-dimensional array of $\pi_\rvec$ values, and returns a 2-dimensional
+matrix of $\phi_{ij}$, $i,j=1, \ldots,K$ values using
+\begin{equation} 
+ \phi_{ij} = 
+   \begin{cases}
+   \big[\tau_{(2\dvec_i)} - \tau_{(\dvec_i)}^2\big]\big/\big[\tau_{(\dvec_i)} (1-\tau_{(\dvec_i)})\big] & i=j\\
+  -\big[\tau_{(\dvec_i+\dvec_j)} - \tau_{(\dvec_i)}\tau_{(\dvec_j)}\big]\big/\big[\tau_{(\dvec_i)} \tau_{(\dvec_j)}\big] & i\ne j,\\
+   \end{cases} 
+\end{equation}
+where $\dvec_i=(0,\ldots,0,\overbrace{1}^i,0,\ldots,0)$.
+@O ..\R\ExchMultinomial.R
+@{
+corr.from.pi <- function(pimat){
+  K <- length(dim(pimat))
+  tt <- tau.from.pi(pimat)
+  
+  idx <- diag(rep(1,K))
+  numerator <- outer(1:K, 1:K, function(i,j){
+     tt[idx[i,]+idx[j,]+1] - tt[idx[i,]+1] * tt[idx[j,]+1]})
+  denominator <- outer(1:K, 1:K, function(i,j){
+     tt[idx[i,]+1] * ifelse(i==j, 1-tt[idx[i,]+1], -tt[idx[j,]+1])})  
+  res <- numerator / denominator    #the negative sign is in the denominator
+}
+
+@| corr.from.pi @}
 
 \subsection{Testing marginal compatibility}
-The \texttt{reprodmc.test.chisq} function implements Pang and Kuk's version of
-the test for marginal compatibility. Note that it only tests that the marginal probability of 
-response $p_i$ does not depend on the cluster size. The original test was only
-defined for one group and the test statistic was compared to $\chi^2_1$ (or more
-precisely, it was a z-test), however the test is easily generalized by adding 
-the test statistics for the $G$ separate groups and using a $\chi^2_G$ distribution.
+The \texttt{mc.test.chisq} function implements a generalization of the Cochran-Armitage trend test
+for correlated multinomial data to test for marginal compatibility. Note that it only tests that the marginal probability of 
+response $p_i$ does not depend on the cluster size for any category.
 
-\begin{equation}
-Z_g = \Big[\sum_{i=1}^{N_g} (c_{n_{g,i}} - \bar{c}_g) r_{g,i}\Big] \bigg/
-  \Big[\hat{p}_g(1-\hat{p}_g)\sum_{i=1}^{N_g}n_{g,i}(c_{n_{g,i}} - \bar{c}_g)^2 \{1+(n_{g,i}-1)\hat{\rho}_g\}\Big]^{1/2},
+First, we define the test statistic for one group, and then add the resulting $\chi^2_{K}$-distributed test statistics
+over the $G$ groups for an overall $G\,K$ degree of freedom test.
+
+As above, let $(\rvec_i, n_i)$, $i=1,\ldots N$ denote
+the observed data for a given dose level, where $i$ iterates
+through the clusters, $n_i$ is the cluster size and 
+$\rvec_i = (r_{i1},\ldots,r_{iK})$ is the observed number of responses of each type. Define the raw trend statistic for response $j$
+as
+\begin{equation}\label{E:rawmcstat}
+X_j = \sum_{i=1}^N r_{ij} (c_{n_i} - \bar{c}), \quad j=1,\ldots,K,
 \end{equation}
-where $c_n$ are the scores for the Cochran-Armitage test usually chosen as $c_n=n-(M+1)/2$, 
-$\bar{c}_g=\big(\sum_{i=1}^{N_g}n_{g,i}c_{n_{g,i}}\big) \big/ \big(\sum_{i=1}^{N_g}n_{g,i}\big)$ is a weighted
-average of the scores; $\hat{p}_g=\big(\sum_{i=1}^{N_g}r_{g,i}\big) \big/ \big(\sum_{i=1}^{N_g}n_{g,i}\big)$ 
-is the raw response probability, and 
-$\hat{\rho}_g=1-\big[\sum_{i=1}^{N_g}(n_{g,i}-r_{g,i})r_{g,i}/n_{g,i}\big] \big/ 
-\big[\hat{p}_g(1-\hat{p}_g)\sum_{i=1}^{N_g}(n_{g,i}-1)\big]$ is the Fleiss-Cuzack estimate of the intra-cluster
-correlation for the $g$th treatment group. 
+where $c_n$ are the scores for the Cochran-Armitage test usually chosen as $c_n=n-(M+1)/2$, and 
+$\bar{c}_g=\big(\sum_{i=1}^{N}n_{i}c_{n_{i}}\big) \big/ \big(\sum_{i=1}^{N}n_{i}\big) = 
+\sum_{n=1}^M M_nc_n / N$ is the weighted
+average of the scores ($M_n$ is the number of clusters of size $n$).
 
+The covariance of two of these test statistics is
 \begin{equation}
-X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
+\sigma_{jk}=\text{Cov}(X_j, X_k) = 
+\begin{cases}
+\dsum_{i=1}^N (c_{n_i}-\bar{c})^2 n_i p_{j|n} (1-p_{j|n})[1+(n_i-1)\phi_{jj|n_i}], & j=k;\\ 
+-\dsum_{i=1}^N (c_{n_i}-\bar{c})^2 n_i p_{j|n} p_{k|n}[1+(n_i-1)\phi_{jk|n_i}], & j\ne k,\\ 
+\end{cases}
+\end{equation}
+where $p_{j|n}=\tau_{\dvec_j|n}$ is the probability of event type $O_j$ in clusters of size $n$. Under the
+null hypothesis of marginal compatibility, the dependence of $p_{j|n}$ and $\phi_{jk|n}$ on $n$ can be removed: 
+\begin{equation}\label{E:mcstatcov}
+\sigma_{jk}=
+\begin{cases}
+ p_{j}(1-p_{j})\dsum_{i=1}^N (c_{n_i}-\bar{c})^2 n_i[1+(n_i-1)\phi_{jj}] = 
+   p_{j}(1-p_{j})\dsum_{n=1}^M n M_n (c_n-\bar{c})^2 [1+(n-1)\phi_{jj}], & j=k;\\ 
+-p_{j}p_{k}\dsum_{i=1}^N (c_{n_i}-\bar{c})^2 n_i [1+(n_i-1)\phi_{jk}] =
+  -p_{j}p_{k}\dsum_{n=1}^M n M_n (c_n-\bar{c})^2 [1+(n-1)\phi_{jk}], & j\ne k,\\ 
+\end{cases}
 \end{equation}
 
-@O ../R/Reprod.R
+The combined test statistic for the given dose group $g$ is
+\begin{equation}
+T^2_g = X_g' \Sigma_g^{-1} X_g \sim \chi^2_K \text{ under }H_0,
+\end{equation}
+where $X_g' =  (X_{g1}, \ldots, X_{gK})$, and $\Sigma_g=(\sigma_{gjk})_{K\times K}$ is its variance-covariance matrix defined by
+\eqref{E:rawmcstat} and \eqref{E:mcstatcov}.
+The unknown values of $p_j$ and $\phi_{jk}$ will be replaced by their estimates under marginal compatibility
+$\hat{\tau}_{g\dvec_j}$ and $\hat{\phi}_{gjk}$.
+
+The final test statistic is an independent combination of the statistics for each dose group:
+\begin{equation}
+T^2=\sum_{g=1}^G T_g^2 \sim \chi^2_{G\,K} \text{ under }H_0.
+\end{equation}
+
+@O ..\R\ExchMultinomial.R
 @{
+mc.test.chisq <- function(cmdata){
+  K <- attr(cmdata, "ncat")-1
+  nrespvars <- paste("NResp", 1:K, sep=".")
   
-mc.test.chisq <- function(cbdata){
-  cbdata <- subset(cbdata, Freq>0)
- 
   get.T <- function(x){
-      max.size <- max(x$ClusterSize)
-      scores <- (1:max.size) - (max.size+1)/2
-      p.hat <- with(x, sum(Freq*NResp) / sum(Freq*ClusterSize))
-      rho.hat <- with(x, 1-sum(Freq*(ClusterSize-NResp)*NResp/ClusterSize) / 
-          (sum(Freq*(ClusterSize-1))*p.hat*(1-p.hat)))  #Fleiss-Cuzick estimate
-      c.bar <- with(x, sum(Freq*scores[ClusterSize]*ClusterSize) / sum(Freq*ClusterSize))
-      T.center <- with(x, sum(Freq*(scores[ClusterSize]-c.bar)*NResp))
-      Var.T.stat <-  with(x, 
-         p.hat*(1-p.hat)*sum(Freq*(scores[ClusterSize]-c.bar)^2*ClusterSize*(1+(ClusterSize-1)*rho.hat)))
-      X.stat <- (T.center)^2/Var.T.stat
-      X.stat}
+      x$Trt <- factor(x$Trt)  #remove unused levels
+      pim <- mc.est(x)[[1]]  #only one treatment group
+      tt <- tau.from.pi(pim)
+      p <- p.from.tau(tt)
+      phi <- corr.from.pi(pim)
+      xx <- x[rep(1:nrow(x), x$Freq),]
+      xx$Freq <- 1
       
-   chis <- by(cbdata, cbdata$Trt, get.T)
+      M <- max(x$ClusterSize)
+      Mn <- table(factor(xx$ClusterSize, levels=1:M)) 
+
+      scores <- (1:M) - (M+1)/2
+      
+      Rmat <- data.matrix(xx[,nrespvars,drop=FALSE])
+      cvec <- scores[xx$ClusterSize] 
+      c.bar <- mean(cvec)
+      cvec <- cvec - c.bar 
+            
+      X <- t(Rmat) %*% cvec
+      Sigma <- diag(p) - outer(p,p)  #multinomial vcov
+      od.matrix <- matrix(0, nr=K, nc=K)  #over-dispersion matrix
+      for (n in 1:M){
+        od.matrix <- od.matrix + n * Mn[n] * (scores[n]-c.bar) * (1+(n-1)*phi)
+      }
+      Sigma <- Sigma * od.matrix
+      
+      T <- t(X) %*% solve(Sigma) %*% X       
+   }
+      
+   chis <- by(cmdata, cmdata$Trt, get.T)
    chis <- chis[1:length(chis)]
-   chi.list <- list(chi.sq=chis, p=pchisq(chis, df=1, lower.tail=FALSE))
+   chi.list <- list(chi.sq=chis, p=pchisq(chis, df=K, lower.tail=FALSE))
    overall.chi <- sum(chis)
-   overall.df <- length(chis)
+   overall.df <- length(chis) * K
    list(overall.chi=overall.chi, overall.p=pchisq(overall.chi, df=overall.df, lower.tail=FALSE), 
         individual=chi.list)
 }

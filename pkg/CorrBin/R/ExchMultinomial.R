@@ -151,55 +151,151 @@ mc.est <- function(cmdata, eps=1E-6){
   res <- list()
   for (trt in levels(cmdata$Trt)){
     cm1 <- subset(cmdata, Trt==trt)
-    # observed freq lookup table
-    atab <- array(0, dim=rep(M+1, nc))
-    a.idx <- data.matrix(cm1[,nrespvars])
-    atab[a.idx + 1] <- atab[a.idx + 1] + cm1$Freq
-    Mn <- sum(cm1$Freq)
-    
-    
-      res.trt <- array(NA, dim=rep(M+1, nc-1))
-      dimnames(res.trt) <- rep.int(list(0:M), nc-1)
-       
-      #starting values
-      res.trt[idx + 1] <- 1/nrow(idx)
+    if (nrow(cm1) > 0){
+      # observed freq lookup table
+      atab <- array(0, dim=rep(M+1, nc))
+      a.idx <- data.matrix(cm1[,nrespvars])
+      atab[a.idx + 1] <- atab[a.idx + 1] + cm1$Freq
+      Mn <- sum(cm1$Freq)
       
-      sqerror <- 1
-      #EM update
-      while (sqerror > eps){
-       sqerror <- 0
-       marg <- Marginals(res.trt)
-        res.new <- array(NA, dim=rep(M+1, nc-1))
-        res.new[idx + 1] <- 0
+      
+        res.trt <- array(NA, dim=rep(M+1, nc-1))
+        dimnames(res.trt) <- rep.int(list(0:M), nc-1)
+         
+        #starting values
+        res.trt[idx + 1] <- 1/nrow(idx)
         
-        
-          for (i in 1:nrow(cm1)){
-            rlong <- data.matrix(cm1[,nrespvars])[i,]    #nc elements
-            r <- rlong[-nc]              #without the last category
-            n <- cm1$ClusterSize[i]  
-            # indices to which this cluster type contributes
-            s.idx <- which(idxsum <= M-sum(r))
-            tidx <- idx[s.idx, , drop=FALSE] + rep(r, each=length(s.idx))
-            
-            hvals <- apply(tidx, 1, function(tvec)prod(choose(tvec, r)) * choose(M-sum(tvec), n-sum(r))) 
-            hvals <- hvals / choose(M, n)
-            res.new[tidx+1] <- res.new[tidx+1] + atab[rbind(rlong)+1] / marg[rbind(c(n,r+1))] / Mn *
-                                                 hvals * res.trt[tidx+1]
-          }
-        
-       
-        sqerror <- sum((res.new[idx+1] - res.trt[idx+1])^2)
-       res.trt <- res.new 
-      }
-    
-    
-    # append treatment-specific result to result list
-    res.trt <- list(res.trt)
-    names(res.trt) <- trt
+        sqerror <- 1
+        #EM update
+        while (sqerror > eps){
+         sqerror <- 0
+         marg <- Marginals(res.trt)
+          res.new <- array(NA, dim=rep(M+1, nc-1))
+          res.new[idx + 1] <- 0
+          
+          
+            for (i in 1:nrow(cm1)){
+              rlong <- data.matrix(cm1[,nrespvars])[i,]    #nc elements
+              r <- rlong[-nc]              #without the last category
+              n <- cm1$ClusterSize[i]  
+              # indices to which this cluster type contributes
+              s.idx <- which(idxsum <= M-sum(r))
+              tidx <- idx[s.idx, , drop=FALSE] + rep(r, each=length(s.idx))
+              
+              hvals <- apply(tidx, 1, function(tvec)prod(choose(tvec, r)) * choose(M-sum(tvec), n-sum(r))) 
+              hvals <- hvals / choose(M, n)
+              res.new[tidx+1] <- res.new[tidx+1] + atab[rbind(rlong)+1] / marg[rbind(c(n,r+1))] / Mn *
+                                                   hvals * res.trt[tidx+1]
+            }
+          
+         
+          sqerror <- sum((res.new[idx+1] - res.trt[idx+1])^2)
+         res.trt <- res.new 
+        }
+      
+      
+      # append treatment-specific result to result list
+      res.trt <- list(res.trt)
+    } else {
+      res.trt <- list(c())
+    } 
     res <- c(res, res.trt) 
   }
+  names(res) <- levels(cmdata$Trt)
+  res
+} 
+tau.from.pi <- function(pimat){
+  K <- length(dim(pimat))
+  n <- dim(pimat)[1] - 1
+  res <- array(NA, dim=rep(n+1, K)) 
+  dimnames(res) <- rep.int(list(0:n), K) 
+  names(dimnames(res)) <- paste("R", 1:K, sep="")
+
+  # multinomial lookup table
+  mctab <- mChooseTable(n, K+1, log=FALSE)
+  
+  # indices for possible values of r
+  
+     idx  <- hcube(rep( n +1,  K ))-1
+      idxsum  <- rowSums(idx )
+     idx  <- idx [ idxsum  <=  n , ,drop=FALSE]  #remove impossible indices
+      idxsum  <-  idxsum [ idxsum  <=  n ]
+  
+  for (i in 1:nrow(idx)){
+    r <- idx[i,]
+    s.idx <- which(idxsum <= n-sum(r))
+    lower.idx <- idx[s.idx, , drop=FALSE]
+    upper.idx <- lower.idx + rep(r, each=nrow(lower.idx))
+    lower.mc.idx <- cbind(lower.idx, n-sum(r)-idxsum[s.idx])   #add implied last column
+    upper.mc.idx <- cbind(upper.idx, n-sum(r)-idxsum[s.idx])   #add implied last column
+    res[rbind(r)+1] <- 
+      sum(mctab[lower.mc.idx+1] / mctab[upper.mc.idx+1] * pimat[upper.idx+1])
+  } 
   res
 }
+
+p.from.tau <- function(taumat){
+  K <- length(dim(taumat))
+  idx <- diag(rep(1,K))
+  taumat[rbind(idx+1)]
+}    
+
+corr.from.pi <- function(pimat){
+  K <- length(dim(pimat))
+  tt <- tau.from.pi(pimat)
+  
+  idx <- diag(rep(1,K))
+  numerator <- outer(1:K, 1:K, function(i,j){
+     tt[idx[i,]+idx[j,]+1] - tt[idx[i,]+1] * tt[idx[j,]+1]})
+  denominator <- outer(1:K, 1:K, function(i,j){
+     tt[idx[i,]+1] * ifelse(i==j, 1-tt[idx[i,]+1], -tt[idx[j,]+1])})  
+  res <- numerator / denominator    #the negative sign is in the denominator
+}
+
+
+mc.test.chisq <- function(cmdata){
+  K <- attr(cmdata, "ncat")-1
+  nrespvars <- paste("NResp", 1:K, sep=".")
+  
+  get.T <- function(x){
+      x$Trt <- factor(x$Trt)  #remove unused levels
+      pim <- mc.est(x)[[1]]  #only one treatment group
+      tt <- tau.from.pi(pim)
+      p <- p.from.tau(tt)
+      phi <- corr.from.pi(pim)
+      xx <- x[rep(1:nrow(x), x$Freq),]
+      xx$Freq <- 1
+      
+      M <- max(x$ClusterSize)
+      Mn <- table(factor(xx$ClusterSize, levels=1:M)) 
+
+      scores <- (1:M) - (M+1)/2
+      
+      Rmat <- data.matrix(xx[,nrespvars,drop=FALSE])
+      cvec <- scores[xx$ClusterSize] 
+      c.bar <- mean(cvec)
+      cvec <- cvec - c.bar 
+            
+      X <- t(Rmat) %*% cvec
+      Sigma <- diag(p) - outer(p,p)  #multinomial vcov
+      od.matrix <- matrix(0, nr=K, nc=K)  #over-dispersion matrix
+      for (n in 1:M){
+        od.matrix <- od.matrix + n * Mn[n] * (scores[n]-c.bar) * (1+(n-1)*phi)
+      }
+      Sigma <- Sigma * od.matrix
+      
+      T <- t(X) %*% solve(Sigma) %*% X       
+   }
+      
+   chis <- by(cmdata, cmdata$Trt, get.T)
+   chis <- chis[1:length(chis)]
+   chi.list <- list(chi.sq=chis, p=pchisq(chis, df=K, lower.tail=FALSE))
+   overall.chi <- sum(chis)
+   overall.df <- length(chis) * K
+   list(overall.chi=overall.chi, overall.p=pchisq(overall.chi, df=overall.df, lower.tail=FALSE), 
+        individual=chi.list)
+}
+
   mChooseTable <- function(n, k, log=FALSE){
     res <- array(NA, dim=rep.int(n+1, k))
     dimnames(res) <- rep.int(list(0:n), k)
