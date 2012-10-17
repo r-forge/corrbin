@@ -394,7 +394,7 @@ of marginal probabilities of success $\tau_{\dvec_i}$.
 @{
 p.from.tau <- function(taumat){
   K <- length(dim(taumat))
-  idx <- diag(rep(1,K))
+  idx <- diag(nrow=K)
   taumat[rbind(idx+1)]
 }    
 @} 
@@ -416,7 +416,7 @@ corr.from.pi <- function(pimat){
   K <- length(dim(pimat))
   tt <- tau.from.pi(pimat)
   
-  idx <- diag(rep(1,K))
+  idx <- diag(nrow=K)
   numerator <- outer(1:K, 1:K, function(i,j){
      tt[idx[i,]+idx[j,]+1] - tt[idx[i,]+1] * tt[idx[j,]+1]})
   denominator <- outer(1:K, 1:K, function(i,j){
@@ -444,7 +444,7 @@ X_j = \sum_{i=1}^N r_{ij} (c_{n_i} - \bar{c}), \quad j=1,\ldots,K,
 \end{equation}
 where $c_n$ are the scores for the Cochran-Armitage test usually chosen as $c_n=n-(M+1)/2$, and 
 $\bar{c}_g=\big(\sum_{i=1}^{N}n_{i}c_{n_{i}}\big) \big/ \big(\sum_{i=1}^{N}n_{i}\big) = 
-\sum_{n=1}^M M_nc_n / N$ is the weighted
+\sum_{n=1}^M M_nnc_n / \sum_{n=1}^M n M_n$ is the weighted
 average of the scores ($M_n$ is the number of clusters of size $n$).
 
 The covariance of two of these test statistics is
@@ -502,19 +502,21 @@ mc.test.chisq <- function(cmdata){
       scores <- (1:M) - (M+1)/2
       
       Rmat <- data.matrix(xx[,nrespvars,drop=FALSE])
-      cvec <- scores[xx$ClusterSize] 
-      c.bar <- mean(cvec)
+      nvec <- xx$ClusterSize
+      cvec <- scores[nvec] 
+      c.bar <- weighted.mean(cvec, w=nvec)
       cvec <- cvec - c.bar 
             
       X <- t(Rmat) %*% cvec
-      Sigma <- diag(p) - outer(p,p)  #multinomial vcov
+      Sigma <- diag(p, nrow=length(p)) - outer(p,p)  #multinomial vcov
       od.matrix <- matrix(0, nr=K, nc=K)  #over-dispersion matrix
       for (n in 1:M){
-        od.matrix <- od.matrix + n * Mn[n] * (scores[n]-c.bar) * (1+(n-1)*phi)
+        od.matrix <- od.matrix + n * Mn[n] * (scores[n]-c.bar)^2 * (1+(n-1)*phi)
       }
       Sigma <- Sigma * od.matrix
       
-      T <- t(X) %*% solve(Sigma) %*% X       
+      Tstat <- t(X) %*% solve(Sigma) %*% X       
+      Tstat
    }
       
    chis <- by(cmdata, cmdata$Trt, get.T)
