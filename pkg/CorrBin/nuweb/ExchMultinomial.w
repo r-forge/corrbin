@@ -35,16 +35,6 @@ We implement parameter estimation for exchangeable multinomial data, including e
 
 \section{Preliminaries}
 
-First we need to set up the C file so that it can access the R internals.
-@o ..\src\ReprodMultiCalcs.c
-@{
-#include <stdlib.h>
-#include <R.h>
-#include <Rdefines.h>
-#include <Rmath.h>
-#include <R_ext/Applic.h>
-@}
-
 We will be using object of \texttt{CMData} class, which is defined in \texttt{CMData.w}.
 
 We will also need to load support libraries.

@@ -160,17 +160,6 @@ treatment group. For the package the compiled library needs to be loaded.
 %into the R code\footnote{this is for a Windows system; on Linux/Unix a .so
 %file would be created and that's what would be loaded}:
 
-@o ../R/zzz.R
-@{
-.First.lib <- function(libname, pkgname){
-  library.dynam("CorrBin", pkgname, libname)
-}
-
-.Last.lib <- function(libpath){
-  library.dynam.unload("CorrBin",libpath)
-}
-@}
-
 
 @o ../R/Reprod.R
 @{
@@ -291,7 +280,7 @@ SO.mc.est <- function(cbdata, turn=1, control=soControl()){
 	  start <- "uniform"
   }
 	if (start=="H0"){
-	  const.row <- matrix(0:size, nr=size+1, nc=ntrt)
+	  const.row <- matrix(0:size, nrow=size+1, ncol=ntrt)
 	  Q[const.row+1] <- 1/(size+1)
 		}
 	else {  #start=="uniform"

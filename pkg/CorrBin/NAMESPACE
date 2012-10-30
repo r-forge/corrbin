@@ -1,0 +1,24 @@
+# Export public functions 
+export(betabin.pdf)
+export(CBData)
+export(GEE.trend.test)
+export(mc.est)
+export(mc.test.chisq)
+export(NOSTASOT)
+export(qpower.pdf)
+export(ran.CBData)
+export(read.CBData)
+export(RS.trend.test)
+export(SO.LRT)
+export(SO.mc.est)
+export(SO.trend.test)
+export(soControl)
+export(trend.test)
+export(unwrap.CBData)
+
+
+# Import required packages
+import(boot)
+
+# Load DLL
+useDynLib(CorrBin)
