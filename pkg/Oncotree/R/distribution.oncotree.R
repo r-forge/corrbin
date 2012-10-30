@@ -31,7 +31,7 @@ function(otree, with.probs=TRUE, with.errors=FALSE,
 	}
 	
 	descendants <- function(outcome, atree, with.probs, edge.weights=c("observed","expected")){
-		desc <- matrix(0, nr=0, nc=atree$nmut)
+		desc <- matrix(0, nrow=0, ncol=atree$nmut)
 		prob.adj <- numeric()
 		level.empty <- tapply(as.numeric(outcome), atree$level, function(x)all(x==0))
 		level.empty <- c(level.empty, TRUE, TRUE)  #add two artificial levels
@@ -91,7 +91,7 @@ function(otree, with.probs=TRUE, with.errors=FALSE,
 		res <- do.call(expand.grid, val.list)
 		attr(res,"out.attrs") <- NULL
 		attr(res,"colnames") <- NULL
-		trans.mat <- matrix(0, nr=nrow(distr), nc=nrow(res))
+		trans.mat <- matrix(0, nrow=nrow(distr), ncol=nrow(res))
 		
 		for (i in 1:nrow(distr)){
 			for (j in 1:nrow(res)){

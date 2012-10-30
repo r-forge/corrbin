@@ -21,7 +21,7 @@ function(otree, R, type=c("nonparametric","parametric")){
 	    }
 	    else {	#type=="parametric"
 	    	if (is.null(otree$eps)) stop("Need false positive and negative rates")
-				result <- matrix(NA, nr=R, nc=nmut)
+				result <- matrix(NA, nrow=R, ncol=nmut)
 				N <- nrow(otree$data)
 	      distr <- distribution.oncotree(otree, with.probs=TRUE, with.errors=TRUE,
 		                     edge.weights="estimated")
