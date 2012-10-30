@@ -1,8 +1,8 @@
 Package: Oncotree
 Type: Package
 Title: Estimating oncogenetic trees
-Version: 0.3.1
-Date: 2009-03-10
+Version: 0.3.2
+Date: 2012-11-30
 Author: Aniko Szabo, Lisa Pappas
 Maintainer: Aniko Szabo <aszabo@mcw.edu>
 Depends: R (>= 2.3.1), boot

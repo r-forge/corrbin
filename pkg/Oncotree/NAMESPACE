@@ -1,0 +1,28 @@
+#Declare S3 methods
+S3method(plot, oncotree)
+S3method(print, oncotree)
+S3method(pstree, oncotree)
+S3method(bootstrap, oncotree)
+S3method(distribution, oncotree)
+S3method(plot, boottree)
+S3method(print, boottree)
+
+# Export public functions and data
+export(ancestors)
+export(bootstrap.oncotree)
+export(distribution.oncotree)
+export("error.rates<-")
+export(generate.data)
+export(least.common.ancestor)
+export(marginal.distr)
+export(oncotree.fit)
+export(ov.cgh)
+export(plot.boottree)
+export(plot.oncotree)
+export(print.boottree)
+export(print.oncotree)
+export(pstree.oncotree)
+
+
+# Import required packages
+import(boot)
