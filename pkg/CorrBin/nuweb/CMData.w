@@ -41,7 +41,7 @@ variable in \texttt{x}. \texttt{nresp} should be a vector of variable names or c
 (if \texttt{clustersize} is given) or $K+1$ (in which case \texttt{clustersize} will be calculated).
 \texttt{freq} can also be NULL, in which case it is 
 assumed that each combination has frequency 1.
-@O ../R/CMData.R @{
+@O ../R/CMData.Rnotyet @{
 CMData <- function(x, trt, nresp, clustersize=NULL, freq=NULL){
   if (!is.data.frame(x)) stop("x has to be a data frame")
   nms <- names(x)
@@ -94,7 +94,7 @@ The first column should always give the treatment group, then either the counts 
 chosen by setting \texttt{with.clustersize = TRUE}). Optionally, a last column could
 give the number of times the given combination occurs in the data.
 
-@o ../R/CMData.R
+@o ../R/CMData.Rnotyet
 @{
 read.CMData <- function(file, with.clustersize=TRUE, with.freq=TRUE, ...){
   d <- read.table(file, ...)
@@ -113,7 +113,7 @@ read.CMData <- function(file, with.clustersize=TRUE, with.freq=TRUE, ...){
 each row is one observation (instead of one cluster). A new `ID' variable is added
 to indicate clusters. 
 
-@O ../R/CMData.R @{
+@O ../R/CMData.Rnotyet @{
 
 unwrap.CMData <- function(cmdata){
   #unwrap Freq variable

@@ -39,7 +39,7 @@ We will be using object of \texttt{CMData} class, which is defined in \texttt{CM
 
 We will also need to load support libraries.
 
-@o ..\R\ExchMultinomial.R @{
+@o ..\R\ExchMultinomial.Rnotyet @{
   library(combinat)
 @}
 
@@ -81,7 +81,7 @@ the cluster size. The calculation of $\theta$'s is done separately for each dose
 level uses a different sample-size distribution for averaging.
 
 
-@o ..\R\ExchMultinomial.R @{
+@o ..\R\ExchMultinomial.Rnotyet @{
 @< Define function for multinomial coefficient @>
 tau <- function(cmdata, type=c("averaged","cluster")){
   type <- match.arg(type)
@@ -213,7 +213,7 @@ where $\dvec_i$ is the $i$th coordinate basis vector (i.e.\ all its elements are
 The input for \texttt{Marginals} is a $K$-dimensional array of $\pi_{\rvec|M}$, and the output is a $(K+1)$-dimensional
 array with the values of $\pi_{\rvec|n}$, $n=1,\ldots,M$ with cluster size as the first dimension
 
-@O ..\R\ExchMultinomial.R
+@O ..\R\ExchMultinomial.Rnotyet
 @{
 Marginals <- function(theta){
   K <- length(dim(theta))
@@ -255,7 +255,7 @@ The iterative step initializes with the last term (with $\pi_{\rvec|n+1}$) and l
 
 The actual EM iterations are performed in \texttt{mc.est}. 
 
-@O ..\R\ExchMultinomial.R
+@O ..\R\ExchMultinomial.Rnotyet
 @{
 mc.est <- function(cmdata, eps=1E-6){
   @< Extract info from cmdata into variables @>
@@ -349,7 +349,7 @@ array of $\tau_\rvec$ values using
   {\binom{n}{\rvec+\svec}}\pi_{\rvec+\svec}.% 
 \end{equation}
 
-@O ..\R\ExchMultinomial.R
+@O ..\R\ExchMultinomial.Rnotyet
 @{ 
 tau.from.pi <- function(pimat){
   K <- length(dim(pimat))
@@ -380,7 +380,7 @@ tau.from.pi <- function(pimat){
 The \texttt{p.from.tau} function function takes a $K$-dimensional array of $\tau_\rvec$ values, and returns a vector 
 of marginal probabilities of success $\tau_{\dvec_i}$.
 
-@o ..\R\ExchMultinomial.R
+@o ..\R\ExchMultinomial.Rnotyet
 @{
 p.from.tau <- function(taumat){
   K <- length(dim(taumat))
@@ -400,7 +400,7 @@ matrix of $\phi_{ij}$, $i,j=1, \ldots,K$ values using
    \end{cases} 
 \end{equation}
 where $\dvec_i=(0,\ldots,0,\overbrace{1}^i,0,\ldots,0)$.
-@O ..\R\ExchMultinomial.R
+@O ..\R\ExchMultinomial.Rnotyet
 @{
 corr.from.pi <- function(pimat){
   K <- length(dim(pimat))
@@ -471,7 +471,7 @@ The final test statistic is an independent combination of the statistics for eac
 T^2=\sum_{g=1}^G T_g^2 \sim \chi^2_{G\,K} \text{ under }H_0.
 \end{equation}
 
-@O ..\R\ExchMultinomial.R
+@O ..\R\ExchMultinomial.Rnotyet
 @{
 mc.test.chisq <- function(cmdata){
   K <- attr(cmdata, "ncat")-1
@@ -555,7 +555,7 @@ with the number of categories $k$ and $n=\max \sum r_i$ given. The results is a 
 \texttt{[r1,\ldots,rK]} corresponding to $\binom{\sum (r_i-1)}{r_1-1,\ldots,r_k-1}$ (because the array is 1-indexed, while
 $r_i$ can go from 0). The values in the array with coordinate sum exceeding $n$ are missing.
  
-@o ..\R\ExchMultinomial.R @{
+@o ..\R\ExchMultinomial.Rnotyet @{
   mChooseTable <- function(n, k, log=FALSE){
     res <- array(NA, dim=rep.int(n+1, k))
     dimnames(res) <- rep.int(list(0:n), k)
