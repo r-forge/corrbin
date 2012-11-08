@@ -16,7 +16,7 @@ mc.est <- function(cbdata){
 
   
 mc.test.chisq <- function(cbdata){
-  cbdata <- subset(cbdata, Freq>0)
+  cbdata <- cbdata[cbdata$Freq>0, ]
  
   get.T <- function(x){
       max.size <- max(x$ClusterSize)
@@ -42,8 +42,6 @@ mc.test.chisq <- function(cbdata){
 
 
 SO.mc.est <- function(cbdata, turn=1, control=soControl()){ 
-  attach(control)
-  on.exit(detach(control))
   tab <- xtabs(Freq~factor(ClusterSize,levels=1:max(ClusterSize))+
                 factor(NResp,levels=0:max(ClusterSize))+Trt, data=cbdata)
    size <- dim(tab)[1]
@@ -56,11 +54,11 @@ SO.mc.est <- function(cbdata, turn=1, control=soControl()){
    S <- DownUpMatrix(size, ntrt, turn)
    storage.mode(S) <- "integer"
    
-   if ((start=="H0")&(method=="EM")){
+   if ((control$start=="H0")&(control$method=="EM")){
      warning("The EM algorithm can only use 'start=uniform'. Switching options.")
      start <- "uniform"
   }
-   if (start=="H0"){
+   if (control$start=="H0"){
      const.row <- matrix(0:size, nrow=size+1, ncol=ntrt)
      Q[const.row+1] <- 1/(size+1)
       }
@@ -68,11 +66,11 @@ SO.mc.est <- function(cbdata, turn=1, control=soControl()){
      Q[S+1] <- 1/(nrow(S))
     }
     
-  res0 <- switch(method,
-      EM = .Call("MixReprodQ", Q, S, tab, as.integer(max.iter), as.double(eps), 
-                    as.integer(verbose),PACKAGE="CorrBin"),
-      ISDM = .Call("ReprodISDM", Q, S, tab, as.integer(max.iter), as.integer(max.directions),
-                   as.double(eps),  as.integer(verbose),PACKAGE="CorrBin"))
+  res0 <- switch(control$method,
+      EM = .Call("MixReprodQ", Q, S, tab, as.integer(control$max.iter), as.double(control$eps), 
+                    as.integer(control$verbose), PACKAGE="CorrBin"),
+      ISDM = .Call("ReprodISDM", Q, S, tab, as.integer(control$max.iter), as.integer(control$max.directions),
+                   as.double(control$eps),  as.integer(control$verbose), PACKAGE="CorrBin"))
  
   names(res0) <- c("MLest","Q","D","loglik", "converge")
   names(res0$converge) <- c("rel.error", "n.iter")
@@ -83,7 +81,7 @@ SO.mc.est <- function(cbdata, turn=1, control=soControl()){
   names(res) <- c("NResp","ClusterSize","Trt","Prob") 
   res$NResp  <- as.numeric(as.character(res$NResp))
   res$ClusterSize  <- as.numeric(as.character(res$ClusterSize))
-  res <- subset(res, NResp <= ClusterSize)
+  res <- res[res$NResp <= res$ClusterSize,]
   levels(res$Trt) <- levels(cbdata$Trt)
   
   attr(res, "loglik") <- res0$loglik
@@ -221,7 +219,7 @@ NOSTASOT <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=
    curr.gr <- levels(cbdata$Trt)[ntrt]
    
    while (!NOSTASOT.found & (curr.gr.idx>1)){
-     d1 <- subset(cbdata, unclass(Trt)<=curr.gr.idx)
+     d1 <- cbdata[unclass(cbdata$Trt)<=curr.gr.idx, ]
      d1$Trt <- factor(d1$Trt) #eliminate unused levels
      tr.test <- trend.test(d1, test=test, exact=exact, R=R, control=control)
      p.vec[curr.gr] <- tr.test$p.val

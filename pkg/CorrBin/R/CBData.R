@@ -60,20 +60,18 @@ unwrap.CBData <- function(cbdata){
 RS.trend.test <- function(cbdata){  
    dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
    dat2$Trt <- factor(dat2$Trt)  #remove unused levels
-  attach(dat2)
-  on.exit(detach(dat2))
-  x.i <- pmax(tapply(NResp, Trt, sum), 0.5)  #"continuity" adjustment to avoid RS=NaN
-  n.i <- tapply(ClusterSize, Trt, sum)
-  m.i <- table(Trt)
+  x.i <- pmax(tapply(dat2$NResp, dat2$Trt, sum), 0.5)  #"continuity" adjustment to avoid RS=NaN
+  n.i <- tapply(dat2$ClusterSize, dat2$Trt, sum)
+  m.i <- table(dat2$Trt)
   p.i.hat <- x.i/n.i
-  r.ij <- NResp - ClusterSize*p.i.hat[Trt]
-  v.i <- m.i/(m.i-1)/n.i^2*tapply(r.ij^2, Trt, sum)
+  r.ij <- dat2$NResp - dat2$ClusterSize*p.i.hat[dat2$Trt]
+  v.i <- m.i/(m.i-1)/n.i^2*tapply(r.ij^2, dat2$Trt, sum)
   d.i <- n.i * v.i / (p.i.hat*(1-p.i.hat))   #design effect
   x.i.new <- x.i/d.i
   n.i.new <- n.i/d.i
   p.hat <- sum(x.i.new)/sum(n.i.new)
   
-  scores <- (1:nlevels(Trt))-1
+  scores <- (1:nlevels(dat2$Trt))-1
   mean.score <- sum(scores*n.i.new)/sum(n.i.new)
   var.scores <- sum(n.i.new*(scores-mean.score)^2)
   RS <- (sum(x.i.new*scores) - p.hat*sum(n.i.new*scores)) / 
@@ -88,13 +86,13 @@ GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
   ucb <- unwrap.CBData(cbdata)
   scale.method <- match.arg(scale.method)
   if (scale.method=="fixed") {
-    geemod <- geese(Resp~unclass(Trt), id=ID, scale.fix=FALSE, data=ucb,
+    geemod <- geese(Resp~unclass(Trt), id=ucb$ID, scale.fix=FALSE, data=ucb,
                     family=binomial, corstr="exch") }  
   else if (scale.method=="trend"){
-    geemod <- geese(Resp~unclass(Trt), sformula=~unclass(Trt), id=ID,  data=ucb,
+    geemod <- geese(Resp~unclass(Trt), sformula=~unclass(Trt), id=ucb$ID,  data=ucb,
                    family=binomial, sca.link="log", corstr="exch")}
   else if (scale.method=="all"){
-    geemod <- geese(Resp~unclass(Trt), id=ID,  sformula=~Trt, data=ucb,
+    geemod <- geese(Resp~unclass(Trt), id=ucb$ID,  sformula=~Trt, data=ucb,
                     family=binomial, sca.link="log", corstr="exch") } 
   geesum <- summary(geemod)
   testres <- geesum$mean[2,"estimate"]/geesum$mean[2,"san.se"]
@@ -119,7 +117,7 @@ ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
    a <- by(sample.sizes, list(Trt=sst, ClusterSize=sample.sizes$ClusterSize), ran.gen)
    a <- data.frame(do.call(rbind, a))
    a$Trt <- factor(a$Trt, labels=levels(sst))
-   a <- subset(a, Freq>0)
+   a <- a[a$Freq>0, ]
    class(a) <-  c("CBData", "data.frame")
    a
  }
