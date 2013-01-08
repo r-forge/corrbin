@@ -1,4 +1,37 @@
 
+#'Distribution of the number of responses assuming marginal compatibility.
+#'
+#'The \code{mc.est} function estimates the distribution of the number of
+#'responses in a cluster under the assumption of marginal compatibility:
+#'information from all cluster sizes is pooled. The estimation is performed
+#'independently for each treatment group.
+#'
+#'The EM algorithm given by Stefanescu and Turnbull (2003) is used.
+#'
+#'@param cbdata a \code{\link{CBData}} object
+#'@return A data frame giving the estimated pdf for each treatment and
+#'clustersize. It has the following columns: .  The probabilities add up to 1
+#'for each \code{Trt}/\code{ClusterSize} combination.
+#'@returnItem Prob numeric, the probability of \code{NResp} responses in a
+#'cluster of size \code{ClusterSize} in group \code{Trt}
+#'@returnItem Trt factor, the treatment group
+#'@returnItem ClusterSize numeric, the cluster size
+#'@returnItem NResp numeric, the number of responses
+#'@author Aniko Szabo
+#'@references Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for
+#'exchangeable binary data with varying cluster sizes.  \emph{Biometrics}, 59,
+#'18-24
+#'@keywords nonparametric models
+#'@examples
+#'
+#'data(shelltox)
+#'sh.mc <- mc.est(shelltox)
+#'
+#'library(lattice)
+#'xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=sh.mc, subset=ClusterSize>0, 
+#'    type="l", as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
+#'    xlab="Number of responses", ylab="Probability P(R=r|N=n)")
+#'
 mc.est <- function(cbdata){
   #by trt
   do.est.fun <- function(x){
@@ -14,7 +47,43 @@ mc.est <- function(cbdata){
   est.list <- by(cbdata, list(Trt=cbdata$Trt), do.est.fun)
   do.call(rbind,est.list)}
 
-  
+#'Test the assumption of reproducibility
+#'
+#'\code{mc.test.chisq} tests whether thee assumption of reproducibility is
+#'violated in the data.
+#'
+#'The assumption of marginal compatibility (AKA interpretability) implies that
+#'the marginal probability of response does not depend on clustersize.
+#'Stefanescu and Turnbull (2003), and Pang and Kuk (2007) developed a
+#'Cochran-Armitage type test for trend in the marginal probability of success
+#'as a function of the clustersize. \code{mc.test.chisq} implements a
+#'generalization of that test extending it to multiple treatment groups.
+#'
+#'@param cbdata a \code{\link{CBData}} object
+#'@return A list with the following components:
+#'@returnItem overall.chi the test statistic; sum of the statistics for each
+#'group
+#'@returnItem overall.p p-value of the test
+#'@returnItem individual a list of the results of the test applied to each
+#'group separately: \itemize{ \itemchi.sq the test statistic for the group
+#'\itemp p-value for the group}
+#'@author Aniko Szabo
+#'@seealso \code{\link{CBData}} for constructing a CBData object,
+#'\code{\link{mc.est}} for estimating the distribution under marginal
+#'compatibility.
+#'@references Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for
+#'exchangeable binary data with varying cluster sizes. \emph{Biometrics}, 59,
+#'18-24
+#'
+#'Pang, Z. & Kuk, A. (2007) Test of marginal compatibility and smoothing
+#'methods for exchangeable binary data with unequal cluster sizes.
+#'\emph{Biometrics}, 63, 218-227
+#'@keywords htest
+#'@examples
+#'
+#'data(shelltox)
+#'mc.test.chisq(shelltox)
+#'  
 mc.test.chisq <- function(cbdata){
   cbdata <- cbdata[cbdata$Freq>0, ]
  
@@ -40,6 +109,62 @@ mc.test.chisq <- function(cbdata){
         individual=chi.list)
 }
 
+#'Order-restricted MLE assuming marginal compatibility
+#'
+#'\code{SO.mc.est} computes the nonparametric maximum likelihood estimate of
+#'the distribution of the number of responses in a cluster \eqn{P(R=r|n)} under
+#'a stochastic ordering constraint. Umbrella ordering can be specified using
+#'the \code{turn} parameter.
+#'
+#'Two different algorithms: EM and ISDM are implemented. In general, ISDM (the
+#'default) should be faster, though its performance depends on the tuning
+#'parameter \code{max.directions}: values that are too low or too high slow the
+#'algorithm down.
+#'
+#'\code{SO.mc.est} allows extension to an umbrella ordering: \eqn{D_1 \geq^{st}
+#'\cdots \geq^{st} D_k \leq^{st} \cdots \leq^{st} D_n}{D_1 >= \ldots >= D_k <=
+#'\ldots <= D_n} by specifying the value of \eqn{k} as the \code{turn}
+#'parameter. This is an experimental feature, and at this point none of the
+#'other functions can handle umbrella orderings.
+#'
+#'@param cbdata an object of class \code{\link{CBData}}.
+#'@param turn integer specifying the peak of the umbrella ordering (see
+#'Details). The default corresponds to a non-decreasing order.
+#'@param control an optional list of control settings, usually a call to
+#'\code{\link{soControl}}.  See there for the names of the settable control
+#'values and their effect.
+#'@return A list with components:
+#'
+#'Components \code{Q} and \code{D} are unlikely to be needed by the user.
+#'@returnItem MLest data frame with the maximum likelihood estimates of
+#'\eqn{P(R_i=r|n)}
+#'@returnItem Q numeric matrix; estimated weights for the mixing distribution
+#'@returnItem D numeric matrix; directional derivative of the log-likelihood
+#'@returnItem loglik the achieved value of the log-likelihood
+#'@returnItem converge a 2-element vector with the achived relative error and
+#'the performed number of iterations
+#'@author Aniko Szabo, aszabo@mcw.edu
+#'@seealso \code{\link{soControl}}
+#'@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
+#'Test for Trend with Clustered Binary Data. \emph{Biometrika}
+#'@keywords nonparametric models
+#'@examples
+#'
+#'  data(shelltox)
+#'  ml <- SO.mc.est(shelltox, control=soControl(eps=0.01, method="ISDM"))
+#'  attr(ml, "converge")
+#'  
+#'  require(lattice)
+#'  panel.cumsum <- function(x,y,...){
+#'    x.ord <- order(x)
+#'    panel.xyplot(x[x.ord], cumsum(y[x.ord]), ...)}
+#'
+#'  xyplot(Prob~NResp|factor(ClusterSize), groups=Trt, data=ml, type="s",
+#'       panel=panel.superpose, panel.groups=panel.cumsum,
+#'       as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
+#'       xlab="Number of responses", ylab="Cumulative Probability R(R>=r|N=n)",
+#'       ylim=c(0,1.1), main="Stochastically ordered estimates\n with marginal compatibility")
+#'
 
 SO.mc.est <- function(cbdata, turn=1, control=soControl()){ 
   tab <- xtabs(Freq~factor(ClusterSize,levels=1:max(ClusterSize))+
@@ -89,6 +214,38 @@ SO.mc.est <- function(cbdata, turn=1, control=soControl()){
   res
 }
 
+#'Control values for order-constrained fit
+#'
+#'The values supplied in the function call replace the defaults and a list with
+#'all possible arguments is returned.  The returned list is used as the control
+#'argument to the \code{\link{mc.est}}, \code{\link{SO.LRT}}, and
+#'\code{\link{SO.trend.test}} functions.
+#'
+#'
+#'@param method a string specifying the maximization method
+#'@param eps a numeric value giving the maximum absolute error in the
+#'log-likelihood
+#'@param max.iter an interger specifying the maximal number of iterations
+#'@param max.directions an integer giving the maximal number of directions
+#'considered at one step of the ISDM method.  If zero or negative, it is set to
+#'the number of non-empty cells. A value of 1 corresponds to the VDM algorithm.
+#'@param start a string specifying the starting setup of the mixing
+#'distribution; "H0" puts weight only on constant vectors (corresponding to the
+#'null hypothesis of no change), "uniform" puts equal weight on all elements.
+#'Only a "uniform" start can be used for the "EM" algorithm.
+#'@param verbose a logical value; if TRUE details of the optimization are
+#'shown.
+#'@return a list with components for each of the possible arguments.
+#'@author Aniko Szabo aszabo@mcw.edu
+#'@seealso \code{\link{mc.est}}, \code{\link{SO.LRT}},
+#'\code{\link{SO.trend.test}}
+#'@keywords models
+#'@examples
+#'
+#'# decrease the maximum number iterations and
+#'# request the "EM" algorithm
+#' soControl(method="EM", max.iter=100)
+#'
 soControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000, 
       max.directions=0, start=ifelse(method=="ISDM", "H0", "uniform"), verbose=FALSE){
   method <- match.arg(method)
@@ -130,6 +287,33 @@ DownUpMatrix <- function(size, ntrt, turn){
   
 }
 
+#'Likelihood-ratio test statistic
+#'
+#'\code{SO.LRT} computes the likelihood ratio test statistic for stochastic
+#'ordering against equality assuming marginal compatibility for both
+#'alternatives. Note that this statistic does not have a
+#'\eqn{\chi^2}{chi-squared} distribution, so the p-value computation is not
+#'straightforward. The \code{\link{SO.trend.test}} function implements a
+#'permutation-based evaluation of the p-value for the likelihood-ratio test.
+#'
+#'
+#'@param cbdata a \code{CBData} object
+#'@param control an optional list of control settings, usually a call to
+#'\code{\link{soControl}}.  See there for the names of the settable control
+#'values and their effect.
+#'@return The value of the likelihood ratio test statistic is returned with two
+#'attributes:
+#'@returnItem ll0 the log-likelihood under \eqn{H_0}{H0} (equality)
+#'@returnItem ll1 the log-likelihood under \eqn{H_a}{Ha} (stochastic order)
+#'@author Aniko Szabo
+#'@seealso \code{\link{SO.trend.test}}, \code{\link{soControl}}
+#'@keywords htest nonparametric
+#'@examples
+#'
+#'data(shelltox)
+#'LRT <- SO.LRT(shelltox, control=soControl(max.iter = 100, max.directions = 50))
+#'LRT
+#'
 SO.LRT <- function(cbdata, control=soControl()){
    # LL under null hypothesis of equality (+ reproducibility)
    a <- with(cbdata, aggregate(Freq, list(ClusterSize=ClusterSize,NResp=NResp), sum))
@@ -152,6 +336,54 @@ SO.LRT <- function(cbdata, control=soControl()){
  }
   
 
+#'Likelihood ratio test of stochastic ordering
+#'
+#'Performs a likelihood ratio test of stochastic ordering versus equality using
+#'permutations to estimate the null-distribution and the p-value.  If only the
+#'value of the test statistic is needed, use \code{\link{SO.LRT}} instead.
+#'
+#'The test is valid only under the assumption that the cluster-size
+#'distribution does not depend on group. During the estimation of the
+#'null-distribution the group assignments of the clusters are permuted keeping
+#'the group sizes constant; the within-group distribution of the cluster-sizes
+#'will vary randomly during the permutation test.
+#'
+#'The default value of \code{R} is probably too low for the final data
+#'analysis, and should be increased.
+#'
+#'@param cbdata a \code{\link{CBData}} object.
+#'@param R an integer -- the number of random permutations for estimating the
+#'null distribution.
+#'@param control an optional list of control settings, usually a call to
+#'\code{\link{soControl}}.  See there for the names of the settable control
+#'values and their effect.
+#'@return A list with the following components
+#'@returnItem LRT the value of the likelihood ratio test statistic. It has two
+#'attributes: \code{ll0} and \code{ll1} - the values of the log-likelihood
+#'under \eqn{H_0}{H0} and \eqn{H_a}{Ha} respectively.
+#'@returnItem p.val the estimated one-sided p-value.
+#'@returnItem boot.res an object of class "boot" with the detailed results of
+#'the permutations.  See \code{\link[boot]{boot}} for details.
+#'@author Aniko Szabo, aszabo@mcw.edu
+#'@seealso \code{\link{SO.LRT}} for calculating only the test statistic,
+#'\code{\link{soControl}}
+#'@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
+#'Test for Trend with Clustered Binary Data.
+#'@keywords htest nonparametric
+#'@examples
+#'
+#'data(shelltox)
+#'set.seed(45742)
+#'sh.test <- SO.trend.test(shelltox, R=10, control=soControl(eps=0.1, max.directions=25)) 
+#'sh.test
+#'
+#'#a plot of the resampled LRT values
+#'#would look better with a reasonable value of R
+#' null.vals <- sh.test$boot.res$t[,1]
+#' hist(null.vals, breaks=10,  freq=FALSE, xlab="Test statistic", ylab="Density", 
+#'      main="Simulated null-distribution", xlim=range(c(0,20,null.vals)))
+#' points(sh.test$LRT, 0, pch="*",col="red", cex=3)
+#'
 SO.trend.test <- function(cbdata, R=100, control=soControl()){
     require(boot)
    dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
@@ -174,6 +406,45 @@ SO.trend.test <- function(cbdata, R=100, control=soControl()){
    LRT <- res$t0
    list(LRT=LRT, p.val=p, boot.res=res)}           
 
+#'Test for increasing trend with correlated binary data
+#'
+#'The \code{trend.test} function provides a common interface to the trend tests
+#'implemented in this package: \code{\link{SO.trend.test}},
+#'\code{\link{RS.trend.test}}, and \code{\link{GEE.trend.test}}. The details of
+#'each test can be found on their help page.
+#'
+#'
+#'@param cbdata a \code{\link{CBData}} object
+#'@param test character string defining the desired test statistic. "RS"
+#'performs the Rao-Scott test (\code{\link{RS.trend.test}}), "SO" performs the
+#'stochastic ordering test (\code{\link{SO.trend.test}}), "GEE", "GEEtrend",
+#'"GEEall" perform the GEE-based test (\code{\link{GEE.trend.test}}) with
+#'constant, linearly modeled, and freely varying scale parameters,
+#'respectively.
+#'@param exact logical, should an exact permutation test be performed. Only an
+#'exact test can be performed for "SO". The default is to use the asymptotic
+#'p-values except for "SO".
+#'@param R integer, number of permutations for the exact test
+#'@param control an optional list of control settings for the stochastic order
+#'("SO") test, usually a call to \code{\link{soControl}}.  See there for the
+#'names of the settable control values and their effect.
+#'@return A list with two components and an optional "boot" attribute that
+#'contains the detailed results of the permutation test as an object of class
+#'\code{\link[boot]{boot}} if an exact test was performed.
+#'@returnItem statistic numeric, the value of the test statistic
+#'@returnItem p.val numeric, asymptotic one-sided p-value of the test
+#'@author Aniko Szabo, aszabo@mcw.edu
+#'@seealso \code{\link{SO.trend.test}}, \code{\link{RS.trend.test}}, and
+#'\code{\link{GEE.trend.test}} for details about the available tests.
+#'@keywords htest nonparametric
+#'@examples
+#'
+#'data(shelltox)
+#'trend.test(shelltox, test="RS")
+#'set.seed(5724)
+#'#R=50 is too low to get a good estimate of the p-value
+#'trend.test(shelltox, test="RS", R=50, exact=TRUE)
+#'
 trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=test=="SO", 
                        R=100, control=soControl()){ 
    test <- match.arg(test)
@@ -208,6 +479,54 @@ trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exac
    }   
    res}
 
+#'Finding the NOSTASOT dose
+#'
+#'The NOSTASOT dose is the No-Statistical-Significance-Of-Trend dose -- the
+#'largest dose at which no trend in the rate of response has been observed. It
+#'is often used to determine a safe dosage level for a potentially toxic
+#'compound.
+#'
+#'A series of hypotheses about the presence of an increasing trend overall,
+#'with all but the last group, all but the last two groups, etc.  are tested.
+#'Since this set of hypotheses forms a closed family, one can test these
+#'hypotheses in a step-down manner with the same \code{sig.level} type I error
+#'rate at each step and still control the family-wise error rate.
+#'
+#'The NOSTASOT dose is the largest dose at which the trend is not statistically
+#'significant. If the trend test is not significant with all the groups
+#'included, the largest dose is the NOSTASOT dose. If the testing sequence goes
+#'down all the way to two groups, and a significant trend is still detected,
+#'the lowest dose is the NOSTASOT dose. This assumes that the lowest dose is a
+#'control group, and this convention might not be meaningful otherwise.
+#'
+#'@param cbdata a \code{\link{CBData}} object
+#'@param test character string defining the desired test statistic. See
+#'\code{\link{trend.test}} for details.
+#'@param exact logical, should an exact permutation test be performed. See
+#'\code{\link{trend.test}} for details.
+#'@param R integer, number of permutations for the exact test
+#'@param sig.level numeric between 0 and 1, significance level of the test
+#'@param control an optional list of control settings for the stochastic order
+#'("SO") test, usually a call to \code{\link{soControl}}.  See there for the
+#'names of the settable control values and their effect.
+#'@return a list with two components
+#'@returnItem NOSTASOT character string identifying the NOSTASOT dose.
+#'@returnItem p numeric vector of the p-values of the tests actually performed.
+#'The last element corresponds to all doses included, and will not be missing.
+#'p-values for tests that were not actually performed due to the procedure
+#'stopping are set to NA.
+#'@author Aniko Szabo, aszabo@mcw.edu
+#'@seealso \code{\link{trend.test}} for details about the available trend
+#'tests.
+#'@references Tukey, J. W.; Ciminera, J. L. & Heyse, J. F. (1985) Testing the
+#'statistical certainty of a response to increasing doses of a drug.
+#'\emph{Biometrics} 41, 295-301.
+#'@keywords htest nonparametric
+#'@examples
+#'
+#'data(shelltox)
+#'NOSTASOT(shelltox, test="RS")
+#'
 NOSTASOT <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=test=="SO",
                      R=100, sig.level=0.05, control=soControl()){
    ntrt <- nlevels(cbdata$Trt)

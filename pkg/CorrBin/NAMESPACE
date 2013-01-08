@@ -14,8 +14,10 @@ export(SO.mc.est)
 export(SO.trend.test)
 export(soControl)
 export(trend.test)
-export(unwrap.CBData)
+export(unwrap)
 
+# register S3 methods
+S3method(unwrap, CBData)
 
 # Import required packages
 import(boot)

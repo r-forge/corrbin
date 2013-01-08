@@ -1,5 +1,5 @@
 \name{unwrap.CBData}
-\alias{unwrap.CBData}
+\alias{unwrap} \alias{unwrap.CBData}
 \title{Unwrap a CBData object}
 \description{
 \code{unwrap.CBData} is a utility function that reformats a CBData object so that
@@ -7,10 +7,11 @@ each row is one observation (instead of one or more clusters). A new `ID' variab
 to indicate clusters. This form can be useful for setting up the data for a different package.
 }
 \usage{
-unwrap.CBData(cbdata)
+\method{unwrap}{CBData}(object,\dots)
 }
 \arguments{
-  \item{cbdata}{a \code{\link{CBData}} object}
+  \item{object}{a \code{\link{CBData}} object}
+  \item{\dots}{other potential arguments; not currently used}
 }
 \value{
 A data frame with one row for each cluster element (having a binary outcome) with the
@@ -24,7 +25,7 @@ following standardized column names
 \author{ Aniko Szabo}
 \examples{
 data(shelltox)
-ush <- unwrap.CBData(shelltox)
+ush <- unwrap(shelltox)
 head(ush)
 }
 \keyword{ manip }

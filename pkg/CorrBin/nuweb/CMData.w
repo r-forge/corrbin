@@ -115,16 +115,16 @@ to indicate clusters.
 
 @O ../R/CMData.Rnotyet @{
 
-unwrap.CMData <- function(cmdata){
+unwrap.CMData <- function(object,...){
   #unwrap Freq variable
-  freqs <- rep(1:nrow(cmdata), cmdata$Freq)
-  cm1 <- cmdata[freqs,]
+  freqs <- rep(1:nrow(object), object$Freq)
+  cm1 <- object[freqs,]
   cm1$Freq <- NULL
   
   #create ID
   cm1$ID <- factor(1:nrow(cm1))
   
-  ncat <- attr(cmdata, "ncat")
+  ncat <- attr(object, "ncat")
   nrespvars <- paste("NResp", 1:ncat, sep=".")
   
   #reshape to have one row per category within cluster

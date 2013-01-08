@@ -1,7 +1,7 @@
 Package: CorrBin
-Title: Nonparametrics with clustered binary data
-Version: 1.3
-Date: 2012-11-8
+Title: Nonparametrics with clustered binary and multinomial data
+Version: 1.4
+Date: 2013-1-8
 Author: Aniko Szabo
 Maintainer: Aniko Szabo <aszabo@mcw.edu>
 Depends: R(>= 2.6.0), boot

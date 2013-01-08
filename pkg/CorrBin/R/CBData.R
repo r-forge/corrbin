@@ -1,4 +1,83 @@
 
+
+
+#'Nonparameterics for correlated binary data
+#'
+#'This package implements nonparametric methods for analysing exchangeable
+#'binary data with variable cluster sizes with emphasis on trend testing. The
+#'input should specify the treatment group, cluster-size, and the number of
+#'responses (i.e. the number of cluster elements with the outcome of interest)
+#'for each cluster.
+#'
+#'\tabular{ll}{ 
+#' Package: \tab CorrBin\cr 
+#' Type: \tab Package\cr 
+#' Version: \tab 1.4\cr
+#' Date: \tab 2013-01-13\cr 
+#' License: \tab GPL 2\cr 
+#' LazyLoad: \tab yes\cr
+#'} 
+#'\itemize{ \item The \code{\link{CBData}} and \code{\link{read.CBData}}
+#'functions create a `CBData' object used by the analysis functions.  
+#'\item \code{\link{ran.CBData}} can be used to generate random data with
+#'prespecified mean response and within-cluster correlation.  
+#'\item \code{\link{mc.test.chisq}} tests the assumption of marginal compatibility
+#'underlying all the methods, while \code{\link{mc.est}} estimates the
+#'distribution of the number of responses under marginal compatibility.  
+#'\item Finally, \code{\link{trend.test}} performs three different tests for trend
+#'along the treatment groups. }
+#'
+#'@name CorrBin-package
+#'@aliases CorrBin-package CorrBin
+#'@docType package
+#'@author Aniko Szabo
+#'
+#'Maintainer: Aniko Szabo <aszabo@mcw.edu>
+#'@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
+#'Test for Trend with Clustered Binary Data. \emph{Biometrika}
+#'
+#'Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for exchangeable
+#'binary data with varying cluster sizes. \emph{Biometrics}, 59, 18-24
+#'
+#'Pang, Z. & Kuk, A. (2007) Test of marginal compatibility and smoothing
+#'methods for exchangeable binary data with unequal cluster sizes.
+#'\emph{Biometrics}, 63, 218-227
+#'@keywords package nonparametric
+NULL
+
+#'Create a `CBdata' object from a data frame.
+#'
+#'The \code{CBData} function creates an object of class \dfn{CBData} that is
+#'used in further analyses. It identifies the variables that define treatment
+#'group, clustersize and the number of responses.
+#'
+#'@export
+#'@param x a data frame with one row representing a cluster or potentially a
+#'set of clusters of the same size and number of responses
+#'@param trt the name of the variable that defines treatment group
+#'@param clustersize the name of the variable that defines cluster size
+#'@param nresp the name of the variable that defines the number of responses in
+#'the cluster
+#'@param freq the name of the variable that defines the number of clusters
+#'represented by the data row. If \code{NULL}, then each row is assumed to
+#'correspond to one cluster.
+#'@return A data frame with each row representing all the clusters with the
+#'same trt/size/number of responses, and standardized variable names:
+#'@returnItem Trt factor, the treatment group
+#'@returnItem ClusterSize numeric, the cluster size
+#'@returnItem NResp numeric, the number of responses
+#'@returnItem Freq numeric, number of clusters with the same values
+#'@author Aniko Szabo
+#'@seealso \code{\link{read.CBData}} for creating a \code{CBData} object
+#'directly from a file.
+#'@keywords classes manip
+#'@examples
+#'
+#'data(shelltox)
+#'sh <- CBData(shelltox, trt="Trt", clustersize="ClusterSize", nresp="NResp")
+#'str(sh)
+#'
+
 CBData <- function(x, trt, clustersize, nresp, freq=NULL){
   if (!is.data.frame(x)) stop("x has to be a data frame")
   nms <- names(x)
@@ -29,6 +108,25 @@ CBData <- function(x, trt, clustersize, nresp, freq=NULL){
   class(d) <- c("CBData", "data.frame")
   d}
 
+#'Read data from external file into a CBData object
+#'
+#'A convenience function to read data from specially structured file directly
+#'into a \code{CBData} object.
+#'
+#'@export
+#'@param file name of file with data. The first column should contain the
+#'treatment group, the second the size of the cluster, the third the number of
+#'responses in the cluster. Optionally, a fourth column could give the number
+#'of times the given combination occurs in the data.
+#'@param with.freq logical indicator of whether a frequency variable is present
+#'in the file
+#'@param ... additonal arguments passed to \code{\link[utils]{read.table}}
+#'@return a \code{CBData} object
+#'@author Aniko Szabo
+#'@seealso \code{\link{CBData}}
+#'@keywords IO file
+#'
+
 read.CBData <- function(file, with.freq=TRUE, ...){
   d <- read.table(file, col.names=c("Trt","ClusterSize","NResp", if (with.freq) "Freq"), ...)
   if (!with.freq) d$Freq <- 1
@@ -39,10 +137,38 @@ read.CBData <- function(file, with.freq=TRUE, ...){
   d <- CBData(d, "Trt", "ClusterSize", "NResp", "Freq")
   d}
 
+#'Unwrap a CBData object
+#'
+#'\code{unwrap.CBData} is a utility function that reformats a CBData object so
+#'that each row is one observation (instead of one or more clusters). A new
+#'`ID' variable is added to indicate clusters. This form can be useful for
+#'setting up the data for a different package.
+#'
+#'@method unwrap CBData
+#'@aliases unwrap unwrap.CBData
+#'@param object a \code{\link{CBData}} object
+#'@param \dots other potential arguments; not currently used
+#'@return A data frame with one row for each cluster element (having a binary
+#'outcome) with the following standardized column names
+#'@returnItem Trt factor, the treatment group
+#'@returnItem ClusterSize numeric, the cluster size
+#'@returnItem ID factor, each level representing a different cluster
+#'@returnItem Resp numeric with 0/1 values, giving the response of the cluster
+#'element
+#'@author Aniko Szabo
+#'@keywords manip
+#'@examples
+#'
+#'data(shelltox)
+#'ush <- unwrap(shelltox)
+#'head(ush)
+#'
 
-unwrap.CBData <- function(cbdata){
-  freqs <- rep(1:nrow(cbdata), cbdata$Freq)
-  cb1 <- cbdata[freqs,]
+unwrap <- function(object,...) UseMethod("unwrap")
+
+unwrap.CBData <- function(object,...){
+  freqs <- rep(1:nrow(object), object$Freq)
+  cb1 <- object[freqs,]
   cb1$Freq <- NULL
   cb1$ID <- factor(1:nrow(cb1))
   pos.idx <- rep(1:nrow(cb1), cb1$NResp)
@@ -56,6 +182,39 @@ unwrap.CBData <- function(cbdata){
   res <- rbind(cb.pos, cb.neg)
   res[order(res$ID),]
   }
+
+
+#'Rao-Scott trend test
+#'
+#'\code{RS.trend.test} implements the Rao-Scott adjusted Cochran-Armitage test
+#'for linear increasing trend with correlated data.
+#'
+#'The test is based on calculating a \dfn{design effect} for each cluster by
+#'dividing the observed variability by the one expected under independence. The
+#'number of responses and the cluster size are then divided by the design
+#'effect, and a Cochran-Armitage type test statistic is computed based on these
+#'adjusted values.
+#'
+#'The implementation aims for testing for \emph{increasing} trend, and a
+#'one-sided p-value is reported. The test statistic is asymptotically normally
+#'distributed, and a two-sided p-value can be easily computed if needed.
+#'
+#'@export
+#'@param cbdata a \code{\link{CBData}} object
+#'@return A list with components
+#'@returnItem statistic numeric, the value of the test statistic
+#'@returnItem p.val numeric, asymptotic one-sided p-value of the test
+#'@author Aniko Szabo, aszabo@mcw.edu
+#'@seealso \code{\link{SO.trend.test}}, \code{\link{GEE.trend.test}} for
+#'alternative tests; \code{\link{CBData}} for constructing a CBData object.
+#'@references Rao, J. N. K. & Scott, A. J. A (1992) Simple Method for the
+#'Analysis of Clustered Data \emph{Biometrics}, 48, 577-586.
+#'@keywords htest nonparametric
+#'@examples
+#'
+#'data(shelltox)
+#'RS.trend.test(shelltox)
+#'
 
 RS.trend.test <- function(cbdata){  
    dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
@@ -80,6 +239,39 @@ RS.trend.test <- function(cbdata){
   list(statistic=RS, p.val=p.val)
   }
 
+#'GEE-based trend test
+#'
+#'\code{GEE.trend.test} implements a GEE based test for linear increasing trend
+#'for correlated binary data.
+#'
+#'The actual work is performed by the \code{\link[geepack]{geese}} function of
+#'the \code{geepack} library. This function only provides a convenient wrapper
+#'to obtain the results in the same format as \code{\link{RS.trend.test}} and
+#'\code{\link{SO.trend.test}}.
+#'
+#'The implementation aims for testing for \emph{increasing} trend, and a
+#'one-sided p-value is reported. The test statistic is asymptotically normally
+#'distributed, and a two-sided p-value can be easily computed if needed.
+#'
+#'@export
+#'@param cbdata a \code{\link{CBData}} object
+#'@param scale.method character string specifying the assumption about the
+#'change in the overdispersion (scale) parameter across the treatment groups:
+#'"fixed" - constant scale parameter (default); "trend" - linear trend for the
+#'log of the scale parameter; "all" - separate scale parameter for each group.
+#'@return A list with components
+#'@returnItem statistic numeric, the value of the test statistic
+#'@returnItem p.val numeric, asymptotic one-sided p-value of the test
+#'@author Aniko Szabo, aszabo@mcw.edu
+#'@seealso \code{\link{RS.trend.test}}, \code{\link{SO.trend.test}} for
+#'alternative tests; \code{\link{CBData}} for constructing a CBData object.
+#'@keywords htest models
+#'@examples
+#'
+#'data(shelltox)
+#'GEE.trend.test(shelltox, "trend")
+#'
+
 
 GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
   require(geepack)
@@ -99,6 +291,47 @@ GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
   p <- pnorm(testres, lower.tail=FALSE)
   list(statistic=testres, p.val=p)
  }   
+
+
+
+#'Generate random correlated binary data
+#'
+#'\code{ran.mc.CBData} generates a random \code{\link{CBData}} object from a
+#'given two-parameter distribution.
+#'
+#'\dfn{p.gen.fun} and \dfn{rho.gen.fun} are functions that generate the
+#'parameter values for each treatment group; \dfn{pdf.fun} is a function
+#'generating the pdf of the number of responses given the two parameters
+#'\dfn{p} and \dfn{rho}, and the cluster size \dfn{n}.
+#'
+#'\code{p.gen.fun} and \code{rho.gen.fun} expect the parameter value of 1 to
+#'represent the first group, 2 - the second group, etc.
+#'
+#'@export
+#'@param sample.sizes a dataset with variables Trt, ClusterSize and Freq giving
+#'the number of clusters to be generated for each Trt/ClusterSize combination.
+#'@param p.gen.fun a function of one parameter that generates the value of the
+#'first parameter of \code{pdf.fun} (\emph{p}) given the group number.
+#'@param rho.gen.fun a function of one parameter that generates the value of
+#'the second parameter of \code{pdf.fun} (\emph{rho}) given the group number.
+#'@param pdf.fun a function of three parameters (\emph{p, rho, n}) giving the
+#'PDF of the number of responses in a cluster given the two parameters
+#'(\emph{p, rho}), and the cluster size (\emph{n}). Functions implementing two
+#'common distributions: the beta-binomial (\code{\link{betabin.pdf}}) and
+#'q-power (\code{\link{qpower.pdf}}) are provided in the package.
+#'@return a CBData object with randomly generated number of responses with
+#'sample sizes specified in the call.
+#'@author Aniko Szabo, aszabo@mcw.edu
+#'@seealso \code{\link{betabin.pdf}} and \code{\link{qpower.pdf}}
+#'@keywords distribution
+#'@examples
+#'
+#' set.seed(3486)
+#' ss <- expand.grid(Trt=0:3, ClusterSize=5, Freq=4)
+#' #Trt is converted to a factor
+#' rd <- ran.CBData(ss, p.gen.fun=function(g)0.2+0.1*g)
+#' rd
+#'
 
 ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
                            rho.gen.fun=function(g)0.2, pdf.fun=qpower.pdf){
@@ -121,6 +354,51 @@ ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
    class(a) <-  c("CBData", "data.frame")
    a
  }
+
+#'Parametric distributions for correlated binary data
+#'
+#'\code{qpower.pdf} and \code{betabin.pdf} calculate the probability
+#'distribution function for the number of responses in a cluster of the q-power
+#'and beta-binomial distributions, respectively.
+#'
+#'The pdf of the q-power distribution is \deqn{P(X=x) =
+#'{{n}\choose{x}}\sum_{k=0}^x (-1)^k{{x}\choose{k}}q^{(n-x+k)^\gamma},}{P(X=x)
+#'= C(n,x)\sum_{k=0}^x (-1)^kC(x,k)q^((n-x+k)^g),} \eqn{x=0,\ldots,n}, where
+#'\eqn{q=1-p}, and the intra-cluster correlation \deqn{\rho =
+#'\frac{q^{2^\gamma}-q^2}{q(1-q)}.}{rho = (q^(2^g)-q^2)/(q(1-q)).}
+#'
+#'The pdf of the beta-binomial distribution is \deqn{P(X=x) = {{n}\choose{x}}
+#'\frac{B(\alpha+x, n+\beta-x)}{B(\alpha,\beta)},}{P(X=x) = C(n,x)
+#'B(a+x,n+b-x)/B(a,b),} \eqn{x=0,\ldots,n}, where \eqn{\alpha=
+#'p\frac{1-\rho}{\rho}}{a=p(1-rho)/rho}, and \eqn{\alpha=
+#'(1-p)\frac{1-\rho}{\rho}}{b=(1-p)(1-rho)/rho}.
+#'
+#'@export
+#'@aliases qpower.pdf betabin.pdf
+#'@param p numeric, the probability of success.
+#'@param rho numeric between 0 and 1 inclusive, the within-cluster correlation.
+#'@param n integer, cluster size.
+#'@return a numeric vector of length \eqn{n+1} giving the value of \eqn{P(X=x)}
+#'for \eqn{x=0,\ldots,n}.
+#'@author Aniko Szabo, aszabo@mcw.edu
+#'@seealso \code{\link{ran.CBData}} for generating an entire dataset using
+#'these functions
+#'@references Kuk, A. A (2004) litter-based approach to risk assessement in
+#'developmental toxicity studies via a power family of completely monotone
+#'functions \emph{Applied Statistics}, 52, 51-61.
+#'
+#'Williams, D. A. (1975) The Analysis of Binary Responses from Toxicological
+#'Experiments Involving Reproduction and Teratogenicity \emph{Biometrics}, 31,
+#'949-952.
+#'@keywords distribution
+#'@examples
+#'
+#'#the distributions have quite different shapes
+#'#with q-power assigning more weight to the "all affected" event than other distributions
+#'plot(0:10, betabin.pdf(0.3, 0.4, 10), type="o", ylim=c(0,0.34), 
+#'   ylab="Density", xlab="Number of responses out of 10")
+#'lines(0:10, qpower.pdf(0.3, 0.4, 10), type="o", col="red")
+#'
 
  betabin.pdf <- function(p, rho, n){
    a <- p*(1/rho-1)
