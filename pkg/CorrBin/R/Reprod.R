@@ -1,4 +1,50 @@
 
+
+
+#'Nonparameterics for correlated binary data
+#'
+#'This package implements nonparametric methods for analysing exchangeable
+#'binary data with variable cluster sizes with emphasis on trend testing. The
+#'input should specify the treatment group, cluster-size, and the number of
+#'responses (i.e. the number of cluster elements with the outcome of interest)
+#'for each cluster.
+#'
+#'\tabular{ll}{ 
+#' Package: \tab CorrBin\cr 
+#' Type: \tab Package\cr 
+#' Version: \tab 1.4\cr
+#' Date: \tab 2013-01-13\cr 
+#' License: \tab GPL 2\cr 
+#' LazyLoad: \tab yes\cr
+#'} 
+#'\itemize{ \item The \code{\link{CBData}} and \code{\link{read.CBData}}
+#'functions create a `CBData' object used by the analysis functions.  
+#'\item \code{\link{ran.CBData}} can be used to generate random data with
+#'prespecified mean response and within-cluster correlation.  
+#'\item \code{\link{mc.test.chisq}} tests the assumption of marginal compatibility
+#'underlying all the methods, while \code{\link{mc.est}} estimates the
+#'distribution of the number of responses under marginal compatibility.  
+#'\item Finally, \code{\link{trend.test}} performs three different tests for trend
+#'along the treatment groups. }
+#'
+#'@name CorrBin-package
+#'@aliases CorrBin-package CorrBin
+#'@docType package
+#'@author Aniko Szabo
+#'
+#'Maintainer: Aniko Szabo <aszabo@@mcw.edu>
+#'@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
+#'Test for Trend with Clustered Binary Data. \emph{Biometrika}
+#'
+#'Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for exchangeable
+#'binary data with varying cluster sizes. \emph{Biometrics}, 59, 18-24
+#'
+#'Pang, Z. & Kuk, A. (2007) Test of marginal compatibility and smoothing
+#'methods for exchangeable binary data with unequal cluster sizes.
+#'\emph{Biometrics}, 63, 218-227
+#'@keywords package nonparametric
+NULL
+
 #'Distribution of the number of responses assuming marginal compatibility.
 #'
 #'The \code{mc.est} function estimates the distribution of the number of
@@ -8,15 +54,17 @@
 #'
 #'The EM algorithm given by Stefanescu and Turnbull (2003) is used.
 #'
+#'@useDynLib CorrBin
+#'@export
 #'@param cbdata a \code{\link{CBData}} object
 #'@return A data frame giving the estimated pdf for each treatment and
 #'clustersize. It has the following columns: .  The probabilities add up to 1
 #'for each \code{Trt}/\code{ClusterSize} combination.
-#'@returnItem Prob numeric, the probability of \code{NResp} responses in a
-#'cluster of size \code{ClusterSize} in group \code{Trt}
-#'@returnItem Trt factor, the treatment group
-#'@returnItem ClusterSize numeric, the cluster size
-#'@returnItem NResp numeric, the number of responses
+#'@return \item{Prob}{numeric, the probability of \code{NResp} responses in a
+#'cluster of size \code{ClusterSize} in group \code{Trt}}
+#'@return \item{Trt}{factor, the treatment group}
+#'@return \item{ClusterSize}{numeric, the cluster size}
+#'@return \item{NResp}{numeric, the number of responses}
 #'@author Aniko Szabo
 #'@references Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for
 #'exchangeable binary data with varying cluster sizes.  \emph{Biometrics}, 59,
@@ -32,11 +80,12 @@
 #'    type="l", as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
 #'    xlab="Number of responses", ylab="Probability P(R=r|N=n)")
 #'
+
 mc.est <- function(cbdata){
   #by trt
   do.est.fun <- function(x){
     est <- .Call("ReprodEstimates", as.integer(x$ClusterSize), as.integer(x$NResp), 
-                   as.integer(x$Freq),PACKAGE="CorrBin")
+                             as.integer(x$Freq),PACKAGE="CorrBin")
     est <- cbind(c(1,rep(NA,nrow(est)-1)), est) 
     idx <- upper.tri(est,diag=TRUE)
     est.d <- data.frame(Prob=est[idx], ClusterSize=as.integer(col(est)[idx]-1), 
@@ -59,14 +108,15 @@ mc.est <- function(cbdata){
 #'as a function of the clustersize. \code{mc.test.chisq} implements a
 #'generalization of that test extending it to multiple treatment groups.
 #'
+#'@export
 #'@param cbdata a \code{\link{CBData}} object
 #'@return A list with the following components:
-#'@returnItem overall.chi the test statistic; sum of the statistics for each
-#'group
-#'@returnItem overall.p p-value of the test
-#'@returnItem individual a list of the results of the test applied to each
-#'group separately: \itemize{ \itemchi.sq the test statistic for the group
-#'\itemp p-value for the group}
+#'@return \item{overall.chi the test statistic; sum of the statistics for each
+#'group}
+#'@return \item{overall.p}{p-value of the test}
+#'@return \item{individual}{a list of the results of the test applied to each
+#'group separately: \itemize{ \item chi.sq the test statistic for the group
+#'\item p p-value for the group}
 #'@author Aniko Szabo
 #'@seealso \code{\link{CBData}} for constructing a CBData object,
 #'\code{\link{mc.est}} for estimating the distribution under marginal
@@ -84,6 +134,7 @@ mc.est <- function(cbdata){
 #'data(shelltox)
 #'mc.test.chisq(shelltox)
 #'  
+
 mc.test.chisq <- function(cbdata){
   cbdata <- cbdata[cbdata$Freq>0, ]
  
@@ -127,6 +178,8 @@ mc.test.chisq <- function(cbdata){
 #'parameter. This is an experimental feature, and at this point none of the
 #'other functions can handle umbrella orderings.
 #'
+#'@useDynLib CorrBin
+#'@export
 #'@param cbdata an object of class \code{\link{CBData}}.
 #'@param turn integer specifying the peak of the umbrella ordering (see
 #'Details). The default corresponds to a non-decreasing order.
@@ -136,14 +189,14 @@ mc.test.chisq <- function(cbdata){
 #'@return A list with components:
 #'
 #'Components \code{Q} and \code{D} are unlikely to be needed by the user.
-#'@returnItem MLest data frame with the maximum likelihood estimates of
-#'\eqn{P(R_i=r|n)}
-#'@returnItem Q numeric matrix; estimated weights for the mixing distribution
-#'@returnItem D numeric matrix; directional derivative of the log-likelihood
-#'@returnItem loglik the achieved value of the log-likelihood
-#'@returnItem converge a 2-element vector with the achived relative error and
-#'the performed number of iterations
-#'@author Aniko Szabo, aszabo@mcw.edu
+#'@return \item{MLest}{data frame with the maximum likelihood estimates of
+#'\eqn{P(R_i=r|n)}}
+#'@return \item{Q}{numeric matrix; estimated weights for the mixing distribution}
+#'@return \item{D}{numeric matrix; directional derivative of the log-likelihood}
+#'@return \item{loglik}{the achieved value of the log-likelihood}
+#'@return \item{converge}{a 2-element vector with the achived relative error and
+#'the performed number of iterations}
+#'@author Aniko Szabo, aszabo@@mcw.edu
 #'@seealso \code{\link{soControl}}
 #'@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
 #'Test for Trend with Clustered Binary Data. \emph{Biometrika}
@@ -166,34 +219,35 @@ mc.test.chisq <- function(cbdata){
 #'       ylim=c(0,1.1), main="Stochastically ordered estimates\n with marginal compatibility")
 #'
 
+
 SO.mc.est <- function(cbdata, turn=1, control=soControl()){ 
   tab <- xtabs(Freq~factor(ClusterSize,levels=1:max(ClusterSize))+
                 factor(NResp,levels=0:max(ClusterSize))+Trt, data=cbdata)
-   size <- dim(tab)[1]
-   ntrt <- dim(tab)[3]
-   ntot <- sum(tab)
+        size <- dim(tab)[1]
+        ntrt <- dim(tab)[3]
+        ntot <- sum(tab)
   storage.mode(tab) <- "double"
-   Q <- array(0, dim=rep(size+1,ntrt))
-   storage.mode(Q) <- "double"
-     
-   S <- DownUpMatrix(size, ntrt, turn)
-   storage.mode(S) <- "integer"
-   
-   if ((control$start=="H0")&(control$method=="EM")){
-     warning("The EM algorithm can only use 'start=uniform'. Switching options.")
-     start <- "uniform"
+        Q <- array(0, dim=rep(size+1,ntrt))
+        storage.mode(Q) <- "double"
+          
+        S <- DownUpMatrix(size, ntrt, turn)
+        storage.mode(S) <- "integer"
+        
+        if ((control$start=="H0")&(control$method=="EM")){
+          warning("The EM algorithm can only use 'start=uniform'. Switching options.")
+          start <- "uniform"
   }
-   if (control$start=="H0"){
-     const.row <- matrix(0:size, nrow=size+1, ncol=ntrt)
-     Q[const.row+1] <- 1/(size+1)
-      }
-   else {  #start=="uniform"
-     Q[S+1] <- 1/(nrow(S))
+        if (control$start=="H0"){
+          const.row <- matrix(0:size, nrow=size+1, ncol=ntrt)
+          Q[const.row+1] <- 1/(size+1)
+                }
+        else {  #start=="uniform"
+          Q[S+1] <- 1/(nrow(S))
     }
-    
+         
   res0 <- switch(control$method,
       EM = .Call("MixReprodQ", Q, S, tab, as.integer(control$max.iter), as.double(control$eps), 
-                    as.integer(control$verbose), PACKAGE="CorrBin"),
+                                   as.integer(control$verbose), PACKAGE="CorrBin"),
       ISDM = .Call("ReprodISDM", Q, S, tab, as.integer(control$max.iter), as.integer(control$max.directions),
                    as.double(control$eps),  as.integer(control$verbose), PACKAGE="CorrBin"))
  
@@ -221,7 +275,7 @@ SO.mc.est <- function(cbdata, turn=1, control=soControl()){
 #'argument to the \code{\link{mc.est}}, \code{\link{SO.LRT}}, and
 #'\code{\link{SO.trend.test}} functions.
 #'
-#'
+#'@export
 #'@param method a string specifying the maximization method
 #'@param eps a numeric value giving the maximum absolute error in the
 #'log-likelihood
@@ -236,7 +290,7 @@ SO.mc.est <- function(cbdata, turn=1, control=soControl()){
 #'@param verbose a logical value; if TRUE details of the optimization are
 #'shown.
 #'@return a list with components for each of the possible arguments.
-#'@author Aniko Szabo aszabo@mcw.edu
+#'@author Aniko Szabo aszabo@@mcw.edu
 #'@seealso \code{\link{mc.est}}, \code{\link{SO.LRT}},
 #'\code{\link{SO.trend.test}}
 #'@keywords models
@@ -246,6 +300,7 @@ SO.mc.est <- function(cbdata, turn=1, control=soControl()){
 #'# request the "EM" algorithm
 #' soControl(method="EM", max.iter=100)
 #'
+
 soControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000, 
       max.directions=0, start=ifelse(method=="ISDM", "H0", "uniform"), verbose=FALSE){
   method <- match.arg(method)
@@ -253,6 +308,16 @@ soControl <- function(method=c("ISDM","EM"), eps=0.005, max.iter=5000,
   list(method = match.arg(method), eps = eps, max.iter = max.iter,
        max.directions = max.directions, start=start, verbose = verbose)
 }
+
+#'Internal CorrBin objects
+#'
+#'Internal CorrBin objects.
+#'
+#'These are not to be called by the user.
+#'
+#'@rdname CorrBin-internal
+#'@aliases .required DownUpMatrix
+#'@keywords internal
 
 DownUpMatrix <- function(size, ntrt, turn){
   if ((turn<1)|(turn>ntrt)) stop("turn should be between 1 and ntrt")
@@ -296,15 +361,15 @@ DownUpMatrix <- function(size, ntrt, turn){
 #'straightforward. The \code{\link{SO.trend.test}} function implements a
 #'permutation-based evaluation of the p-value for the likelihood-ratio test.
 #'
-#'
+#'@export
 #'@param cbdata a \code{CBData} object
 #'@param control an optional list of control settings, usually a call to
 #'\code{\link{soControl}}.  See there for the names of the settable control
 #'values and their effect.
 #'@return The value of the likelihood ratio test statistic is returned with two
 #'attributes:
-#'@returnItem ll0 the log-likelihood under \eqn{H_0}{H0} (equality)
-#'@returnItem ll1 the log-likelihood under \eqn{H_a}{Ha} (stochastic order)
+#'@return \item{ll0}{the log-likelihood under \eqn{H_0}{H0} (equality)}
+#'@return \item{ll1}{the log-likelihood under \eqn{H_a}{Ha} (stochastic order)}
 #'@author Aniko Szabo
 #'@seealso \code{\link{SO.trend.test}}, \code{\link{soControl}}
 #'@keywords htest nonparametric
@@ -314,15 +379,16 @@ DownUpMatrix <- function(size, ntrt, turn){
 #'LRT <- SO.LRT(shelltox, control=soControl(max.iter = 100, max.directions = 50))
 #'LRT
 #'
+
 SO.LRT <- function(cbdata, control=soControl()){
-   # LL under null hypothesis of equality (+ reproducibility)
-   a <- with(cbdata, aggregate(Freq, list(ClusterSize=ClusterSize,NResp=NResp), sum))
-   names(a)[names(a)=="x"] <- "Freq"
-   a$ClusterSize <- as.integer(as.character(a$ClusterSize))
-   a$NResp <- as.integer(as.character(a$NResp))
-   a$Trt <- 1
+        # LL under null hypothesis of equality (+ reproducibility)
+        a <- with(cbdata, aggregate(Freq, list(ClusterSize=ClusterSize,NResp=NResp), sum))
+        names(a)[names(a)=="x"] <- "Freq"
+        a$ClusterSize <- as.integer(as.character(a$ClusterSize))
+        a$NResp <- as.integer(as.character(a$NResp))
+        a$Trt <- 1
                        
-   b <- mc.est(a)
+        b <- mc.est(a)
   b <- merge(cbdata, b, all.x=TRUE, by=c("ClusterSize","NResp"))
   ll0 <- with(b, sum(Freq*log(Prob)))
   
@@ -351,6 +417,8 @@ SO.LRT <- function(cbdata, control=soControl()){
 #'The default value of \code{R} is probably too low for the final data
 #'analysis, and should be increased.
 #'
+#'@import boot
+#'@export
 #'@param cbdata a \code{\link{CBData}} object.
 #'@param R an integer -- the number of random permutations for estimating the
 #'null distribution.
@@ -358,13 +426,13 @@ SO.LRT <- function(cbdata, control=soControl()){
 #'\code{\link{soControl}}.  See there for the names of the settable control
 #'values and their effect.
 #'@return A list with the following components
-#'@returnItem LRT the value of the likelihood ratio test statistic. It has two
+#'@return \item{LRT}{the value of the likelihood ratio test statistic. It has two
 #'attributes: \code{ll0} and \code{ll1} - the values of the log-likelihood
-#'under \eqn{H_0}{H0} and \eqn{H_a}{Ha} respectively.
-#'@returnItem p.val the estimated one-sided p-value.
-#'@returnItem boot.res an object of class "boot" with the detailed results of
-#'the permutations.  See \code{\link[boot]{boot}} for details.
-#'@author Aniko Szabo, aszabo@mcw.edu
+#'under \eqn{H_0}{H0} and \eqn{H_a}{Ha} respectively.}
+#'@return \item{p.val}{the estimated one-sided p-value.}
+#'@return \item{boot.res}{an object of class "boot" with the detailed results of
+#'the permutations.  See \code{\link[boot]{boot}} for details.}
+#'@author Aniko Szabo, aszabo@@mcw.edu
 #'@seealso \code{\link{SO.LRT}} for calculating only the test statistic,
 #'\code{\link{soControl}}
 #'@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
@@ -384,18 +452,19 @@ SO.LRT <- function(cbdata, control=soControl()){
 #'      main="Simulated null-distribution", xlim=range(c(0,20,null.vals)))
 #' points(sh.test$LRT, 0, pch="*",col="red", cex=3)
 #'
+
 SO.trend.test <- function(cbdata, R=100, control=soControl()){
     require(boot)
-   dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
-   dat2$Freq <- NULL
-   
-   boot.LRT.fun <- function(dat, idx){
-     dat.new <- cbind(dat[idx, c("ClusterSize","NResp")], Trt=dat$Trt)   #rearrange clusters
-      dat.f <- aggregate(dat.new$Trt, 
-                list(Trt=dat.new$Trt, ClusterSize=dat.new$ClusterSize, NResp=dat.new$NResp), length)
-     names(dat.f)[names(dat.f)=="x"] <- "Freq"
+        dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
+        dat2$Freq <- NULL
+        
+        boot.LRT.fun <- function(dat, idx){
+          dat.new <- cbind(dat[idx, c("ClusterSize","NResp")], Trt=dat$Trt)   #rearrange clusters
+                dat.f <- aggregate(dat.new$Trt, 
+                          list(Trt=dat.new$Trt, ClusterSize=dat.new$ClusterSize, NResp=dat.new$NResp), length)
+          names(dat.f)[names(dat.f)=="x"] <- "Freq"
     dat.f$ClusterSize <- as.numeric(as.character(dat.f$ClusterSize))
-     dat.f$NResp <- as.numeric(as.character(dat.f$NResp))
+          dat.f$NResp <- as.numeric(as.character(dat.f$NResp))
                     
     stat <- SO.LRT(dat.f, control=control)
     stat}        
@@ -413,7 +482,7 @@ SO.trend.test <- function(cbdata, R=100, control=soControl()){
 #'\code{\link{RS.trend.test}}, and \code{\link{GEE.trend.test}}. The details of
 #'each test can be found on their help page.
 #'
-#'
+#'@export
 #'@param cbdata a \code{\link{CBData}} object
 #'@param test character string defining the desired test statistic. "RS"
 #'performs the Rao-Scott test (\code{\link{RS.trend.test}}), "SO" performs the
@@ -431,9 +500,9 @@ SO.trend.test <- function(cbdata, R=100, control=soControl()){
 #'@return A list with two components and an optional "boot" attribute that
 #'contains the detailed results of the permutation test as an object of class
 #'\code{\link[boot]{boot}} if an exact test was performed.
-#'@returnItem statistic numeric, the value of the test statistic
-#'@returnItem p.val numeric, asymptotic one-sided p-value of the test
-#'@author Aniko Szabo, aszabo@mcw.edu
+#'@return \item{statistic}{numeric, the value of the test statistic}
+#'@return \item{p.val}{numeric, asymptotic one-sided p-value of the test}
+#'@author Aniko Szabo, aszabo@@mcw.edu
 #'@seealso \code{\link{SO.trend.test}}, \code{\link{RS.trend.test}}, and
 #'\code{\link{GEE.trend.test}} for details about the available tests.
 #'@keywords htest nonparametric
@@ -445,6 +514,7 @@ SO.trend.test <- function(cbdata, R=100, control=soControl()){
 #'#R=50 is too low to get a good estimate of the p-value
 #'trend.test(shelltox, test="RS", R=50, exact=TRUE)
 #'
+
 trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=test=="SO", 
                        R=100, control=soControl()){ 
    test <- match.arg(test)
@@ -499,6 +569,7 @@ trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exac
 #'the lowest dose is the NOSTASOT dose. This assumes that the lowest dose is a
 #'control group, and this convention might not be meaningful otherwise.
 #'
+#'@export
 #'@param cbdata a \code{\link{CBData}} object
 #'@param test character string defining the desired test statistic. See
 #'\code{\link{trend.test}} for details.
@@ -510,12 +581,12 @@ trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exac
 #'("SO") test, usually a call to \code{\link{soControl}}.  See there for the
 #'names of the settable control values and their effect.
 #'@return a list with two components
-#'@returnItem NOSTASOT character string identifying the NOSTASOT dose.
-#'@returnItem p numeric vector of the p-values of the tests actually performed.
+#'@return \item{NOSTASOT}{character string identifying the NOSTASOT dose.}
+#'@return \item{p}{numeric vector of the p-values of the tests actually performed.}
 #'The last element corresponds to all doses included, and will not be missing.
 #'p-values for tests that were not actually performed due to the procedure
 #'stopping are set to NA.
-#'@author Aniko Szabo, aszabo@mcw.edu
+#'@author Aniko Szabo, aszabo@@mcw.edu
 #'@seealso \code{\link{trend.test}} for details about the available trend
 #'tests.
 #'@references Tukey, J. W.; Ciminera, J. L. & Heyse, J. F. (1985) Testing the
@@ -527,6 +598,7 @@ trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exac
 #'data(shelltox)
 #'NOSTASOT(shelltox, test="RS")
 #'
+
 NOSTASOT <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exact=test=="SO",
                      R=100, sig.level=0.05, control=soControl()){
    ntrt <- nlevels(cbdata$Trt)

@@ -1,6 +1,5 @@
 
 
-
 #'Nonparameterics for correlated binary data
 #'
 #'This package implements nonparametric methods for analysing exchangeable
@@ -32,7 +31,7 @@
 #'@docType package
 #'@author Aniko Szabo
 #'
-#'Maintainer: Aniko Szabo <aszabo@mcw.edu>
+#'Maintainer: Aniko Szabo <aszabo@@mcw.edu>
 #'@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
 #'Test for Trend with Clustered Binary Data. \emph{Biometrika}
 #'
@@ -63,10 +62,10 @@ NULL
 #'correspond to one cluster.
 #'@return A data frame with each row representing all the clusters with the
 #'same trt/size/number of responses, and standardized variable names:
-#'@returnItem Trt factor, the treatment group
-#'@returnItem ClusterSize numeric, the cluster size
-#'@returnItem NResp numeric, the number of responses
-#'@returnItem Freq numeric, number of clusters with the same values
+#'@return \item{Trt}{factor, the treatment group}
+#'@return \item{ClusterSize}{numeric, the cluster size}
+#'@return \item{NResp}{numeric, the number of responses}
+#'@return \item{Freq}{numeric, number of clusters with the same values}
 #'@author Aniko Szabo
 #'@seealso \code{\link{read.CBData}} for creating a \code{CBData} object
 #'directly from a file.
@@ -144,17 +143,16 @@ read.CBData <- function(file, with.freq=TRUE, ...){
 #'`ID' variable is added to indicate clusters. This form can be useful for
 #'setting up the data for a different package.
 #'
-#'@method unwrap CBData
 #'@aliases unwrap unwrap.CBData
 #'@param object a \code{\link{CBData}} object
 #'@param \dots other potential arguments; not currently used
 #'@return A data frame with one row for each cluster element (having a binary
 #'outcome) with the following standardized column names
-#'@returnItem Trt factor, the treatment group
-#'@returnItem ClusterSize numeric, the cluster size
-#'@returnItem ID factor, each level representing a different cluster
-#'@returnItem Resp numeric with 0/1 values, giving the response of the cluster
-#'element
+#'@return \item{Trt}{factor, the treatment group}
+#'@return \item{ClusterSize}{numeric, the cluster size}
+#'@return \item{ID}{factor, each level representing a different cluster}
+#'@return \item{Resp}{numeric with 0/1 values, giving the response of the cluster
+#'element}
 #'@author Aniko Szabo
 #'@keywords manip
 #'@examples
@@ -166,6 +164,8 @@ read.CBData <- function(file, with.freq=TRUE, ...){
 
 unwrap <- function(object,...) UseMethod("unwrap")
 
+#'@rdname unwrap
+#'@method unwrap CBData
 unwrap.CBData <- function(object,...){
   freqs <- rep(1:nrow(object), object$Freq)
   cb1 <- object[freqs,]
@@ -202,9 +202,9 @@ unwrap.CBData <- function(object,...){
 #'@export
 #'@param cbdata a \code{\link{CBData}} object
 #'@return A list with components
-#'@returnItem statistic numeric, the value of the test statistic
-#'@returnItem p.val numeric, asymptotic one-sided p-value of the test
-#'@author Aniko Szabo, aszabo@mcw.edu
+#'@return \item{statistic}{numeric, the value of the test statistic}
+#'@return \item{p.val}{numeric, asymptotic one-sided p-value of the test}
+#'@author Aniko Szabo, aszabo@@mcw.edu
 #'@seealso \code{\link{SO.trend.test}}, \code{\link{GEE.trend.test}} for
 #'alternative tests; \code{\link{CBData}} for constructing a CBData object.
 #'@references Rao, J. N. K. & Scott, A. J. A (1992) Simple Method for the
@@ -217,8 +217,8 @@ unwrap.CBData <- function(object,...){
 #'
 
 RS.trend.test <- function(cbdata){  
-   dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
-   dat2$Trt <- factor(dat2$Trt)  #remove unused levels
+        dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
+        dat2$Trt <- factor(dat2$Trt)  #remove unused levels
   x.i <- pmax(tapply(dat2$NResp, dat2$Trt, sum), 0.5)  #"continuity" adjustment to avoid RS=NaN
   n.i <- tapply(dat2$ClusterSize, dat2$Trt, sum)
   m.i <- table(dat2$Trt)
@@ -260,9 +260,9 @@ RS.trend.test <- function(cbdata){
 #'"fixed" - constant scale parameter (default); "trend" - linear trend for the
 #'log of the scale parameter; "all" - separate scale parameter for each group.
 #'@return A list with components
-#'@returnItem statistic numeric, the value of the test statistic
-#'@returnItem p.val numeric, asymptotic one-sided p-value of the test
-#'@author Aniko Szabo, aszabo@mcw.edu
+#'@return \item{statistic}{numeric, the value of the test statistic}
+#'@return \item{p.val}{numeric, asymptotic one-sided p-value of the test}
+#'@author Aniko Szabo, aszabo@@mcw.edu
 #'@seealso \code{\link{RS.trend.test}}, \code{\link{SO.trend.test}} for
 #'alternative tests; \code{\link{CBData}} for constructing a CBData object.
 #'@keywords htest models
@@ -321,7 +321,7 @@ GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
 #'q-power (\code{\link{qpower.pdf}}) are provided in the package.
 #'@return a CBData object with randomly generated number of responses with
 #'sample sizes specified in the call.
-#'@author Aniko Szabo, aszabo@mcw.edu
+#'@author Aniko Szabo, aszabo@@mcw.edu
 #'@seealso \code{\link{betabin.pdf}} and \code{\link{qpower.pdf}}
 #'@keywords distribution
 #'@examples
@@ -374,13 +374,14 @@ ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
 #'(1-p)\frac{1-\rho}{\rho}}{b=(1-p)(1-rho)/rho}.
 #'
 #'@export
+#'@rdname pdf
 #'@aliases qpower.pdf betabin.pdf
 #'@param p numeric, the probability of success.
 #'@param rho numeric between 0 and 1 inclusive, the within-cluster correlation.
 #'@param n integer, cluster size.
 #'@return a numeric vector of length \eqn{n+1} giving the value of \eqn{P(X=x)}
 #'for \eqn{x=0,\ldots,n}.
-#'@author Aniko Szabo, aszabo@mcw.edu
+#'@author Aniko Szabo, aszabo@@mcw.edu
 #'@seealso \code{\link{ran.CBData}} for generating an entire dataset using
 #'these functions
 #'@references Kuk, A. A (2004) litter-based approach to risk assessement in
@@ -408,6 +409,8 @@ ran.CBData <- function(sample.sizes, p.gen.fun=function(g)0.3,
    res
   } 
 
+#'@rdname pdf
+#'@export
  qpower.pdf <- function(p, rho, n){
    .q <- 1-p
    gamm <- log2(log(.q^2+rho*.q*(1-.q))/log(.q))

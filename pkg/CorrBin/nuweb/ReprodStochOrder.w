@@ -178,11 +178,11 @@ treatment group. For the package the compiled library needs to be loaded.
 #'@@return A data frame giving the estimated pdf for each treatment and
 #'clustersize. It has the following columns: .  The probabilities add up to 1
 #'for each \code{Trt}/\code{ClusterSize} combination.
-#'@@returnItem Prob numeric, the probability of \code{NResp} responses in a
-#'cluster of size \code{ClusterSize} in group \code{Trt}
-#'@@returnItem Trt factor, the treatment group
-#'@@returnItem ClusterSize numeric, the cluster size
-#'@@returnItem NResp numeric, the number of responses
+#'@@return \item{Prob}{numeric, the probability of \code{NResp} responses in a
+#'cluster of size \code{ClusterSize} in group \code{Trt}}
+#'@@return \item{Trt}{factor, the treatment group}
+#'@@return \item{ClusterSize}{numeric, the cluster size}
+#'@@return \item{NResp}{numeric, the number of responses}
 #'@@author Aniko Szabo
 #'@@references Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for
 #'exchangeable binary data with varying cluster sizes.  \emph{Biometrics}, 59,
@@ -257,12 +257,12 @@ X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
 #'@@export
 #'@@param cbdata a \code{\link{CBData}} object
 #'@@return A list with the following components:
-#'@@returnItem overall.chi the test statistic; sum of the statistics for each
-#'group
-#'@@returnItem overall.p p-value of the test
-#'@@returnItem individual a list of the results of the test applied to each
-#'group separately: \itemize{ \itemchi.sq the test statistic for the group
-#'\itemp p-value for the group}
+#'@@return \item{overall.chi the test statistic; sum of the statistics for each
+#'group}
+#'@@return \item{overall.p}{p-value of the test}
+#'@@return \item{individual}{a list of the results of the test applied to each
+#'group separately: \itemize{ \item chi.sq the test statistic for the group
+#'\item p p-value for the group}
 #'@@author Aniko Szabo
 #'@@seealso \code{\link{CBData}} for constructing a CBData object,
 #'\code{\link{mc.est}} for estimating the distribution under marginal
@@ -364,14 +364,14 @@ it changes $Q$ only multiplicatively.
 #'@@return A list with components:
 #'
 #'Components \code{Q} and \code{D} are unlikely to be needed by the user.
-#'@@returnItem MLest data frame with the maximum likelihood estimates of
-#'\eqn{P(R_i=r|n)}
-#'@@returnItem Q numeric matrix; estimated weights for the mixing distribution
-#'@@returnItem D numeric matrix; directional derivative of the log-likelihood
-#'@@returnItem loglik the achieved value of the log-likelihood
-#'@@returnItem converge a 2-element vector with the achived relative error and
-#'the performed number of iterations
-#'@@author Aniko Szabo, aszabo@@mcw.edu
+#'@@return \item{MLest}{data frame with the maximum likelihood estimates of
+#'\eqn{P(R_i=r|n)}}
+#'@@return \item{Q}{numeric matrix; estimated weights for the mixing distribution}
+#'@@return \item{D}{numeric matrix; directional derivative of the log-likelihood}
+#'@@return \item{loglik}{the achieved value of the log-likelihood}
+#'@@return \item{converge}{a 2-element vector with the achived relative error and
+#'the performed number of iterations}
+#'@@author Aniko Szabo, aszabo@@@@mcw.edu
 #'@@seealso \code{\link{soControl}}
 #'@@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
 #'Test for Trend with Clustered Binary Data. \emph{Biometrika}
@@ -473,7 +473,7 @@ The \texttt{method} argument allows to select either the EM, or the ISDM method.
 #'@@param verbose a logical value; if TRUE details of the optimization are
 #'shown.
 #'@@return a list with components for each of the possible arguments.
-#'@@author Aniko Szabo aszabo@@mcw.edu
+#'@@author Aniko Szabo aszabo@@@@mcw.edu
 #'@@seealso \code{\link{mc.est}}, \code{\link{SO.LRT}},
 #'\code{\link{SO.trend.test}}
 #'@@keywords models
@@ -582,9 +582,9 @@ $k$ is \texttt{ntrt}, and $q$ is \texttt{turn}):
 #'
 #'These are not to be called by the user.
 #'
-#'@aliases .required DownUpMatrix
-#'@keywords internal
-NULL
+#'@@rdname CorrBin-internal
+#'@@aliases .required DownUpMatrix
+#'@@keywords internal
 @}
 @O ../R/Reprod.R
 @{
@@ -1442,8 +1442,8 @@ The \texttt{SO.LRT} computes the likelihood-ratio test statistic.
 #'values and their effect.
 #'@@return The value of the likelihood ratio test statistic is returned with two
 #'attributes:
-#'@@returnItem ll0 the log-likelihood under \eqn{H_0}{H0} (equality)
-#'@@returnItem ll1 the log-likelihood under \eqn{H_a}{Ha} (stochastic order)
+#'@@return \item{ll0}{the log-likelihood under \eqn{H_0}{H0} (equality)}
+#'@@return \item{ll1}{the log-likelihood under \eqn{H_a}{Ha} (stochastic order)}
 #'@@author Aniko Szabo
 #'@@seealso \code{\link{SO.trend.test}}, \code{\link{soControl}}
 #'@@keywords htest nonparametric
@@ -1510,13 +1510,13 @@ specifies the number of resamples, \texttt{method} could be either ``ISDM'' or
 #'\code{\link{soControl}}.  See there for the names of the settable control
 #'values and their effect.
 #'@@return A list with the following components
-#'@@returnItem LRT the value of the likelihood ratio test statistic. It has two
+#'@@return \item{LRT}{the value of the likelihood ratio test statistic. It has two
 #'attributes: \code{ll0} and \code{ll1} - the values of the log-likelihood
-#'under \eqn{H_0}{H0} and \eqn{H_a}{Ha} respectively.
-#'@@returnItem p.val the estimated one-sided p-value.
-#'@@returnItem boot.res an object of class "boot" with the detailed results of
-#'the permutations.  See \code{\link[boot]{boot}} for details.
-#'@@author Aniko Szabo, aszabo@@mcw.edu
+#'under \eqn{H_0}{H0} and \eqn{H_a}{Ha} respectively.}
+#'@@return \item{p.val}{the estimated one-sided p-value.}
+#'@@return \item{boot.res}{an object of class "boot" with the detailed results of
+#'the permutations.  See \code{\link[boot]{boot}} for details.}
+#'@@author Aniko Szabo, aszabo@@@@mcw.edu
 #'@@seealso \code{\link{SO.LRT}} for calculating only the test statistic,
 #'\code{\link{soControl}}
 #'@@references Szabo A, George EO. (2009) On the Use of Stochastic Ordering to
@@ -1594,9 +1594,9 @@ order based trend tests.
 #'@@return A list with two components and an optional "boot" attribute that
 #'contains the detailed results of the permutation test as an object of class
 #'\code{\link[boot]{boot}} if an exact test was performed.
-#'@@returnItem statistic numeric, the value of the test statistic
-#'@@returnItem p.val numeric, asymptotic one-sided p-value of the test
-#'@@author Aniko Szabo, aszabo@@mcw.edu
+#'@@return \item{statistic}{numeric, the value of the test statistic}
+#'@@return \item{p.val}{numeric, asymptotic one-sided p-value of the test}
+#'@@author Aniko Szabo, aszabo@@@@mcw.edu
 #'@@seealso \code{\link{SO.trend.test}}, \code{\link{RS.trend.test}}, and
 #'\code{\link{GEE.trend.test}} for details about the available tests.
 #'@@keywords htest nonparametric
@@ -1683,12 +1683,12 @@ at which no trend in the rate of adverse events has been observed.
 #'("SO") test, usually a call to \code{\link{soControl}}.  See there for the
 #'names of the settable control values and their effect.
 #'@@return a list with two components
-#'@@returnItem NOSTASOT character string identifying the NOSTASOT dose.
-#'@@returnItem p numeric vector of the p-values of the tests actually performed.
+#'@@return \item{NOSTASOT}{character string identifying the NOSTASOT dose.}
+#'@@return \item{p}{numeric vector of the p-values of the tests actually performed.}
 #'The last element corresponds to all doses included, and will not be missing.
 #'p-values for tests that were not actually performed due to the procedure
 #'stopping are set to NA.
-#'@@author Aniko Szabo, aszabo@@mcw.edu
+#'@@author Aniko Szabo, aszabo@@@@mcw.edu
 #'@@seealso \code{\link{trend.test}} for details about the available trend
 #'tests.
 #'@@references Tukey, J. W.; Ciminera, J. L. & Heyse, J. F. (1985) Testing the
