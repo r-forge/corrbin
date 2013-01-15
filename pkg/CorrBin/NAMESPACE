@@ -1,4 +1,3 @@
-# Export public functions 
 export(betabin.pdf)
 export(CBData)
 export(GEE.trend.test)
@@ -15,12 +14,6 @@ export(SO.trend.test)
 export(soControl)
 export(trend.test)
 export(unwrap)
-
-# register S3 methods
-S3method(unwrap, CBData)
-
-# Import required packages
 import(boot)
-
-# Load DLL
+S3method(unwrap,CBData)
 useDynLib(CorrBin)

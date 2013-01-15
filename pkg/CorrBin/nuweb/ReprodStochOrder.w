@@ -257,12 +257,12 @@ X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
 #'@@export
 #'@@param cbdata a \code{\link{CBData}} object
 #'@@return A list with the following components:
-#'@@return \item{overall.chi the test statistic; sum of the statistics for each
+#'@@return \item{overall.chi}{the test statistic; sum of the statistics for each
 #'group}
 #'@@return \item{overall.p}{p-value of the test}
 #'@@return \item{individual}{a list of the results of the test applied to each
 #'group separately: \itemize{ \item chi.sq the test statistic for the group
-#'\item p p-value for the group}
+#'\item p p-value for the group}}
 #'@@author Aniko Szabo
 #'@@seealso \code{\link{CBData}} for constructing a CBData object,
 #'\code{\link{mc.est}} for estimating the distribution under marginal

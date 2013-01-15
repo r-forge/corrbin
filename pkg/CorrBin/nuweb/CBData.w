@@ -202,6 +202,7 @@ to indicate clusters. It is first defined as a generic function to allow general
 #'setting up the data for a different package.
 #'
 #'@@aliases unwrap unwrap.CBData
+#'@@export
 #'@@param object a \code{\link{CBData}} object
 #'@@param \dots other potential arguments; not currently used
 #'@@return A data frame with one row for each cluster element (having a binary
@@ -225,6 +226,7 @@ unwrap <- function(object,...) UseMethod("unwrap")
 
 #'@@rdname unwrap
 #'@@method unwrap CBData
+#'@@S3method unwrap CBData
 unwrap.CBData <- function(object,...){
   freqs <- rep(1:nrow(object), object$Freq)
   cb1 <- object[freqs,]
