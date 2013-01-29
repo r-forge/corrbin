@@ -91,7 +91,7 @@ read.CBData <- function(file, with.freq=TRUE, ...){
   d <- CBData(d, "Trt", "ClusterSize", "NResp", "Freq")
   d}
 
-#'Unwrap a CBData object
+#'Unwrap a clustered object
 #'
 #'\code{unwrap.CBData} is a utility function that reformats a CBData object so
 #'that each row is one observation (instead of one or more clusters). A new
@@ -102,7 +102,7 @@ read.CBData <- function(file, with.freq=TRUE, ...){
 #'@export
 #'@param object a \code{\link{CBData}} object
 #'@param \dots other potential arguments; not currently used
-#'@return A data frame with one row for each cluster element (having a binary
+#'@return For \code{uwrap.CBData}: a data frame with one row for each cluster element (having a binary
 #'outcome) with the following standardized column names
 #'@return \item{Trt}{factor, the treatment group}
 #'@return \item{ClusterSize}{numeric, the cluster size}

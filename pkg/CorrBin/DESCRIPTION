@@ -21,3 +21,4 @@ Collate:
     'CBData.R'
     'CorrBin-package.R'
     'Reprod.R'
+    'CMData.R'
