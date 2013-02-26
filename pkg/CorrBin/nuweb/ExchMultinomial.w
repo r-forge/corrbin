@@ -473,8 +473,14 @@ T^2=\sum_{g=1}^G T_g^2 \sim \chi^2_{G\,K} \text{ under }H_0.
 
 @O ..\R\ExchMultinomial.Rnotyet
 @{
-mc.test.chisq <- function(cmdata){
-  K <- attr(cmdata, "ncat")-1
+#'@@rdname mc.test.chisq
+#'@@method mc.test.chisq CMData
+#'@@S3method mc.test.chisq CMData
+#'@@export
+
+mc.test.chisq.CMData <- function(object, ...){
+  cmdata <- object[object$Freq > 0, ]
+  K <- attr(object, "ncat")-1
   nrespvars <- paste("NResp", 1:K, sep=".")
   
   get.T <- function(x){

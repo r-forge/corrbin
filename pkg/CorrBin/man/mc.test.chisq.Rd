@@ -1,11 +1,18 @@
 \name{mc.test.chisq}
 \alias{mc.test.chisq}
+\alias{mc.test.chisq.CBData}
 \title{Test the assumption of reproducibility}
 \usage{
-  mc.test.chisq(cbdata)
+  mc.test.chisq(object, ...)
+
+  \method{mc.test.chisq}{CBData} (object, ...)
 }
 \arguments{
-  \item{cbdata}{a \code{\link{CBData}} object}
+  \item{object}{a \code{\link{CBData}} or
+  \code{\link{CMData}} object}
+
+  \item{\dots}{other potential arguments; not currently
+  used}
 }
 \value{
   A list with the following components:

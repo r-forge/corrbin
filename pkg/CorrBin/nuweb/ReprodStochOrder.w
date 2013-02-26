@@ -255,7 +255,8 @@ X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
 #'generalization of that test extending it to multiple treatment groups.
 #'
 #'@@export
-#'@@param cbdata a \code{\link{CBData}} object
+#'@@param object a \code{\link{CBData}} or \code{\link{CMData}} object
+#'@@param \dots other potential arguments; not currently used
 #'@@return A list with the following components:
 #'@@return \item{overall.chi}{the test statistic; sum of the statistics for each
 #'group}
@@ -282,8 +283,14 @@ X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
 #'  
 @}
 @O ../R/Reprod.R @{
-mc.test.chisq <- function(cbdata){
-  cbdata <- cbdata[cbdata$Freq>0, ]
+mc.test.chisq <- function(object,...) UseMethod("mc.test.chisq")
+
+#'@@rdname mc.test.chisq
+#'@@method mc.test.chisq CBData
+#'@@S3method mc.test.chisq CBData
+
+mc.test.chisq.CBData <- function(object,...){
+  cbdata <- object[object$Freq>0, ]
  
   get.T <- function(x){
       max.size <- max(x$ClusterSize)
