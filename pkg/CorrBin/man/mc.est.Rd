@@ -1,17 +1,21 @@
 \name{mc.est}
 \alias{mc.est}
+\alias{mc.est.CBData}
 \title{Distribution of the number of responses assuming marginal compatibility.}
 \usage{
-  mc.est(cbdata)
+  mc.est(object, ...)
+
+  \method{mc.est}{CBData} (object, ...)
 }
 \arguments{
-  \item{cbdata}{a \code{\link{CBData}} object}
+  \item{object}{a \code{\link{CBData}} or
+  \code{\link{CMData}} object}
 }
 \value{
   A data frame giving the estimated pdf for each treatment
-  and clustersize. It has the following columns: .  The
-  probabilities add up to 1 for each
-  \code{Trt}/\code{ClusterSize} combination.
+  and clustersize.  The probabilities add up to 1 for each
+  \code{Trt}/\code{ClusterSize} combination. It has the
+  following columns:
 
   \item{Prob}{numeric, the probability of \code{NResp}
   responses in a cluster of size \code{ClusterSize} in

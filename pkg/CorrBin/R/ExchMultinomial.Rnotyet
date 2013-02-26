@@ -38,7 +38,7 @@ tau <- function(cmdata, type=c("averaged","cluster")){
       dimnames(res.trt) <- rep.int(list(0:M), nc-1) 
       names(dimnames(res.trt)) <- paste("R", 1:(nc-1), sep="")
       # indices for possible values of r
-      
+
          idx  <- hcube(rep( M +1,  nc-1 ))-1
           idxsum  <- rowSums(idx )
          idx  <- idx [ idxsum  <=  M , ,drop=FALSE]  #remove impossible indices
@@ -46,7 +46,7 @@ tau <- function(cmdata, type=c("averaged","cluster")){
       
       #indices for possible values of s 
       # (one more column than for r - ensures summation over all n's)
-      
+
          sidx  <- hcube(rep( M +1,  nc ))-1
           sidxsum  <- rowSums(sidx )
          sidx  <- sidx [ sidxsum  <=  M , ,drop=FALSE]  #remove impossible indices
@@ -97,6 +97,34 @@ tau <- function(cmdata, type=c("averaged","cluster")){
   res
 }
 
+#'@rdname mc.est
+#'@method mc.est CMData
+#'@S3method mc.est CMData
+#'@export
+
+mc.est.CMData <- function(object, eps=1E-6, ...){
+
+    nc <- attr(object, "ncat")      
+    resp.vars1 <- paste("NResp", 1:(nc-1), sep=".")
+   
+    res <- mc.est.raw(object=object, eps=eps, ...)
+    margres <- lapply(res, Marginals)  # has only NResp.1 - NResp.K
+    
+    mat.to.df <- function(idx, alist){
+        dd <- as.data.frame.table(alist[[idx]], responseName="Prob")
+        dd[c("N", resp.vars1)] <- lapply(dd[c("N", resp.vars1)], function(x)as.numeric(as.character(x)))
+        dd$Trt <- names(alist)[idx]
+        dd
+    }
+    margres <- lapply(1:length(margres), mat.to.df, alist=margres)
+    fin <- do.call(rbind, margres)
+    names(fin)[1] <- "ClusterSize"
+    last.resp <- paste("NResp", nc, sep=".")
+    fin[last.resp] <- fin$ClusterSize - rowSums(fin[resp.vars1]) # calculated omitted frequency
+    fin$Trt <- factor(fin$Trt)
+    fin[c("Trt","ClusterSize", resp.vars1, last.resp, "Prob")]
+}
+
 Marginals <- function(theta){
   K <- length(dim(theta))
   M <- dim(theta)[1]-1
@@ -133,7 +161,10 @@ Marginals <- function(theta){
   res
 }
 
-mc.est <- function(cmdata, eps=1E-6){
+mc.est.raw <- function(object, ...) UseMethod("mc.est.raw")
+
+mc.est.raw.CMData <- function(object, eps=1E-6, ...){
+  cmdata <- object
   
     nc <- attr(cmdata, "ncat")
     nrespvars <- paste("NResp", 1:nc, sep=".")
@@ -160,7 +191,6 @@ mc.est <- function(cmdata, eps=1E-6){
       
       
         res.trt <- array(NA, dim=rep(M+1, nc-1))
-        dimnames(res.trt) <- rep.int(list(0:M), nc-1)
          
         #starting values
         res.trt[idx + 1] <- 1/nrow(idx)
@@ -168,8 +198,8 @@ mc.est <- function(cmdata, eps=1E-6){
         sqerror <- 1
         #EM update
         while (sqerror > eps){
-         sqerror <- 0
-         marg <- Marginals(res.trt)
+              sqerror <- 0
+              marg <- Marginals(res.trt)
           res.new <- array(NA, dim=rep(M+1, nc-1))
           res.new[idx + 1] <- 0
           
@@ -188,13 +218,15 @@ mc.est <- function(cmdata, eps=1E-6){
                                                    hvals * res.trt[tidx+1]
             }
           
-         
+              
           sqerror <- sum((res.new[idx+1] - res.trt[idx+1])^2)
-         res.trt <- res.new 
+              res.trt <- res.new 
         }
       
       
       # append treatment-specific result to result list
+      dimnames(res.trt) <- rep.int(list(0:M), nc-1)
+      names(dimnames(res.trt)) <- paste("NResp", 1:(nc-1), sep=".")
       res.trt <- list(res.trt)
     } else {
       res.trt <- list(c())
@@ -253,13 +285,19 @@ corr.from.pi <- function(pimat){
 }
 
 
-mc.test.chisq <- function(cmdata){
-  K <- attr(cmdata, "ncat")-1
+#'@rdname mc.test.chisq
+#'@method mc.test.chisq CMData
+#'@S3method mc.test.chisq CMData
+#'@export
+
+mc.test.chisq.CMData <- function(object, ...){
+  cmdata <- object[object$Freq > 0, ]
+  K <- attr(object, "ncat")-1
   nrespvars <- paste("NResp", 1:K, sep=".")
   
   get.T <- function(x){
       x$Trt <- factor(x$Trt)  #remove unused levels
-      pim <- mc.est(x)[[1]]  #only one treatment group
+      pim <- mc.est.raw(x)[[1]]  #only one treatment group
       tt <- tau.from.pi(pim)
       p <- p.from.tau(tt)
       phi <- corr.from.pi(pim)

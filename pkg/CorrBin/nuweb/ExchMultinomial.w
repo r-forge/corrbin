@@ -202,6 +202,40 @@ $\rvec_i = (r_1,\ldots,r_K)$ is the observed number of responses of each type.
              \frac{\pi^{(t)}_{\tvec|M}}{\pi^{(t)}_{\rvec_{i}|n_{i}}},
 \end{equation}
 
+The \texttt{mc.est.CMData} function implements the \texttt{mc.est} S3 method for \texttt{CMData} objects, 
+returning a data frame with all  $\pi^{(g)}_{\rvec|n}, n=1,\ldots, M$ probabilities. The `hard' work is done
+by the \texttt{mc.est.raw} function, which returns a list of matrices with  $\pi^{(g)}_{\rvec|M}$ values.
+@O ..\R\ExchMultinomial.Rnotyet
+@{
+#'@@rdname mc.est
+#'@@method mc.est CMData
+#'@@S3method mc.est CMData
+#'@@export
+
+mc.est.CMData <- function(object, eps=1E-6, ...){
+
+    nc <- attr(object, "ncat")      
+    resp.vars1 <- paste("NResp", 1:(nc-1), sep=".")
+   
+    res <- mc.est.raw(object=object, eps=eps, ...)
+    margres <- lapply(res, Marginals)  # has only NResp.1 - NResp.K
+    
+    mat.to.df <- function(idx, alist){
+        dd <- as.data.frame.table(alist[[idx]], responseName="Prob")
+        dd[c("N", resp.vars1)] <- lapply(dd[c("N", resp.vars1)], function(x)as.numeric(as.character(x)))
+        dd$Trt <- names(alist)[idx]
+        dd
+    }
+    margres <- lapply(1:length(margres), mat.to.df, alist=margres)
+    fin <- do.call(rbind, margres)
+    names(fin)[1] <- "ClusterSize"
+    last.resp <- paste("NResp", nc, sep=".")
+    fin[last.resp] <- fin$ClusterSize - rowSums(fin[resp.vars1]) # calculated omitted frequency
+    fin$Trt <- factor(fin$Trt)
+    fin[c("Trt","ClusterSize", resp.vars1, last.resp, "Prob")]
+}
+@| mc.est.CMData @}
+
 First we write a help-function that calculates all the probabilities
 $\pi_{\rvec|n}$ given the set of $\theta_\rvec=\pi_{\rvec|M}$. While there are a variety
 of ways doing this, we use a recursive formula:
@@ -233,7 +267,7 @@ Marginals <- function(theta){
   
   res
 }
-@}
+@| Marginals @}
 
 The initialization just copies over the values from \texttt{theta} to the appropriate dimension. Note that when indexing
 the arrays, a ``+1'' is necessary since \texttt{idx} is 0-based.
@@ -253,11 +287,14 @@ The iterative step initializes with the last term (with $\pi_{\rvec|n+1}$) and l
   }  
 @}
 
-The actual EM iterations are performed in \texttt{mc.est}. 
+The actual EM iterations are performed in \texttt{mc.est.raw}. 
 
 @O ..\R\ExchMultinomial.Rnotyet
 @{
-mc.est <- function(cmdata, eps=1E-6){
+mc.est.raw <- function(object, ...) UseMethod("mc.est.raw")
+
+mc.est.raw.CMData <- function(object, eps=1E-6, ...){
+  cmdata <- object
   @< Extract info from cmdata into variables @>
   
   # indices for possible values of r with clustersize = M
@@ -276,6 +313,8 @@ mc.est <- function(cmdata, eps=1E-6){
       @< MC estimates for given dose group @>
       
       # append treatment-specific result to result list
+      dimnames(res.trt) <- rep.int(list(0:M), nc-1)
+      names(dimnames(res.trt)) <- paste("NResp", 1:(nc-1), sep=".")
       res.trt <- list(res.trt)
     } else {
       res.trt <- list(c())
@@ -284,13 +323,12 @@ mc.est <- function(cmdata, eps=1E-6){
   }
   names(res) <- levels(cmdata$Trt)
   res
-}@| mc.est@}
+}@| mc.est.raw@}
 
 Within each dose group, the algorithm iterates until the sum of squared changes of the parameters is smaller
 than the selected threshold \texttt{eps}.
 @D MC estimates for given dose group @{
   res.trt <- array(NA, dim=rep(M+1, nc-1))
-  dimnames(res.trt) <- rep.int(list(0:M), nc-1)
    
   #starting values
   res.trt[idx + 1] <- 1/nrow(idx)
@@ -485,7 +523,7 @@ mc.test.chisq.CMData <- function(object, ...){
   
   get.T <- function(x){
       x$Trt <- factor(x$Trt)  #remove unused levels
-      pim <- mc.est(x)[[1]]  #only one treatment group
+      pim <- mc.est.raw(x)[[1]]  #only one treatment group
       tt <- tau.from.pi(pim)
       p <- p.from.tau(tt)
       phi <- corr.from.pi(pim)

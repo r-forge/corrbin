@@ -10,10 +10,10 @@
 #'
 #'@useDynLib CorrBin
 #'@export
-#'@param cbdata a \code{\link{CBData}} object
+#'@param object a \code{\link{CBData}} or \code{\link{CMData}} object
 #'@return A data frame giving the estimated pdf for each treatment and
-#'clustersize. It has the following columns: .  The probabilities add up to 1
-#'for each \code{Trt}/\code{ClusterSize} combination.
+#'clustersize.  The probabilities add up to 1
+#'for each \code{Trt}/\code{ClusterSize} combination. It has the following columns: 
 #'@return \item{Prob}{numeric, the probability of \code{NResp} responses in a
 #'cluster of size \code{ClusterSize} in group \code{Trt}}
 #'@return \item{Trt}{factor, the treatment group}
@@ -35,7 +35,16 @@
 #'    xlab="Number of responses", ylab="Probability P(R=r|N=n)")
 #'
 
-mc.est <- function(cbdata){
+mc.est <- function(object,...) UseMethod("mc.est")
+ 
+
+
+#'@rdname mc.est
+#'@method mc.est CBData
+#'@S3method mc.est CBData
+
+mc.est.CBData <- function(object, ...){
+  cbdata <- object[object$Freq>0, ]
   #by trt
   do.est.fun <- function(x){
     est <- .Call("ReprodEstimates", as.integer(x$ClusterSize), as.integer(x$NResp), 
@@ -48,7 +57,7 @@ mc.est <- function(cbdata){
     est.d}  
   
   est.list <- by(cbdata, list(Trt=cbdata$Trt), do.est.fun)
-  do.call(rbind,est.list)}
+  do.call(rbind, est.list)}
 
 #'Test the assumption of reproducibility
 #'
@@ -88,9 +97,11 @@ mc.est <- function(cbdata){
 #'
 #'data(shelltox)
 #'mc.test.chisq(shelltox)
-#'  
+#' 
 
 mc.test.chisq <- function(object,...) UseMethod("mc.test.chisq")
+ 
+
 
 #'@rdname mc.test.chisq
 #'@method mc.test.chisq CBData
@@ -426,6 +437,7 @@ SO.trend.test <- function(cbdata, R=100, control=soControl()){
           names(dat.f)[names(dat.f)=="x"] <- "Freq"
     dat.f$ClusterSize <- as.numeric(as.character(dat.f$ClusterSize))
           dat.f$NResp <- as.numeric(as.character(dat.f$NResp))
+    class(dat.f) <- c("CBData", class(dat.f))
                     
     stat <- SO.LRT(dat.f, control=control)
     stat}        
@@ -496,7 +508,8 @@ trend.test <- function(cbdata, test=c("RS","GEE","GEEtrend","GEEall","SO"), exac
        names(dat.f)[names(dat.f)=="x"] <- "Freq"
        dat.f$ClusterSize <- as.numeric(as.character(dat.f$ClusterSize))
        dat.f$NResp <- as.numeric(as.character(dat.f$NResp))
-                      
+       class(dat.f) <- c("CBData", class(dat.f))
+                     
        stat <- switch(test, SO=SO.LRT(dat.f, control=control),
                             RS=RS.trend.test(dat.f)$statistic,
                             GEE=GEE.trend.test(dat.f, scale.method="fixed")$statistic,
