@@ -359,6 +359,7 @@ SO.LRT <- function(cbdata, control=soControl()){
         a$ClusterSize <- as.integer(as.character(a$ClusterSize))
         a$NResp <- as.integer(as.character(a$NResp))
         a$Trt <- 1
+    class(a) <- c("CBData", "data.frame")
                        
         b <- mc.est(a)
   b <- merge(cbdata, b, all.x=TRUE, by=c("ClusterSize","NResp"))

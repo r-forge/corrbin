@@ -175,6 +175,7 @@ treatment group. For the package the compiled library needs to be loaded.
 #'@@useDynLib CorrBin
 #'@@export
 #'@@param object a \code{\link{CBData}} or \code{\link{CMData}} object
+#'@@param \dots other potential arguments; not currently used
 #'@@return A data frame giving the estimated pdf for each treatment and
 #'clustersize.  The probabilities add up to 1
 #'for each \code{Trt}/\code{ClusterSize} combination. It has the following columns: 
@@ -1480,6 +1481,7 @@ SO.LRT <- function(cbdata, control=soControl()){
 	a$ClusterSize <- as.integer(as.character(a$ClusterSize))
  	a$NResp <- as.integer(as.character(a$NResp))
  	a$Trt <- 1
+    class(a) <- c("CBData", "data.frame")
                        
 	b <- mc.est(a)
   b <- merge(cbdata, b, all.x=TRUE, by=c("ClusterSize","NResp"))

@@ -40,7 +40,7 @@ We will be using object of \texttt{CMData} class, which is defined in \texttt{CM
 We will also need to load support libraries.
 
 @o ..\R\ExchMultinomial.Rnotyet @{
-  library(combinat)
+#'@@import combinat
 @}
 
 \section{Exchangeable multinomial model}\label{S:MLE} 
@@ -82,6 +82,7 @@ level uses a different sample-size distribution for averaging.
 
 
 @o ..\R\ExchMultinomial.Rnotyet @{
+#'@@rdname CorrBin-internal
 @< Define function for multinomial coefficient @>
 tau <- function(cmdata, type=c("averaged","cluster")){
   type <- match.arg(type)
@@ -249,6 +250,7 @@ array with the values of $\pi_{\rvec|n}$, $n=1,\ldots,M$ with cluster size as th
 
 @O ..\R\ExchMultinomial.Rnotyet
 @{
+#'@@rdname CorrBin-internal
 Marginals <- function(theta){
   K <- length(dim(theta))
   M <- dim(theta)[1]-1
@@ -291,8 +293,11 @@ The actual EM iterations are performed in \texttt{mc.est.raw}.
 
 @O ..\R\ExchMultinomial.Rnotyet
 @{
+#'@@rdname CorrBin-internal
 mc.est.raw <- function(object, ...) UseMethod("mc.est.raw")
 
+#'@@method mc.est.raw CMData
+#'@@S3method mc.est.raw CMData
 mc.est.raw.CMData <- function(object, eps=1E-6, ...){
   cmdata <- object
   @< Extract info from cmdata into variables @>
@@ -389,6 +394,7 @@ array of $\tau_\rvec$ values using
 
 @O ..\R\ExchMultinomial.Rnotyet
 @{ 
+#'@@rdname CorrBin-internal
 tau.from.pi <- function(pimat){
   K <- length(dim(pimat))
   n <- dim(pimat)[1] - 1
@@ -420,6 +426,7 @@ of marginal probabilities of success $\tau_{\dvec_i}$.
 
 @o ..\R\ExchMultinomial.Rnotyet
 @{
+#'@@rdname CorrBin-internal
 p.from.tau <- function(taumat){
   K <- length(dim(taumat))
   idx <- diag(nrow=K)
@@ -440,6 +447,7 @@ matrix of $\phi_{ij}$, $i,j=1, \ldots,K$ values using
 where $\dvec_i=(0,\ldots,0,\overbrace{1}^i,0,\ldots,0)$.
 @O ..\R\ExchMultinomial.Rnotyet
 @{
+#'@@rdname CorrBin-internal
 corr.from.pi <- function(pimat){
   K <- length(dim(pimat))
   tt <- tau.from.pi(pimat)
@@ -600,6 +608,7 @@ with the number of categories $k$ and $n=\max \sum r_i$ given. The results is a 
 $r_i$ can go from 0). The values in the array with coordinate sum exceeding $n$ are missing.
  
 @o ..\R\ExchMultinomial.Rnotyet @{
+#'@@rdname CorrBin-internal
   mChooseTable <- function(n, k, log=FALSE){
     res <- array(NA, dim=rep.int(n+1, k))
     dimnames(res) <- rep.int(list(0:n), k)
