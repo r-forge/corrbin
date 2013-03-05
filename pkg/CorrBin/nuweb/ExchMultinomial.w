@@ -39,7 +39,7 @@ We will be using object of \texttt{CMData} class, which is defined in \texttt{CM
 
 We will also need to load support libraries.
 
-@o ..\R\ExchMultinomial.Rnotyet @{
+@o ..\R\ExchMultinomial.R @{
 #'@@import combinat
 @}
 
@@ -81,7 +81,7 @@ the cluster size. The calculation of $\theta$'s is done separately for each dose
 level uses a different sample-size distribution for averaging.
 
 
-@o ..\R\ExchMultinomial.Rnotyet @{
+@o ..\R\ExchMultinomial.R @{
 #'@@rdname CorrBin-internal
 @< Define function for multinomial coefficient @>
 tau <- function(cmdata, type=c("averaged","cluster")){
@@ -93,7 +93,7 @@ tau <- function(cmdata, type=c("averaged","cluster")){
   
   res <- list()
   for (trt in levels(cmdata$Trt)){
-    cm1 <- subset(cmdata, Trt==trt)
+    cm1 <- cmdata[cmdata$Trt==trt,]
     # observed freq lookup table
     atab <- array(0, dim=rep(M+1, nc))
     a.idx <- data.matrix(cm1[,nrespvars])
@@ -206,12 +206,14 @@ $\rvec_i = (r_1,\ldots,r_K)$ is the observed number of responses of each type.
 The \texttt{mc.est.CMData} function implements the \texttt{mc.est} S3 method for \texttt{CMData} objects, 
 returning a data frame with all  $\pi^{(g)}_{\rvec|n}, n=1,\ldots, M$ probabilities. The `hard' work is done
 by the \texttt{mc.est.raw} function, which returns a list of matrices with  $\pi^{(g)}_{\rvec|M}$ values.
-@O ..\R\ExchMultinomial.Rnotyet
+@O ..\R\ExchMultinomial.R
 @{
 #'@@rdname mc.est
 #'@@method mc.est CMData
 #'@@S3method mc.est CMData
 #'@@export
+#'@@param eps numeric; EM iterations proceed until the sum of squared changes fall below \code{eps}  
+
 
 mc.est.CMData <- function(object, eps=1E-6, ...){
 
@@ -248,7 +250,7 @@ where $\dvec_i$ is the $i$th coordinate basis vector (i.e.\ all its elements are
 The input for \texttt{Marginals} is a $K$-dimensional array of $\pi_{\rvec|M}$, and the output is a $(K+1)$-dimensional
 array with the values of $\pi_{\rvec|n}$, $n=1,\ldots,M$ with cluster size as the first dimension
 
-@O ..\R\ExchMultinomial.Rnotyet
+@O ..\R\ExchMultinomial.R
 @{
 #'@@rdname CorrBin-internal
 Marginals <- function(theta){
@@ -291,7 +293,7 @@ The iterative step initializes with the last term (with $\pi_{\rvec|n+1}$) and l
 
 The actual EM iterations are performed in \texttt{mc.est.raw}. 
 
-@O ..\R\ExchMultinomial.Rnotyet
+@O ..\R\ExchMultinomial.R
 @{
 #'@@rdname CorrBin-internal
 mc.est.raw <- function(object, ...) UseMethod("mc.est.raw")
@@ -307,7 +309,7 @@ mc.est.raw.CMData <- function(object, eps=1E-6, ...){
 
   res <- list()
   for (trt in levels(cmdata$Trt)){
-    cm1 <- subset(cmdata, Trt==trt)
+    cm1 <- cmdata[cmdata$Trt==trt,]
     if (nrow(cm1) > 0){
       # observed freq lookup table
       atab <- array(0, dim=rep(M+1, nc))
@@ -392,7 +394,7 @@ array of $\tau_\rvec$ values using
   {\binom{n}{\rvec+\svec}}\pi_{\rvec+\svec}.% 
 \end{equation}
 
-@O ..\R\ExchMultinomial.Rnotyet
+@O ..\R\ExchMultinomial.R
 @{ 
 #'@@rdname CorrBin-internal
 tau.from.pi <- function(pimat){
@@ -424,7 +426,7 @@ tau.from.pi <- function(pimat){
 The \texttt{p.from.tau} function function takes a $K$-dimensional array of $\tau_\rvec$ values, and returns a vector 
 of marginal probabilities of success $\tau_{\dvec_i}$.
 
-@o ..\R\ExchMultinomial.Rnotyet
+@o ..\R\ExchMultinomial.R
 @{
 #'@@rdname CorrBin-internal
 p.from.tau <- function(taumat){
@@ -445,7 +447,7 @@ matrix of $\phi_{ij}$, $i,j=1, \ldots,K$ values using
    \end{cases} 
 \end{equation}
 where $\dvec_i=(0,\ldots,0,\overbrace{1}^i,0,\ldots,0)$.
-@O ..\R\ExchMultinomial.Rnotyet
+@O ..\R\ExchMultinomial.R
 @{
 #'@@rdname CorrBin-internal
 corr.from.pi <- function(pimat){
@@ -517,7 +519,7 @@ The final test statistic is an independent combination of the statistics for eac
 T^2=\sum_{g=1}^G T_g^2 \sim \chi^2_{G\,K} \text{ under }H_0.
 \end{equation}
 
-@O ..\R\ExchMultinomial.Rnotyet
+@O ..\R\ExchMultinomial.R
 @{
 #'@@rdname mc.test.chisq
 #'@@method mc.test.chisq CMData
@@ -551,7 +553,7 @@ mc.test.chisq.CMData <- function(object, ...){
             
       X <- t(Rmat) %*% cvec
       Sigma <- diag(p, nrow=length(p)) - outer(p,p)  #multinomial vcov
-      od.matrix <- matrix(0, nr=K, nc=K)  #over-dispersion matrix
+      od.matrix <- matrix(0, nrow=K, ncol=K)  #over-dispersion matrix
       for (n in 1:M){
         od.matrix <- od.matrix + n * Mn[n] * (scores[n]-c.bar)^2 * (1+(n-1)*phi)
       }
@@ -607,7 +609,7 @@ with the number of categories $k$ and $n=\max \sum r_i$ given. The results is a 
 \texttt{[r1,\ldots,rK]} corresponding to $\binom{\sum (r_i-1)}{r_1-1,\ldots,r_k-1}$ (because the array is 1-indexed, while
 $r_i$ can go from 0). The values in the array with coordinate sum exceeding $n$ are missing.
  
-@o ..\R\ExchMultinomial.Rnotyet @{
+@o ..\R\ExchMultinomial.R @{
 #'@@rdname CorrBin-internal
   mChooseTable <- function(n, k, log=FALSE){
     res <- array(NA, dim=rep.int(n+1, k))

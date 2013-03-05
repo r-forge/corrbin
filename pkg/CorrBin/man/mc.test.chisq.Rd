@@ -1,11 +1,14 @@
 \name{mc.test.chisq}
 \alias{mc.test.chisq}
 \alias{mc.test.chisq.CBData}
+\alias{mc.test.chisq.CMData}
 \title{Test the assumption of reproducibility}
 \usage{
   mc.test.chisq(object, ...)
 
   \method{mc.test.chisq}{CBData} (object, ...)
+
+  \method{mc.test.chisq}{CMData} (object, ...)
 }
 \arguments{
   \item{object}{a \code{\link{CBData}} or

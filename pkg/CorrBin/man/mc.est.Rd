@@ -1,15 +1,24 @@
 \name{mc.est}
 \alias{mc.est}
 \alias{mc.est.CBData}
+\alias{mc.est.CMData}
 \title{Distribution of the number of responses assuming marginal compatibility.}
 \usage{
   mc.est(object, ...)
 
   \method{mc.est}{CBData} (object, ...)
+
+  \method{mc.est}{CMData} (object, eps = 1e-06, ...)
 }
 \arguments{
   \item{object}{a \code{\link{CBData}} or
   \code{\link{CMData}} object}
+
+  \item{\dots}{other potential arguments; not currently
+  used}
+
+  \item{eps}{numeric; EM iterations proceed until the sum
+  of squared changes fall below \code{eps}}
 }
 \value{
   A data frame giving the estimated pdf for each treatment

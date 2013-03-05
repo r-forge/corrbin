@@ -11,6 +11,7 @@
 #'@useDynLib CorrBin
 #'@export
 #'@param object a \code{\link{CBData}} or \code{\link{CMData}} object
+#'@param \dots other potential arguments; not currently used
 #'@return A data frame giving the estimated pdf for each treatment and
 #'clustersize.  The probabilities add up to 1
 #'for each \code{Trt}/\code{ClusterSize} combination. It has the following columns: 
