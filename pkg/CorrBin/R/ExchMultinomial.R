@@ -1,6 +1,7 @@
 
-  library(combinat)
+#'@import combinat
 
+#'@rdname CorrBin-internal
 
     mChoose <- function(n, rvec, log=FALSE){
       rlast <- n - sum(rvec)
@@ -24,7 +25,7 @@ tau <- function(cmdata, type=c("averaged","cluster")){
   
   res <- list()
   for (trt in levels(cmdata$Trt)){
-    cm1 <- subset(cmdata, Trt==trt)
+    cm1 <- cmdata[cmdata$Trt==trt,]
     # observed freq lookup table
     atab <- array(0, dim=rep(M+1, nc))
     a.idx <- data.matrix(cm1[,nrespvars])
@@ -101,6 +102,8 @@ tau <- function(cmdata, type=c("averaged","cluster")){
 #'@method mc.est CMData
 #'@S3method mc.est CMData
 #'@export
+#'@param eps numeric; EM iterations proceed until the sum of squared changes fall below \code{eps}  
+
 
 mc.est.CMData <- function(object, eps=1E-6, ...){
 
@@ -125,6 +128,7 @@ mc.est.CMData <- function(object, eps=1E-6, ...){
     fin[c("Trt","ClusterSize", resp.vars1, last.resp, "Prob")]
 }
 
+#'@rdname CorrBin-internal
 Marginals <- function(theta){
   K <- length(dim(theta))
   M <- dim(theta)[1]-1
@@ -161,8 +165,11 @@ Marginals <- function(theta){
   res
 }
 
+#'@rdname CorrBin-internal
 mc.est.raw <- function(object, ...) UseMethod("mc.est.raw")
 
+#'@method mc.est.raw CMData
+#'@S3method mc.est.raw CMData
 mc.est.raw.CMData <- function(object, eps=1E-6, ...){
   cmdata <- object
   
@@ -181,7 +188,7 @@ mc.est.raw.CMData <- function(object, eps=1E-6, ...){
 
   res <- list()
   for (trt in levels(cmdata$Trt)){
-    cm1 <- subset(cmdata, Trt==trt)
+    cm1 <- cmdata[cmdata$Trt==trt,]
     if (nrow(cm1) > 0){
       # observed freq lookup table
       atab <- array(0, dim=rep(M+1, nc))
@@ -236,6 +243,7 @@ mc.est.raw.CMData <- function(object, eps=1E-6, ...){
   names(res) <- levels(cmdata$Trt)
   res
 } 
+#'@rdname CorrBin-internal
 tau.from.pi <- function(pimat){
   K <- length(dim(pimat))
   n <- dim(pimat)[1] - 1
@@ -266,12 +274,14 @@ tau.from.pi <- function(pimat){
   res
 }
 
+#'@rdname CorrBin-internal
 p.from.tau <- function(taumat){
   K <- length(dim(taumat))
   idx <- diag(nrow=K)
   taumat[rbind(idx+1)]
 }    
 
+#'@rdname CorrBin-internal
 corr.from.pi <- function(pimat){
   K <- length(dim(pimat))
   tt <- tau.from.pi(pimat)
@@ -317,7 +327,7 @@ mc.test.chisq.CMData <- function(object, ...){
             
       X <- t(Rmat) %*% cvec
       Sigma <- diag(p, nrow=length(p)) - outer(p,p)  #multinomial vcov
-      od.matrix <- matrix(0, nr=K, nc=K)  #over-dispersion matrix
+      od.matrix <- matrix(0, nrow=K, ncol=K)  #over-dispersion matrix
       for (n in 1:M){
         od.matrix <- od.matrix + n * Mn[n] * (scores[n]-c.bar)^2 * (1+(n-1)*phi)
       }
@@ -336,6 +346,7 @@ mc.test.chisq.CMData <- function(object, ...){
         individual=chi.list)
 }
 
+#'@rdname CorrBin-internal
   mChooseTable <- function(n, k, log=FALSE){
     res <- array(NA, dim=rep.int(n+1, k))
     dimnames(res) <- rep.int(list(0:n), k)
