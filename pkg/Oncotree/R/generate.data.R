@@ -1,10 +1,10 @@
 "generate.data" <-
 function(N, otree, with.errors=TRUE,
          edge.weights=if (with.errors) "estimated" else "observed",
-         method=c("D1","D2","S")){
+         method=c("S","D1","D2")){
   
   method <- match.arg(method)
-  edge.weights <- match.arg(edge.weights)
+  edge.weights <- match.arg(edge.weights, c("observed","estimated"))
   if (!with.errors && method=="D2") method <- "D1"  #D2 only makes sense with errors
   
   if (method=="D1"){
@@ -36,20 +36,28 @@ function(N, otree, with.errors=TRUE,
     plotinfo <- build.plot(otree$parent) #need level info
     maxLev <- max(plotinfo$level)
     level.list <- split(otree$parent$child, plotinfo$level)
-    ran.data <- matrix(NA, nrow=N, ncol=otree$nmut)
-    colnames(ran.data) <- otree$parent$child
+    ran.data0 <- matrix(NA, nrow=N, ncol=otree$nmut)
+    colnames(ran.data0) <- otree$parent$child
     w <- if (edge.weights=="observed") otree$parent$obs.weight else otree$parent$est.weight
-    ran.data[,1] <- 1  #Root is always present
+    names(w) <- otree$parent$child
+    ran.data0[,1] <- 1  #Root is always present
     
     for (lev in 2:maxLev){
       events <- level.list[[lev]]
       for (ev in events){
         ev.parent <- otree$parent$parent[otree$parent$child==ev]
         transition <- rbinom(N, size=1, p=w[ev])
-        ran.data[,ev] <- ran.data[,ev.parent] * transition #only happens, if parent already occurred
+        ran.data0[,ev] <- ran.data0[,ev.parent] * transition #only happens, if parent already occurred
       }    
     }   
-    ran.data <- ran.data[,-1]  #remove root
+    ran.data0 <- ran.data0[,-1]  #remove root
+    
+    epos <- otree$eps["epos"]
+    eneg <- otree$eps["eneg"]
+    ran.data <- matrix(rbinom(prod(dim(ran.data0)), size=1, p=ifelse(ran.data0==0,epos,1-eneg)),
+                       nrow=nrow(ran.data0), ncol=ncol(ran.data0), 
+                       dimnames=dimnames(ran.data0))
+    
   }
 	ran.data
 }
