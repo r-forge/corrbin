@@ -31,7 +31,7 @@
   responses with sample sizes specified in the call.
 }
 \description{
-  \code{ran.mc.CBData} generates a random
+  \code{ran.CBData} generates a random
   \code{\link{CBData}} object from a given two-parameter
   distribution.
 }
