@@ -2,7 +2,7 @@
 \alias{CMData}
 \title{Create a `CMdata' object from a data frame.}
 \usage{
-  CMData(x, trt, nresp, clustersize = NULL, freq = NULL)
+CMData(x, trt, nresp, clustersize = NULL, freq = NULL)
 }
 \arguments{
   \item{x}{a data frame with one row representing a cluster
@@ -34,26 +34,26 @@
   correspond to one cluster.}
 }
 \value{
-  A data frame with each row representing all the clusters
-  with the same trt/size/number of responses, and
-  standardized variable names:
+A data frame with each row representing all the clusters
+with the same trt/size/number of responses, and
+standardized variable names:
 
-  \item{Trt}{factor, the treatment group}
+\item{Trt}{factor, the treatment group}
 
-  \item{ClusterSize}{numeric, the cluster size}
+\item{ClusterSize}{numeric, the cluster size}
 
-  \item{NResp.1--NResp.K+1}{numeric, the number of
-  responses for each of the K+1 outcome types}
+\item{NResp.1--NResp.K+1}{numeric, the number of responses
+for each of the K+1 outcome types}
 
-  \item{Freq}{numeric, number of clusters with the same
-  values}
+\item{Freq}{numeric, number of clusters with the same
+values}
 }
 \description{
-  The \code{CMData} function creates an object of class
-  \dfn{CMData} that is used in further analyses. It
-  identifies the variables that define treatment group,
-  clustersize and the number of responses for each outcome
-  type.
+The \code{CMData} function creates an object of class
+\dfn{CMData} that is used in further analyses. It
+identifies the variables that define treatment group,
+clustersize and the number of responses for each outcome
+type.
 }
 \examples{
 data(dehp)
@@ -61,11 +61,11 @@ dehp <- CMData(dehp, trt="Trt", nresp=c("NResp.1","NResp.2","NResp.3"))
 str(dehp)
 }
 \author{
-  Aniko Szabo
+Aniko Szabo
 }
 \seealso{
-  \code{\link{read.CMData}} for creating a \code{CMData}
-  object directly from a file.
+\code{\link{read.CMData}} for creating a \code{CMData}
+object directly from a file.
 }
 \keyword{classes}
 \keyword{manip}

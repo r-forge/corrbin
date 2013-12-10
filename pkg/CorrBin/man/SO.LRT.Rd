@@ -2,7 +2,7 @@
 \alias{SO.LRT}
 \title{Likelihood-ratio test statistic}
 \usage{
-  SO.LRT(cbdata, control = soControl())
+SO.LRT(cbdata, control = soControl())
 }
 \arguments{
   \item{cbdata}{a \code{CBData} object}
@@ -13,25 +13,24 @@
   effect.}
 }
 \value{
-  The value of the likelihood ratio test statistic is
-  returned with two attributes:
+The value of the likelihood ratio test statistic is
+returned with two attributes:
 
-  \item{ll0}{the log-likelihood under \eqn{H_0}{H0}
-  (equality)}
+\item{ll0}{the log-likelihood under \eqn{H_0}{H0}
+(equality)}
 
-  \item{ll1}{the log-likelihood under \eqn{H_a}{Ha}
-  (stochastic order)}
+\item{ll1}{the log-likelihood under \eqn{H_a}{Ha}
+(stochastic order)}
 }
 \description{
-  \code{SO.LRT} computes the likelihood ratio test
-  statistic for stochastic ordering against equality
-  assuming marginal compatibility for both alternatives.
-  Note that this statistic does not have a
-  \eqn{\chi^2}{chi-squared} distribution, so the p-value
-  computation is not straightforward. The
-  \code{\link{SO.trend.test}} function implements a
-  permutation-based evaluation of the p-value for the
-  likelihood-ratio test.
+\code{SO.LRT} computes the likelihood ratio test statistic
+for stochastic ordering against equality assuming marginal
+compatibility for both alternatives. Note that this
+statistic does not have a \eqn{\chi^2}{chi-squared}
+distribution, so the p-value computation is not
+straightforward. The \code{\link{SO.trend.test}} function
+implements a permutation-based evaluation of the p-value
+for the likelihood-ratio test.
 }
 \examples{
 data(shelltox)
@@ -39,10 +38,10 @@ LRT <- SO.LRT(shelltox, control=soControl(max.iter = 100, max.directions = 50))
 LRT
 }
 \author{
-  Aniko Szabo
+Aniko Szabo
 }
 \seealso{
-  \code{\link{SO.trend.test}}, \code{\link{soControl}}
+\code{\link{SO.trend.test}}, \code{\link{soControl}}
 }
 \keyword{htest}
 \keyword{nonparametric}

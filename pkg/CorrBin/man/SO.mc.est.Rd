@@ -2,7 +2,7 @@
 \alias{SO.mc.est}
 \title{Order-restricted MLE assuming marginal compatibility}
 \usage{
-  SO.mc.est(cbdata, turn = 1, control = soControl())
+SO.mc.est(cbdata, turn = 1, control = soControl())
 }
 \arguments{
   \item{cbdata}{an object of class \code{\link{CBData}}.}
@@ -17,46 +17,46 @@
   effect.}
 }
 \value{
-  A list with components:
+A list with components:
 
-  Components \code{Q} and \code{D} are unlikely to be
-  needed by the user.
+Components \code{Q} and \code{D} are unlikely to be needed
+by the user.
 
-  \item{MLest}{data frame with the maximum likelihood
-  estimates of \eqn{P(R_i=r|n)}}
+\item{MLest}{data frame with the maximum likelihood
+estimates of \eqn{P(R_i=r|n)}}
 
-  \item{Q}{numeric matrix; estimated weights for the mixing
-  distribution}
+\item{Q}{numeric matrix; estimated weights for the mixing
+distribution}
 
-  \item{D}{numeric matrix; directional derivative of the
-  log-likelihood}
+\item{D}{numeric matrix; directional derivative of the
+log-likelihood}
 
-  \item{loglik}{the achieved value of the log-likelihood}
+\item{loglik}{the achieved value of the log-likelihood}
 
-  \item{converge}{a 2-element vector with the achived
-  relative error and the performed number of iterations}
+\item{converge}{a 2-element vector with the achived
+relative error and the performed number of iterations}
 }
 \description{
-  \code{SO.mc.est} computes the nonparametric maximum
-  likelihood estimate of the distribution of the number of
-  responses in a cluster \eqn{P(R=r|n)} under a stochastic
-  ordering constraint. Umbrella ordering can be specified
-  using the \code{turn} parameter.
+\code{SO.mc.est} computes the nonparametric maximum
+likelihood estimate of the distribution of the number of
+responses in a cluster \eqn{P(R=r|n)} under a stochastic
+ordering constraint. Umbrella ordering can be specified
+using the \code{turn} parameter.
 }
 \details{
-  Two different algorithms: EM and ISDM are implemented. In
-  general, ISDM (the default) should be faster, though its
-  performance depends on the tuning parameter
-  \code{max.directions}: values that are too low or too
-  high slow the algorithm down.
+Two different algorithms: EM and ISDM are implemented. In
+general, ISDM (the default) should be faster, though its
+performance depends on the tuning parameter
+\code{max.directions}: values that are too low or too high
+slow the algorithm down.
 
-  \code{SO.mc.est} allows extension to an umbrella
-  ordering: \eqn{D_1 \geq^{st} \cdots \geq^{st} D_k
-  \leq^{st} \cdots \leq^{st} D_n}{D_1 >= \ldots >= D_k <=
-  \ldots <= D_n} by specifying the value of \eqn{k} as the
-  \code{turn} parameter. This is an experimental feature,
-  and at this point none of the other functions can handle
-  umbrella orderings.
+\code{SO.mc.est} allows extension to an umbrella ordering:
+\eqn{D_1 \geq^{st} \cdots \geq^{st} D_k \leq^{st} \cdots
+\leq^{st} D_n}{D_1 >= \ldots >= D_k <= \ldots <= D_n} by
+specifying the value of \eqn{k} as the \code{turn}
+parameter. This is an experimental feature, and at this
+point none of the other functions can handle umbrella
+orderings.
 }
 \examples{
 data(shelltox)
@@ -75,15 +75,15 @@ data(shelltox)
       ylim=c(0,1.1), main="Stochastically ordered estimates\\n with marginal compatibility")
 }
 \author{
-  Aniko Szabo, aszabo@mcw.edu
+Aniko Szabo, aszabo@mcw.edu
 }
 \references{
-  Szabo A, George EO. (2009) On the Use of Stochastic
-  Ordering to Test for Trend with Clustered Binary Data.
-  \emph{Biometrika}
+Szabo A, George EO. (2009) On the Use of Stochastic
+Ordering to Test for Trend with Clustered Binary Data.
+\emph{Biometrika}
 }
 \seealso{
-  \code{\link{soControl}}
+\code{\link{soControl}}
 }
 \keyword{models}
 \keyword{nonparametric}

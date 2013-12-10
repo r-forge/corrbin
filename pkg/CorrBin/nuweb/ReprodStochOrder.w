@@ -1559,7 +1559,6 @@ specifies the number of resamples, \texttt{method} could be either ``ISDM'' or
 @}
 @O ../R/Reprod.R @{
 SO.trend.test <- function(cbdata, R=100, control=soControl()){
-    require(boot)
 	dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
 	dat2$Freq <- NULL
 	

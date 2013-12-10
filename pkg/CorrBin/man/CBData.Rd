@@ -2,7 +2,7 @@
 \alias{CBData}
 \title{Create a `CBdata' object from a data frame.}
 \usage{
-  CBData(x, trt, clustersize, nresp, freq = NULL)
+CBData(x, trt, clustersize, nresp, freq = NULL)
 }
 \arguments{
   \item{x}{a data frame with one row representing a cluster
@@ -24,24 +24,24 @@
   one cluster.}
 }
 \value{
-  A data frame with each row representing all the clusters
-  with the same trt/size/number of responses, and
-  standardized variable names:
+A data frame with each row representing all the clusters
+with the same trt/size/number of responses, and
+standardized variable names:
 
-  \item{Trt}{factor, the treatment group}
+\item{Trt}{factor, the treatment group}
 
-  \item{ClusterSize}{numeric, the cluster size}
+\item{ClusterSize}{numeric, the cluster size}
 
-  \item{NResp}{numeric, the number of responses}
+\item{NResp}{numeric, the number of responses}
 
-  \item{Freq}{numeric, number of clusters with the same
-  values}
+\item{Freq}{numeric, number of clusters with the same
+values}
 }
 \description{
-  The \code{CBData} function creates an object of class
-  \dfn{CBData} that is used in further analyses. It
-  identifies the variables that define treatment group,
-  clustersize and the number of responses.
+The \code{CBData} function creates an object of class
+\dfn{CBData} that is used in further analyses. It
+identifies the variables that define treatment group,
+clustersize and the number of responses.
 }
 \examples{
 data(shelltox)
@@ -49,11 +49,11 @@ sh <- CBData(shelltox, trt="Trt", clustersize="ClusterSize", nresp="NResp")
 str(sh)
 }
 \author{
-  Aniko Szabo
+Aniko Szabo
 }
 \seealso{
-  \code{\link{read.CBData}} for creating a \code{CBData}
-  object directly from a file.
+\code{\link{read.CBData}} for creating a \code{CBData}
+object directly from a file.
 }
 \keyword{classes}
 \keyword{manip}

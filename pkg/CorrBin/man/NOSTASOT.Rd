@@ -2,10 +2,9 @@
 \alias{NOSTASOT}
 \title{Finding the NOSTASOT dose}
 \usage{
-  NOSTASOT(cbdata,
-    test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"),
-    exact = test == "SO", R = 100, sig.level = 0.05,
-    control = soControl())
+NOSTASOT(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"),
+  exact = test == "SO", R = 100, sig.level = 0.05,
+  control = soControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object}
@@ -28,58 +27,57 @@
   settable control values and their effect.}
 }
 \value{
-  a list with two components
+a list with two components
 
-  \item{NOSTASOT}{character string identifying the NOSTASOT
-  dose.}
+\item{NOSTASOT}{character string identifying the NOSTASOT
+dose.}
 
-  \item{p}{numeric vector of the p-values of the tests
-  actually performed.} The last element corresponds to all
-  doses included, and will not be missing. p-values for
-  tests that were not actually performed due to the
-  procedure stopping are set to NA.
+\item{p}{numeric vector of the p-values of the tests
+actually performed.} The last element corresponds to all
+doses included, and will not be missing. p-values for tests
+that were not actually performed due to the procedure
+stopping are set to NA.
 }
 \description{
-  The NOSTASOT dose is the
-  No-Statistical-Significance-Of-Trend dose -- the largest
-  dose at which no trend in the rate of response has been
-  observed. It is often used to determine a safe dosage
-  level for a potentially toxic compound.
+The NOSTASOT dose is the
+No-Statistical-Significance-Of-Trend dose -- the largest
+dose at which no trend in the rate of response has been
+observed. It is often used to determine a safe dosage level
+for a potentially toxic compound.
 }
 \details{
-  A series of hypotheses about the presence of an
-  increasing trend overall, with all but the last group,
-  all but the last two groups, etc.  are tested. Since this
-  set of hypotheses forms a closed family, one can test
-  these hypotheses in a step-down manner with the same
-  \code{sig.level} type I error rate at each step and still
-  control the family-wise error rate.
+A series of hypotheses about the presence of an increasing
+trend overall, with all but the last group, all but the
+last two groups, etc.  are tested. Since this set of
+hypotheses forms a closed family, one can test these
+hypotheses in a step-down manner with the same
+\code{sig.level} type I error rate at each step and still
+control the family-wise error rate.
 
-  The NOSTASOT dose is the largest dose at which the trend
-  is not statistically significant. If the trend test is
-  not significant with all the groups included, the largest
-  dose is the NOSTASOT dose. If the testing sequence goes
-  down all the way to two groups, and a significant trend
-  is still detected, the lowest dose is the NOSTASOT dose.
-  This assumes that the lowest dose is a control group, and
-  this convention might not be meaningful otherwise.
+The NOSTASOT dose is the largest dose at which the trend is
+not statistically significant. If the trend test is not
+significant with all the groups included, the largest dose
+is the NOSTASOT dose. If the testing sequence goes down all
+the way to two groups, and a significant trend is still
+detected, the lowest dose is the NOSTASOT dose. This
+assumes that the lowest dose is a control group, and this
+convention might not be meaningful otherwise.
 }
 \examples{
 data(shelltox)
 NOSTASOT(shelltox, test="RS")
 }
 \author{
-  Aniko Szabo, aszabo@mcw.edu
+Aniko Szabo, aszabo@mcw.edu
 }
 \references{
-  Tukey, J. W.; Ciminera, J. L. & Heyse, J. F. (1985)
-  Testing the statistical certainty of a response to
-  increasing doses of a drug. \emph{Biometrics} 41,
-  295-301.
+Tukey, J. W.; Ciminera, J. L. & Heyse, J. F. (1985) Testing
+the statistical certainty of a response to increasing doses
+of a drug. \emph{Biometrics} 41, 295-301.
 }
 \seealso{
-  \code{\link{trend.test}} for details about the available
-  trend tests.
+\code{\link{trend.test}} for details about the available
+trend tests.
 }
 \keyword{htest}
 \keyword{nonparametric}

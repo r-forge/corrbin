@@ -2,7 +2,7 @@
 \alias{read.CBData}
 \title{Read data from external file into a CBData object}
 \usage{
-  read.CBData(file, with.freq = TRUE, ...)
+read.CBData(file, with.freq = TRUE, ...)
 }
 \arguments{
   \item{file}{name of file with data. The first column
@@ -19,18 +19,18 @@
   \code{\link[utils]{read.table}}}
 }
 \value{
-  a \code{CBData} object
+a \code{CBData} object
 }
 \description{
-  A convenience function to read data from specially
-  structured file directly into a \code{CBData} object.
+A convenience function to read data from specially
+structured file directly into a \code{CBData} object.
 }
 \author{
-  Aniko Szabo
+Aniko Szabo
 }
 \seealso{
-  \code{\link{CBData}}
+\code{\link{CBData}}
 }
-\keyword{file}
 \keyword{IO}
+\keyword{file}
 

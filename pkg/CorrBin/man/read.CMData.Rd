@@ -2,8 +2,7 @@
 \alias{read.CMData}
 \title{Read data from external file into a CMData object}
 \usage{
-  read.CMData(file, with.clustersize = TRUE,
-    with.freq = TRUE, ...)
+read.CMData(file, with.clustersize = TRUE, with.freq = TRUE, ...)
 }
 \arguments{
   \item{file}{name of file with data. The data in the file
@@ -19,30 +18,29 @@
   \code{\link[utils]{read.table}}}
 }
 \value{
-  a \code{CMData} object
+a \code{CMData} object
 }
 \description{
-  A convenience function to read data from specially
-  structured file directly into a \code{CMData} object.
-  There are two basic data format options: etiher the
-  counts of responses of all categories are given (and the
-  cluster size is the sum of these counts), or the total
-  cluster size is given with the counts of all but one
-  category. The first column should always give the
-  treatment group, then either the counts for each category
-  (first option, chosen by setting \code{with.clustersize =
-  FALSE}), or the size of the cluster followed by the
-  counts for all but one category (second option, chosen by
-  setting \code{with.clustersize = TRUE}). Optionally, a
-  last column could give the number of times the given
-  combination occurs in the data.
+A convenience function to read data from specially
+structured file directly into a \code{CMData} object. There
+are two basic data format options: etiher the counts of
+responses of all categories are given (and the cluster size
+is the sum of these counts), or the total cluster size is
+given with the counts of all but one category. The first
+column should always give the treatment group, then either
+the counts for each category (first option, chosen by
+setting \code{with.clustersize = FALSE}), or the size of
+the cluster followed by the counts for all but one category
+(second option, chosen by setting \code{with.clustersize =
+TRUE}). Optionally, a last column could give the number of
+times the given combination occurs in the data.
 }
 \author{
-  Aniko Szabo
+Aniko Szabo
 }
 \seealso{
-  \code{\link{CMData}}
+\code{\link{CMData}}
 }
-\keyword{file}
 \keyword{IO}
+\keyword{file}
 

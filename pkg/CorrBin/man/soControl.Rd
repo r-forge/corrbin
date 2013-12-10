@@ -2,10 +2,9 @@
 \alias{soControl}
 \title{Control values for order-constrained fit}
 \usage{
-  soControl(method = c("ISDM", "EM"), eps = 0.005,
-    max.iter = 5000, max.directions = 0,
-    start = ifelse(method == "ISDM", "H0", "uniform"),
-    verbose = FALSE)
+soControl(method = c("ISDM", "EM"), eps = 0.005, max.iter = 5000,
+  max.directions = 0, start = ifelse(method == "ISDM", "H0", "uniform"),
+  verbose = FALSE)
 }
 \arguments{
   \item{method}{a string specifying the maximization
@@ -34,16 +33,14 @@
   optimization are shown.}
 }
 \value{
-  a list with components for each of the possible
-  arguments.
+a list with components for each of the possible arguments.
 }
 \description{
-  The values supplied in the function call replace the
-  defaults and a list with all possible arguments is
-  returned.  The returned list is used as the control
-  argument to the \code{\link{mc.est}},
-  \code{\link{SO.LRT}}, and \code{\link{SO.trend.test}}
-  functions.
+The values supplied in the function call replace the
+defaults and a list with all possible arguments is
+returned.  The returned list is used as the control
+argument to the \code{\link{mc.est}}, \code{\link{SO.LRT}},
+and \code{\link{SO.trend.test}} functions.
 }
 \examples{
 # decrease the maximum number iterations and
@@ -51,11 +48,11 @@
 soControl(method="EM", max.iter=100)
 }
 \author{
-  Aniko Szabo aszabo@mcw.edu
+Aniko Szabo aszabo@mcw.edu
 }
 \seealso{
-  \code{\link{mc.est}}, \code{\link{SO.LRT}},
-  \code{\link{SO.trend.test}}
+\code{\link{mc.est}}, \code{\link{SO.LRT}},
+\code{\link{SO.trend.test}}
 }
 \keyword{models}
 

@@ -2,9 +2,8 @@
 \alias{trend.test}
 \title{Test for increasing trend with correlated binary data}
 \usage{
-  trend.test(cbdata,
-    test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"),
-    exact = test == "SO", R = 100, control = soControl())
+trend.test(cbdata, test = c("RS", "GEE", "GEEtrend", "GEEall", "SO"),
+  exact = test == "SO", R = 100, control = soControl())
 }
 \arguments{
   \item{cbdata}{a \code{\link{CBData}} object}
@@ -32,23 +31,22 @@
   settable control values and their effect.}
 }
 \value{
-  A list with two components and an optional "boot"
-  attribute that contains the detailed results of the
-  permutation test as an object of class
-  \code{\link[boot]{boot}} if an exact test was performed.
+A list with two components and an optional "boot" attribute
+that contains the detailed results of the permutation test
+as an object of class \code{\link[boot]{boot}} if an exact
+test was performed.
 
-  \item{statistic}{numeric, the value of the test
-  statistic}
+\item{statistic}{numeric, the value of the test statistic}
 
-  \item{p.val}{numeric, asymptotic one-sided p-value of the
-  test}
+\item{p.val}{numeric, asymptotic one-sided p-value of the
+test}
 }
 \description{
-  The \code{trend.test} function provides a common
-  interface to the trend tests implemented in this package:
-  \code{\link{SO.trend.test}}, \code{\link{RS.trend.test}},
-  and \code{\link{GEE.trend.test}}. The details of each
-  test can be found on their help page.
+The \code{trend.test} function provides a common interface
+to the trend tests implemented in this package:
+\code{\link{SO.trend.test}}, \code{\link{RS.trend.test}},
+and \code{\link{GEE.trend.test}}. The details of each test
+can be found on their help page.
 }
 \examples{
 data(shelltox)
@@ -58,12 +56,12 @@ set.seed(5724)
 trend.test(shelltox, test="RS", R=50, exact=TRUE)
 }
 \author{
-  Aniko Szabo, aszabo@mcw.edu
+Aniko Szabo, aszabo@mcw.edu
 }
 \seealso{
-  \code{\link{SO.trend.test}}, \code{\link{RS.trend.test}},
-  and \code{\link{GEE.trend.test}} for details about the
-  available tests.
+\code{\link{SO.trend.test}}, \code{\link{RS.trend.test}},
+and \code{\link{GEE.trend.test}} for details about the
+available tests.
 }
 \keyword{htest}
 \keyword{nonparametric}

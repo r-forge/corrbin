@@ -428,7 +428,6 @@ SO.LRT <- function(cbdata, control=soControl()){
 #'
 
 SO.trend.test <- function(cbdata, R=100, control=soControl()){
-    require(boot)
         dat2 <- cbdata[rep(1:nrow(cbdata), cbdata$Freq),]  #each row is one sample
         dat2$Freq <- NULL
         

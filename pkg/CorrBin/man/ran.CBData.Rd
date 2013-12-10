@@ -2,8 +2,8 @@
 \alias{ran.CBData}
 \title{Generate random correlated binary data}
 \usage{
-  ran.CBData(sample.sizes, p.gen.fun = function(g) 0.3,
-    rho.gen.fun = function(g) 0.2, pdf.fun = qpower.pdf)
+ran.CBData(sample.sizes, p.gen.fun = function(g) 0.3,
+  rho.gen.fun = function(g) 0.2, pdf.fun = qpower.pdf)
 }
 \arguments{
   \item{sample.sizes}{a dataset with variables Trt,
@@ -27,24 +27,24 @@
   (\code{\link{qpower.pdf}}) are provided in the package.}
 }
 \value{
-  a CBData object with randomly generated number of
-  responses with sample sizes specified in the call.
+a CBData object with randomly generated number of responses
+with sample sizes specified in the call.
 }
 \description{
-  \code{ran.CBData} generates a random
-  \code{\link{CBData}} object from a given two-parameter
-  distribution.
+\code{ran.mc.CBData} generates a random
+\code{\link{CBData}} object from a given two-parameter
+distribution.
 }
 \details{
-  \dfn{p.gen.fun} and \dfn{rho.gen.fun} are functions that
-  generate the parameter values for each treatment group;
-  \dfn{pdf.fun} is a function generating the pdf of the
-  number of responses given the two parameters \dfn{p} and
-  \dfn{rho}, and the cluster size \dfn{n}.
+\dfn{p.gen.fun} and \dfn{rho.gen.fun} are functions that
+generate the parameter values for each treatment group;
+\dfn{pdf.fun} is a function generating the pdf of the
+number of responses given the two parameters \dfn{p} and
+\dfn{rho}, and the cluster size \dfn{n}.
 
-  \code{p.gen.fun} and \code{rho.gen.fun} expect the
-  parameter value of 1 to represent the first group, 2 -
-  the second group, etc.
+\code{p.gen.fun} and \code{rho.gen.fun} expect the
+parameter value of 1 to represent the first group, 2 - the
+second group, etc.
 }
 \examples{
 set.seed(3486)
@@ -54,10 +54,10 @@ rd <- ran.CBData(ss, p.gen.fun=function(g)0.2+0.1*g)
 rd
 }
 \author{
-  Aniko Szabo, aszabo@mcw.edu
+Aniko Szabo, aszabo@mcw.edu
 }
 \seealso{
-  \code{\link{betabin.pdf}} and \code{\link{qpower.pdf}}
+\code{\link{betabin.pdf}} and \code{\link{qpower.pdf}}
 }
 \keyword{distribution}
 

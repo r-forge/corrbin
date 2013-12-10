@@ -18,9 +18,3 @@ Description: This package implements non-parametric analyses for clustered
     based on stochastic ordering is implemented.
 License: GPL (>=2)
 LazyLoad: yes
-Collate:
-    'CBData.R'
-    'CorrBin-package.R'
-    'Reprod.R'
-    'CMData.R'
-    'ExchMultinomial.R'
