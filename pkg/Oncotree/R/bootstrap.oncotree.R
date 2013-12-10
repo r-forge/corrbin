@@ -15,7 +15,6 @@ function(otree, R, type=c("nonparametric","parametric")){
 	    nmut <- otree$nmut
 
 	    if (type=="nonparametric"){
-	      require(boot);
 		    test<-boot(otree$data, parentlist, R)    
 		    result<-test$t
 	    }
