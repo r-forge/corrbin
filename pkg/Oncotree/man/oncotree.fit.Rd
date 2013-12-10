@@ -15,12 +15,14 @@
 \usage{
   oncotree.fit(dataset, error.fun = function(x, y){sum((x - y)^2)})
   \method{print}{oncotree}(x, \dots)
-  \method{plot}{oncotree}(x, edge.weights = c("none", "observed", "estimated"), 
-            edge.digits=2, node.coords=NULL, plot=TRUE, cex = par("cex"), 
-						col.edge=par("col"), col.text=par("col"), col.weight=par("col"),\dots)
+  \method{plot}{oncotree}(x, edge.weights = c("none", "observed", "estimated"),
+    edge.digits=2, node.coords=NULL, plot=TRUE, cex = par("cex"), 
+		col.edge=par("col"), col.text=par("col"), col.weight=par("col"),\dots)
+            
   pstree.oncotree(x, edge.weights=c("none","observed","estimated"), edge.digits=2,
                   shape=c("none","oval", "circle", "triangle", "diamond"),
-                  pstree.options=list(arrows="->", treefit="loose", arrowscale="1.5 0.8", nodesep="3pt"))
+                  pstree.options=list(arrows="->", treefit="loose", 
+                                      arrowscale="1.5 0.8", nodesep="3pt"))
 }
 
 

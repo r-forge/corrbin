@@ -26,7 +26,7 @@ function(N, otree, with.errors=TRUE,
     
     epos <- otree$eps["epos"]
     eneg <- otree$eps["eneg"]
-    ran.data <- matrix(rbinom(prod(dim(ran.data0)), size=1, p=ifelse(ran.data0==0,epos,1-eneg)),
+    ran.data <- matrix(rbinom(prod(dim(ran.data0)), size=1, prob=ifelse(ran.data0==0,epos,1-eneg)),
                        nrow=nrow(ran.data0), ncol=ncol(ran.data0), 
                        dimnames=dimnames(ran.data0))
   }
@@ -46,7 +46,7 @@ function(N, otree, with.errors=TRUE,
       events <- level.list[[lev]]
       for (ev in events){
         ev.parent <- otree$parent$parent[otree$parent$child==ev]
-        transition <- rbinom(N, size=1, p=w[ev])
+        transition <- rbinom(N, size=1, prob=w[ev])
         ran.data0[,ev] <- ran.data0[,ev.parent] * transition #only happens, if parent already occurred
       }    
     }   
@@ -54,7 +54,7 @@ function(N, otree, with.errors=TRUE,
     
     epos <- otree$eps["epos"]
     eneg <- otree$eps["eneg"]
-    ran.data <- matrix(rbinom(prod(dim(ran.data0)), size=1, p=ifelse(ran.data0==0,epos,1-eneg)),
+    ran.data <- matrix(rbinom(prod(dim(ran.data0)), size=1, prob=ifelse(ran.data0==0,epos,1-eneg)),
                        nrow=nrow(ran.data0), ncol=ncol(ran.data0), 
                        dimnames=dimnames(ran.data0))
     

@@ -12,8 +12,9 @@ plotting the resulting set of trees.}
 \usage{
    bootstrap.oncotree(otree, R, type = c("nonparametric", "parametric"))
    \method{print}{boottree}(x, \dots)
-   \method{plot}{boottree}(x, minfreq=NULL, minprop=NULL, nboots=NULL, draw.orig=TRUE, draw.consensus=TRUE, 
-	                         fix.nodes=FALSE, ask=(prod(par("mfrow"))<ntrees)&&dev.interactive(), \dots)
+   \method{plot}{boottree}(x, minfreq=NULL, minprop=NULL, nboots=NULL, draw.orig=TRUE,
+                           draw.consensus=TRUE, fix.nodes=FALSE, 
+                           ask=(prod(par("mfrow"))<ntrees)&&dev.interactive(), \dots)
 }
 \arguments{
   \item{otree}{An object of class \code{oncotree}.}
