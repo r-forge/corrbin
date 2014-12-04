@@ -125,6 +125,7 @@ mc.est.CMData <- function(object, eps=1E-6, ...){
     last.resp <- paste("NResp", nc, sep=".")
     fin[last.resp] <- fin$ClusterSize - rowSums(fin[resp.vars1]) # calculated omitted frequency
     fin$Trt <- factor(fin$Trt)
+    fin <- fin[fin[last.resp] >= 0,]  #remove impossible clusters
     fin[c("Trt","ClusterSize", resp.vars1, last.resp, "Prob")]
 }
 
