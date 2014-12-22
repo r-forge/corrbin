@@ -91,6 +91,41 @@ read.CBData <- function(file, with.freq=TRUE, ...){
   d <- CBData(d, "Trt", "ClusterSize", "NResp", "Freq")
   d}
 
+#'Extract from a CBData/CMData object
+#'
+#'The extracting syntax works as for \code{\link{[.data.frame}}, and in general the returned object is not a \code{CBData}/\code{CMData} object.
+#'However if the columns are not modified, then the result is still a \code{CBData}/\code{CMData} object  with appropriate attributes  preserved, 
+#' and the unused levels of treatment groups dropped.
+#'
+#'@export
+#'@param x \code{CMData} object.
+#'@param i numeric, row index of extracted values
+#'@param j numeric, column index of extracted values
+#'@param drop logical. If TRUE the result is coerced to the lowest possible dimension. 
+#'The default is the same as for \code{\link{[.data.frame}}: to drop if only one column is left, but not to drop if only one row is left.
+#'@return a \code{CBData}/\code{CMData} object
+#'@author Aniko Szabo
+#'@seealso \code{CBData}/, \code{\link{CMData}}
+#'@keywords manip
+#'@name Extract
+#'
+NULL
+
+#'@rdname Extract
+#'@export
+"[.CBData" <- function(x, i, j, drop){
+  res <- NextMethod("[")
+  if (NCOL(res) == ncol(x)){
+    res <- "[.data.frame"(x, i, )
+    res$Trt <- droplevels(res$Trt)
+    res
+  }
+  else {
+    class(res) <- setdiff(class(res), "CBData")
+  }
+  res
+}
+
 #'Unwrap a clustered object
 #'
 #'\code{unwrap.CBData} is a utility function that reformats a CBData object so
@@ -122,7 +157,6 @@ unwrap <- function(object,...) UseMethod("unwrap")
 
 #'@rdname unwrap
 #'@method unwrap CBData
-#'@S3method unwrap CBData
 unwrap.CBData <- function(object,...){
   freqs <- rep(1:nrow(object), object$Freq)
   cb1 <- object[freqs,]

@@ -12,9 +12,9 @@ Suggests:
     geepack,
     lattice
 Description: This package implements non-parametric analyses for clustered
-    binary data. The elements of the cluster are assumed exchangeable, and
-    identical joint distribution (also known as marginal compatibility, or
-    reproducibility) is assumed for clusters of different sizes. A trend test
-    based on stochastic ordering is implemented.
+    binary and multinomial data. The elements of the cluster are assumed
+    exchangeable, and identical joint distribution (also known as marginal
+    compatibility, or reproducibility) is assumed for clusters of different
+    sizes. A trend test based on stochastic ordering is implemented.
 License: GPL (>=2)
 LazyLoad: yes

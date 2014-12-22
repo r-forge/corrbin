@@ -98,9 +98,8 @@ tau <- function(cmdata, type=c("averaged","cluster")){
   res
 }
 
-#'@rdname mc.est
+#'@describeIn mc.est
 #'@method mc.est CMData
-#'@S3method mc.est CMData
 #'@export
 #'@param eps numeric; EM iterations proceed until the sum of squared changes fall below \code{eps}  
 
@@ -170,7 +169,6 @@ Marginals <- function(theta){
 mc.est.raw <- function(object, ...) UseMethod("mc.est.raw")
 
 #'@method mc.est.raw CMData
-#'@S3method mc.est.raw CMData
 mc.est.raw.CMData <- function(object, eps=1E-6, ...){
   cmdata <- object
   
@@ -298,7 +296,6 @@ corr.from.pi <- function(pimat){
 
 #'@rdname mc.test.chisq
 #'@method mc.test.chisq CMData
-#'@S3method mc.test.chisq CMData
 #'@export
 
 mc.test.chisq.CMData <- function(object, ...){

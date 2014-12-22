@@ -199,15 +199,15 @@ treatment group. For the package the compiled library needs to be loaded.
 #'    type="l", as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
 #'    xlab="Number of responses", ylab="Probability P(R=r|N=n)")
 #'
+#'@@rdname mc.est
 
 mc.est <- function(object,...) UseMethod("mc.est")
  
 @}
 @O ../R/Reprod.R @{
 
-#'@@rdname mc.est
+#'@@describeIn mc.est
 #'@@method mc.est CBData
-#'@@S3method mc.est CBData
 
 mc.est.CBData <- function(object, ...){
   cbdata <- object[object$Freq>0, ]
@@ -299,7 +299,6 @@ mc.test.chisq <- function(object,...) UseMethod("mc.test.chisq")
 
 #'@@rdname mc.test.chisq
 #'@@method mc.test.chisq CBData
-#'@@S3method mc.test.chisq CBData
 
 mc.test.chisq.CBData <- function(object,...){
   cbdata <- object[object$Freq>0, ]

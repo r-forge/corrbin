@@ -182,23 +182,8 @@ have a \texttt{CMData} class anymore.
 
 @o ../R/CMData.R
 @{
-#'Extract from a CMData object
-#'
-#'The extracting syntax works as for \code{\link{[.data.frame}}, and in general the returned object is not a \code{CMData} object.
-#'However if the columns are not modified, then the result is still a \code{CMData} object  with appropriate attributes  preserved, 
-#' and the unused levels of treatment groups dropped.
-#'
+#'@@rdname Extract
 #'@@export
-#'@@param x \code{CMData} object.
-#'@@param i numeric, row index of extracted values
-#'@@param j numeric, column index of extracted values
-#'@@param drop logical. If TRUE the result is coerced to the lowest possible dimension. 
-#'The default is the same as for \code{\link{[.data.frame}}: to drop if only one column is left, but not to drop if only one row is left.
-#'@@return a \code{CMData} object
-#'@@author Aniko Szabo
-#'@@seealso \code{\link{CMData}}
-#'@@keywords IO file
-#'
 @}
 @o ../R/CMData.R
 @{
@@ -229,7 +214,6 @@ to indicate clusters.
 #'
 #'@@rdname unwrap
 #'@@method unwrap CMData
-#'@@S3method unwrap CMData
 #'@@export
 #'@@return For \code{unwrap.CMData}: a data frame with one row for each cluster element (having a multinomial
 #'outcome) with the following standardized column names

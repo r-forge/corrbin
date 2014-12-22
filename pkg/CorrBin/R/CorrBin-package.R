@@ -1,9 +1,9 @@
 
 
-#'Nonparameterics for correlated binary data
+#'Nonparameterics for Correlated Binary and Multinomial Data
 #'
 #'This package implements nonparametric methods for analysing exchangeable
-#'binary data with variable cluster sizes with emphasis on trend testing. The
+#'binary and multinomial data with variable cluster sizes with emphasis on trend testing. The
 #'input should specify the treatment group, cluster-size, and the number of
 #'responses (i.e. the number of cluster elements with the outcome of interest)
 #'for each cluster.
@@ -11,8 +11,8 @@
 #'\tabular{ll}{ 
 #' Package: \tab CorrBin\cr 
 #' Type: \tab Package\cr 
-#' Version: \tab 1.4\cr
-#' Date: \tab 2013-01-13\cr 
+#' Version: \tab 1.5\cr
+#' Date: \tab 2014-12-18\cr 
 #' License: \tab GPL 2\cr 
 #' LazyLoad: \tab yes\cr
 #'} 
