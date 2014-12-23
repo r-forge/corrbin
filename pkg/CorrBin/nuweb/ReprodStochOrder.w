@@ -161,7 +161,7 @@ treatment group. For the package the compiled library needs to be loaded.
 %file would be created and that's what would be loaded}:
 
 
-@o ../R/Reprod.R
+@o ../R/aaa-generics1.R
 @{
 #'Distribution of the number of responses assuming marginal compatibility.
 #'
@@ -251,7 +251,7 @@ correlation for the $g$th treatment group.
 X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
 \end{equation}
 
-@O ../R/Reprod.R
+@O ../R/aaa-generics1.R
 @{
 #'Test the assumption of reproducibility
 #'

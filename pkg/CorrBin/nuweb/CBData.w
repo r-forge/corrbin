@@ -240,7 +240,7 @@ NULL
 each row is one observation (instead of one cluster). A new `ID' variable is added
 to indicate clusters. It is first defined as a generic function to allow generalization.
 
-@O ../R/CBData.R @{
+@O ../R/aaa-generics.R @{
 #'Unwrap a clustered object
 #'
 #'\code{unwrap.CBData} is a utility function that reformats a CBData object so
@@ -267,10 +267,10 @@ to indicate clusters. It is first defined as a generic function to allow general
 #'ush <- unwrap(shelltox)
 #'head(ush)
 #'
+
+unwrap <- function(object,...) UseMethod("unwrap")
 @}
 @O ../R/CBData.R @{
-unwrap <- function(object,...) UseMethod("unwrap")
-
 #'@@rdname unwrap
 #'@@method unwrap CBData
 #'@@export

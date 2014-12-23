@@ -18,4 +18,3 @@ Description: This package implements non-parametric analyses for clustered
     sizes. A trend test based on stochastic ordering is implemented.
 License: GPL (>=2)
 LazyLoad: yes
-Collate: CorrBin-package.R CBData.R Reprod.R CMData.R ExchMultinomial.R

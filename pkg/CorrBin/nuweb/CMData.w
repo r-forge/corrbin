@@ -32,7 +32,8 @@ class is a data frame with the following columns:
 \item[Freq]  an integer-valued  variable defining frequency for each
 Trt/ClusterSize/NResp.1/$\cdots$/NResp.K combination
 \end{description}
-While having all the counts and the clustersize is somewhat redundant (sum of counts = clustersize)
+While having all the counts and the clustersize is somewhat redundant (sum of counts = clustersize), this can be helpful for many computations.
+
 
 \texttt{CMData} converts a data frame to a CMData object. \texttt{x}
 is the input data frame; \texttt{trt}, \texttt{clustersize},  and
