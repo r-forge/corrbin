@@ -121,7 +121,7 @@ read.CMData <- function(file, with.clustersize=TRUE, with.freq=TRUE, ...){
   res <- NextMethod("[")
   if (NCOL(res) == ncol(x)){
     res <- "[.data.frame"(x, i, )
-    res$Trt <- droplevels(res$Trt)
+    if (is.factor(res$Trt)) res$Trt <- droplevels(res$Trt)
     attr(res, "ncat") <- attr(x, "ncat")
     res
   }

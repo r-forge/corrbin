@@ -208,6 +208,7 @@ mc.est <- function(object,...) UseMethod("mc.est")
 
 #'@@describeIn mc.est
 #'@@method mc.est CBData
+#'@@export
 
 mc.est.CBData <- function(object, ...){
   cbdata <- object[object$Freq>0, ]
@@ -299,6 +300,7 @@ mc.test.chisq <- function(object,...) UseMethod("mc.test.chisq")
 
 #'@@rdname mc.test.chisq
 #'@@method mc.test.chisq CBData
+#'@@export
 
 mc.test.chisq.CBData <- function(object,...){
   cbdata <- object[object$Freq>0, ]

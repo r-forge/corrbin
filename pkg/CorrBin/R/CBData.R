@@ -97,7 +97,6 @@ read.CBData <- function(file, with.freq=TRUE, ...){
 #'However if the columns are not modified, then the result is still a \code{CBData}/\code{CMData} object  with appropriate attributes  preserved, 
 #' and the unused levels of treatment groups dropped.
 #'
-#'@export
 #'@param x \code{CMData} object.
 #'@param i numeric, row index of extracted values
 #'@param j numeric, column index of extracted values
@@ -111,13 +110,15 @@ read.CBData <- function(file, with.freq=TRUE, ...){
 #'
 NULL
 
+
 #'@rdname Extract
 #'@export
+
 "[.CBData" <- function(x, i, j, drop){
   res <- NextMethod("[")
   if (NCOL(res) == ncol(x)){
     res <- "[.data.frame"(x, i, )
-    res$Trt <- droplevels(res$Trt)
+    if (is.factor(res$Trt)) res$Trt <- droplevels(res$Trt)
     res
   }
   else {
@@ -157,6 +158,8 @@ unwrap <- function(object,...) UseMethod("unwrap")
 
 #'@rdname unwrap
 #'@method unwrap CBData
+#'@export
+
 unwrap.CBData <- function(object,...){
   freqs <- rep(1:nrow(object), object$Freq)
   cb1 <- object[freqs,]
