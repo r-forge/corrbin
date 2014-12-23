@@ -1,6 +1,6 @@
 Package: CorrBin
 Title: Nonparametrics with clustered binary and multinomial data
-Version: 1.4
+Version: 1.5
 Date: 2013-1-8
 Author: Aniko Szabo
 Maintainer: Aniko Szabo <aszabo@mcw.edu>
@@ -18,3 +18,4 @@ Description: This package implements non-parametric analyses for clustered
     sizes. A trend test based on stochastic ordering is implemented.
 License: GPL (>=2)
 LazyLoad: yes
+Collate: CorrBin-package.R CBData.R Reprod.R CMData.R ExchMultinomial.R
