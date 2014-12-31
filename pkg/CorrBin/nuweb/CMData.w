@@ -185,9 +185,12 @@ have a \texttt{CMData} class anymore.
 @{
 #'@@rdname Extract
 #'@@export
-@}
-@o ../R/CMData.R
-@{
+#'@@examples
+#'
+#'data(dehp)
+#'str(dehp[1:5,])
+#'str(dehp[1:5, 2:4])
+
 "[.CMData" <- function(x, i, j, drop){
   res <- NextMethod("[")
   if (NCOL(res) == ncol(x)){

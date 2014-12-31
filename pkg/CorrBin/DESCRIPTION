@@ -1,15 +1,14 @@
 Package: CorrBin
-Title: Nonparametrics with clustered binary and multinomial data
+Title: Nonparametrics with Clustered Binary and Multinomial Data
 Version: 1.5
 Date: 2013-1-8
-Author: Aniko Szabo
-Maintainer: Aniko Szabo <aszabo@mcw.edu>
+Authors@R: person("Aniko", "Szabo", role=c("aut","cre"), email="aszabo@mcw.edu")
 Depends:
     R(>= 2.6.0),
     boot,
-    combinat
+    combinat,
+    geepack
 Suggests:
-    geepack,
     lattice
 Description: This package implements non-parametric analyses for clustered
     binary and multinomial data. The elements of the cluster are assumed

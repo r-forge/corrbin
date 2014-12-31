@@ -98,11 +98,26 @@ tau <- function(cmdata, type=c("averaged","cluster")){
   res
 }
 
-#'@describeIn mc.est
+#'@rdname mc.est
 #'@method mc.est CMData
 #'@export
 #'@param eps numeric; EM iterations proceed until the sum of squared changes fall below \code{eps}  
-
+#'@return For \code{CMData}: A data frame giving the estimated pdf for each treatment and
+#'clustersize.  The probabilities add up to 1
+#'for each \code{Trt}/\code{ClusterSize} combination. It has the following columns: 
+#'@return \item{Prob}{numeric, the probability of \code{NResp} responses in a
+#'cluster of size \code{ClusterSize} in group \code{Trt}}
+#'@return \item{Trt}{factor, the treatment group}
+#'@return \item{ClusterSize}{numeric, the cluster size}
+#'@return \item{NResp.1 - NResp.K}{numeric, the number of responses of each type}
+#'
+#'@note
+#'For multinomial data, the implementation is curerntly written in R, so it is not very fast.
+#'
+#'@examples
+#'data(dehp)
+#'dehp.mc <- mc.est(subset(dehp, Trt=="0"))
+#'subset(dehp.mc, ClusterSize==2)
 
 mc.est.CMData <- function(object, eps=1E-6, ...){
 
@@ -297,6 +312,11 @@ corr.from.pi <- function(pimat){
 #'@rdname mc.test.chisq
 #'@method mc.test.chisq CMData
 #'@export
+#'@examples
+#'
+#'data(dehp)
+#'mc.test.chisq(dehp)
+#' 
 
 mc.test.chisq.CMData <- function(object, ...){
   cmdata <- object[object$Freq > 0, ]

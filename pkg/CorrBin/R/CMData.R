@@ -116,6 +116,11 @@ read.CMData <- function(file, with.clustersize=TRUE, with.freq=TRUE, ...){
 
 #'@rdname Extract
 #'@export
+#'@examples
+#'
+#'data(dehp)
+#'str(dehp[1:5,])
+#'str(dehp[1:5, 2:4])
 
 "[.CMData" <- function(x, i, j, drop){
   res <- NextMethod("[")

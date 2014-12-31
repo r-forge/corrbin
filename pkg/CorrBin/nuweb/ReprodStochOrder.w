@@ -170,13 +170,13 @@ treatment group. For the package the compiled library needs to be loaded.
 #'information from all cluster sizes is pooled. The estimation is performed
 #'independently for each treatment group.
 #'
-#'The EM algorithm given by Stefanescu and Turnbull (2003) is used.
+#'The EM algorithm given by Stefanescu and Turnbull (2003) is used for the binary data.
 #'
 #'@@useDynLib CorrBin
 #'@@export
 #'@@param object a \code{\link{CBData}} or \code{\link{CMData}} object
 #'@@param \dots other potential arguments; not currently used
-#'@@return A data frame giving the estimated pdf for each treatment and
+#'@@return For \code{CBData}: A data frame giving the estimated pdf for each treatment and
 #'clustersize.  The probabilities add up to 1
 #'for each \code{Trt}/\code{ClusterSize} combination. It has the following columns: 
 #'@@return \item{Prob}{numeric, the probability of \code{NResp} responses in a
@@ -199,14 +199,14 @@ treatment group. For the package the compiled library needs to be loaded.
 #'    type="l", as.table=TRUE, auto.key=list(columns=4, lines=TRUE, points=FALSE),
 #'    xlab="Number of responses", ylab="Probability P(R=r|N=n)")
 #'
-#'@@rdname mc.est
+#'@@name mc.est
 
 mc.est <- function(object,...) UseMethod("mc.est")
  
 @}
 @O ../R/Reprod.R @{
 
-#'@@describeIn mc.est
+#'@@rdname mc.est
 #'@@method mc.est CBData
 #'@@export
 
@@ -253,12 +253,12 @@ X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
 
 @O ../R/aaa-generics1.R
 @{
-#'Test the assumption of reproducibility
+#'Test the assumption of marginal compatibility
 #'
-#'\code{mc.test.chisq} tests whether thee assumption of reproducibility is
+#'\code{mc.test.chisq} tests whether the assumption of marginal compatibility is
 #'violated in the data.
 #'
-#'The assumption of marginal compatibility (AKA interpretability) implies that
+#'The assumption of marginal compatibility (AKA reproducibility or interpretability) implies that
 #'the marginal probability of response does not depend on clustersize.
 #'Stefanescu and Turnbull (2003), and Pang and Kuk (2007) developed a
 #'Cochran-Armitage type test for trend in the marginal probability of success
@@ -276,8 +276,7 @@ X^2=\sum_{g=1}^G Z_g^2 \sim \chi^2_G \text{ under }H_0.
 #'group separately: \itemize{ \item chi.sq the test statistic for the group
 #'\item p p-value for the group}}
 #'@@author Aniko Szabo
-#'@@seealso \code{\link{CBData}} for constructing a CBData object,
-#'\code{\link{mc.est}} for estimating the distribution under marginal
+#'@@seealso '\code{\link{mc.est}} for estimating the distribution under marginal
 #'compatibility.
 #'@@references Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for
 #'exchangeable binary data with varying cluster sizes. \emph{Biometrics}, 59,

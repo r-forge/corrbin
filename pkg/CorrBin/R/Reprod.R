@@ -1,6 +1,6 @@
 
 
-#'@describeIn mc.est
+#'@rdname mc.est
 #'@method mc.est CBData
 #'@export
 

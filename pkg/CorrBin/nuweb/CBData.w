@@ -38,15 +38,15 @@ and implement fitting of a variety of existing models and trend tests.
 #' License: \tab GPL 2\cr 
 #' LazyLoad: \tab yes\cr
 #'} 
-#'\itemize{ \item The \code{\link{CBData}} and \code{\link{read.CBData}}
-#'functions create a `CBData' object used by the analysis functions.  
+#'\itemize{ \item The \code{\link{CBData}/\link{CMData}} and \code{\link{read.CBData}/\link{read.CMData}}
+#'functions create a `CBData' or `CMData' object used by the analysis functions.  
 #'\item \code{\link{ran.CBData}} can be used to generate random data with
 #'prespecified mean response and within-cluster correlation.  
 #'\item \code{\link{mc.test.chisq}} tests the assumption of marginal compatibility
 #'underlying all the methods, while \code{\link{mc.est}} estimates the
 #'distribution of the number of responses under marginal compatibility.  
 #'\item Finally, \code{\link{trend.test}} performs three different tests for trend
-#'along the treatment groups. }
+#'along the treatment groups for binomial data. }
 #'
 #'@@name CorrBin-package
 #'@@aliases CorrBin-package CorrBin
@@ -196,10 +196,10 @@ have a \texttt{CMData} class anymore.
 
 @o ../R/CBData.R
 @{
-#'Extract from a CBData/CMData object
+#'Extract from a CBData or CMData object
 #'
-#'The extracting syntax works as for \code{\link{[.data.frame}}, and in general the returned object is not a \code{CBData}/\code{CMData} object.
-#'However if the columns are not modified, then the result is still a \code{CBData}/\code{CMData} object  with appropriate attributes  preserved, 
+#'The extracting syntax works as for \code{\link{[.data.frame}}, and in general the returned object is not a \code{CBData} or \code{CMData} object.
+#'However if the columns are not modified, then the result is still a \code{CBData} or \code{CMData} object  with appropriate attributes  preserved, 
 #' and the unused levels of treatment groups dropped.
 #'
 #'@@param x \code{CMData} object.
@@ -207,9 +207,9 @@ have a \texttt{CMData} class anymore.
 #'@@param j numeric, column index of extracted values
 #'@@param drop logical. If TRUE the result is coerced to the lowest possible dimension. 
 #'The default is the same as for \code{\link{[.data.frame}}: to drop if only one column is left, but not to drop if only one row is left.
-#'@@return a \code{CBData}/\code{CMData} object
+#'@@return a \code{CBData} or \code{CMData} object
 #'@@author Aniko Szabo
-#'@@seealso \code{CBData}/, \code{\link{CMData}}
+#'@@seealso \code{CBData}, \code{\link{CMData}}
 #'@@keywords manip
 #'@@name Extract
 #'
@@ -221,6 +221,11 @@ NULL
 @{
 #'@@rdname Extract
 #'@@export
+#'@@examples
+#'
+#'data(shelltox)
+#'str(shelltox[1:5,])
+#'str(shelltox[1:5, 2:4])
 
 "[.CBData" <- function(x, i, j, drop){
   res <- NextMethod("[")
@@ -373,6 +378,7 @@ RS.trend.test <- function(cbdata){
 #'distributed, and a two-sided p-value can be easily computed if needed.
 #'
 #'@@export
+#'@@import geepack
 #'@@param cbdata a \code{\link{CBData}} object
 #'@@param scale.method character string specifying the assumption about the
 #'change in the overdispersion (scale) parameter across the treatment groups:
@@ -394,7 +400,6 @@ RS.trend.test <- function(cbdata){
 @O ../R/CBData.R @{
 
 GEE.trend.test <- function(cbdata, scale.method=c("fixed", "trend", "all")){
-  require(geepack)
   ucb <- unwrap.CBData(cbdata)
   scale.method <- match.arg(scale.method)
   if (scale.method=="fixed") {
@@ -514,7 +519,7 @@ can be used in \texttt{ran.CBData}.
 #'(1-p)\frac{1-\rho}{\rho}}{b=(1-p)(1-rho)/rho}.
 #'
 #'@@export
-#'@@rdname pdf
+#'@@name pdf
 #'@@aliases qpower.pdf betabin.pdf
 #'@@param p numeric, the probability of success.
 #'@@param rho numeric between 0 and 1 inclusive, the within-cluster correlation.
