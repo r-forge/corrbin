@@ -18,8 +18,8 @@
 #'} 
 #'\itemize{ \item The \code{\link{CBData}/\link{CMData}} and \code{\link{read.CBData}/\link{read.CMData}}
 #'functions create a `CBData' or `CMData' object used by the analysis functions.  
-#'\item \code{\link{ran.CBData}} can be used to generate random data with
-#'prespecified mean response and within-cluster correlation.  
+#'\item \code{\link{ran.CBData}} and \code{\link{ran.CMData}} can be used to generate random 
+#' binary or multinomial data using a variety of distributions.  
 #'\item \code{\link{mc.test.chisq}} tests the assumption of marginal compatibility
 #'underlying all the methods, while \code{\link{mc.est}} estimates the
 #'distribution of the number of responses under marginal compatibility.  
