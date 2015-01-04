@@ -59,7 +59,7 @@ methods for exchangeable binary data with unequal cluster sizes.
 \emph{Biometrics}, 63, 218-227
 }
 \seealso{
-'\code{\link{mc.est}} for estimating the distribution under marginal
+\code{\link{mc.est}} for estimating the distribution under marginal
 compatibility.
 }
 \keyword{htest}

@@ -42,12 +42,7 @@ outcome) with the following standardized column names
 element}
 }
 \description{
-\code{unwrap.CBData} is a utility function that reformats a CBData object so
-that each row is one observation (instead of one or more clusters). A new
-`ID' variable is added to indicate clusters. This form can be useful for
-setting up the data for a different package.
-
-\code{unwrap.CMData} is a utility function that reformats a CMData object so
+\code{unwrap} is a utility function that reformats a CBData or CMData object so
 that each row is one observation (instead of one or more clusters). A new
 `ID' variable is added to indicate clusters. This form can be useful for
 setting up the data for a different package.

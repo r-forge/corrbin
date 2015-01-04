@@ -248,7 +248,7 @@ to indicate clusters. It is first defined as a generic function to allow general
 @O ../R/aaa-generics.R @{
 #'Unwrap a clustered object
 #'
-#'\code{unwrap.CBData} is a utility function that reformats a CBData object so
+#'\code{unwrap} is a utility function that reformats a CBData or CMData object so
 #'that each row is one observation (instead of one or more clusters). A new
 #'`ID' variable is added to indicate clusters. This form can be useful for
 #'setting up the data for a different package.
@@ -257,7 +257,7 @@ to indicate clusters. It is first defined as a generic function to allow general
 #'@@export
 #'@@param object a \code{\link{CBData}} object
 #'@@param \dots other potential arguments; not currently used
-#'@@return For \code{uwrap.CBData}: a data frame with one row for each cluster element (having a binary
+#'@@return For \code{unwrap.CBData}: a data frame with one row for each cluster element (having a binary
 #'outcome) with the following standardized column names
 #'@@return \item{Trt}{factor, the treatment group}
 #'@@return \item{ClusterSize}{numeric, the cluster size}

@@ -12,7 +12,45 @@
       if (log) res else exp(res)
     }
 
-tau <- function(cmdata, type=c("averaged","cluster")){
+#' Estimate joint event probabilities for multinomial data
+#'
+#' An exchangeable multinomial distribution with \eqn{K+1} categories \eqn{O_1,\ldots,O_{K+1}}, can be
+#' parameterized by the joint probabilities of events
+#'\deqn{\tau_{r_1,\ldots,r_{K}|n} = P\big[X_1=\cdots=X_{r_1}=O_1,\ldots, X_{\sum_{i=1}^{K-1}r_i+1} =\cdots=X_{\sum_{i=1}^{K}r_i}=O_K\big] }{tau_{r_1,..,r_K|n} = P[X_1=...=X_{r_1}=O_1,..., X_{sum_{i=1}^{K-1}r_i+1} =...=X_{sum_{i=1}^{K}r_i}=O_K]}
+#'where \eqn{r_i \geq 0} and \eqn{r_1+\cdots +r_K\leq n}.
+#'The \code{jointprobs} function estimates these probabilities under various settings. 
+#'Note that when some of the \eqn{r_i}'s equal zero, then no restriction on the number of outcomes of the 
+#' corresponding type are imposed, so the resulting probabilities are marginal.
+#'
+#'@param cmdata a \code{CMData} object
+#'@param type character string describing the desired type of estimate:
+#' \itemize{
+#'  \item{"averaged"}{ - averaged over the observed cluster-size distribution within each treatment}
+#'  \item{"cluster"}{ - separately for each cluster size within each treatment}
+#'  \item{"mc"}{ - assuming marginal compatibility, ie that \eqn{\tau} does not depend on the cluster-size}
+#' }
+#'@return a list with an array of estimates for each treatment. For a multinomial distribution with
+#' \eqn{K+1} categories the arrays will have either \eqn{K+1} or {K} dimensions, depending on whether 
+#' cluster-size specific estimates (\code{type="cluster"}) or pooled estimates 
+#' (\code{type="averaged"} or \code{type="mc"}) are requested. For the cluster-size specific estimates #' the first dimension is the cluster-size. Each additional dimension is a possible outcome. 
+#'
+#'@seealso \code{\link{mc.est}} for estimating the distribution under marginal compatibility,
+#'\code{\link{uniprobs}} and \code{\link{multi.corr}} for extracting the univariate marginal event
+#'probabilities, and the within-multinomial correlations from the joint probabilities.
+#'@examples
+#'data(dehp)
+#'# averaged over cluster-sizes
+#'tau.ave <- jointprobs(dehp, type="ave")
+#'# averaged P(X1=X2=O1, X3=O2) in the 1500 dose group
+#'tau.ave[["1500"]]["2","1"]  # there are two type-1, and one type-2 outcome
+#'
+#'#plot P(X1=O1) - the marginal probability of a type-1 event over cluster-sizes
+#'tau <- jointprobs(dehp, type="cluster")
+#'ests <- as.data.frame(lapply(tau, function(x)x[,"1","0"]))
+#'matplot(ests, type="b")
+#'@export
+
+jointprobs <- function(cmdata, type=c("averaged","cluster","mc")){
   type <- match.arg(type)
   
   
@@ -62,7 +100,7 @@ tau <- function(cmdata, type=c("averaged","cluster")){
           sum(mctab[lower.idx+1] / mctab[upper.idx+1] * atab[upper.idx+1]) / Mn
       }
       
-    } else {
+    } else if (type=="cluster") {
       Mn <- xtabs(Freq ~ factor(ClusterSize, levels=1:M), data=cm1) 
       
       res.trt <- array(NA, dim=c(M, rep(M+1, nc-1))) #first dimension is 'n'
@@ -88,6 +126,11 @@ tau <- function(cmdata, type=c("averaged","cluster")){
         }
       }
       
+    } else if (type=="mc") {
+      
+         pim <- mc.est.raw(cm1)[[1]]  #only one treatment group
+         res.trt <- tau.from.pi(pim)
+      
     }
     
     # append treatment-specific result to result list
@@ -95,6 +138,7 @@ tau <- function(cmdata, type=c("averaged","cluster")){
     names(res.trt) <- trt
     res <- c(res, res.trt) 
   }
+  attr(res, "type") <- type
   res
 }
 
@@ -295,19 +339,104 @@ p.from.tau <- function(taumat){
   taumat[rbind(idx+1)]
 }    
 
+#'Extract univariate marginal probabilities from joint probability arrays
+#'
+#'Calculates the marginal probability of each event type for exchangeable correlated multinomial
+#'data based on joint probability estimates calculated by the \code{\link{jointprobs}} function.
+#'@param jp the output of \code{\link{jointprobs}} - a list of joint probability arrays by treatment
+#'@param type one of c("averaged","cluster","mc") - the type of joint probability. By default,
+#'the \code{type} attribute of \code{jp} is used.
+#'@return a list of estimated probability of each outcome by treatment group. The elements are either
+#'matrices or vectors depending on whether cluster-size specific estimates were requested 
+#' (\code{type="cluster"}) or not.
+#'@export
+#'@seealso \code{\link{jointprobs}} for calculating the joint probability arrays
+#'@examples
+#'data(dehp)
+#'tau <- jointprobs(dehp, type="averaged")
+#'uniprobs(tau)
+#'
+#'#separately for each cluster size
+#'tau2 <- jointprobs(dehp, type="cluster")
+#'uniprobs(tau2)
+
+uniprobs <- function(jp, type=attr(jp, "type")){
+  type <- match.arg(type, c("averaged","cluster","mc"))
+  
+  get.probs <- function(tt){
+    p <- p.from.tau(tt)
+    c(p, 1-sum(p)) #add probability of last event type
+  }
+
+  if (type=="cluster") {
+    res <- lapply(jp, function(x)apply(x, 1, get.probs))
+  } else {
+    res <- lapply(jp, get.probs)
+  }
+  res  
+}
+
 #'@rdname CorrBin-internal
-corr.from.pi <- function(pimat){
-  K <- length(dim(pimat))
-  tt <- tau.from.pi(pimat)
+corr.from.tau <- function(taumat){
+  K <- length(dim(taumat))
   
   idx <- diag(nrow=K)
   numerator <- outer(1:K, 1:K, function(i,j){
-     tt[idx[i,]+idx[j,]+1] - tt[idx[i,]+1] * tt[idx[j,]+1]})
+     taumat[idx[i,]+idx[j,]+1] - taumat[idx[i,]+1] * taumat[idx[j,]+1]})
   denominator <- outer(1:K, 1:K, function(i,j){
-     tt[idx[i,]+1] * ifelse(i==j, 1-tt[idx[i,]+1], -tt[idx[j,]+1])})  
+     taumat[idx[i,]+1] * ifelse(i==j, 1-taumat[idx[i,]+1], -taumat[idx[j,]+1])})  
   res <- numerator / denominator    #the negative sign is in the denominator
+  res
 }
 
+
+#'@rdname CorrBin-internal
+corr.from.pi <- function(pimat){
+  tt <- tau.from.pi(pimat)
+  res <- corr.from.tau(tt)
+  res
+}
+
+
+#'Extract correlation coefficients from joint probability arrays
+#'
+#'Calculates the within- and between-outcome correlation coefficients for exchangeable correlated
+#'multinomial data based on joint probability estimates calculated by the \code{\link{jointprobs}}
+#'function. These determine the variance inflation due the cluster structure.
+#'
+#'If \eqn{R_i} and \eqn{R_j} is the number of events of type \eqn{i} and \eqn{j}, respectively, in a cluster of
+#'size \eqn{n}, then
+#'\deqn{Var(R_i)= n p_i (1-p_i)(1 + (n-1)\phi_{ii})}
+#'\deqn{Cov(R_i,R_j)= -n p_i p_j (1 + (n-1)\phi_{ij})}
+#'where \eqn{p_i} and \eqn{p_j} are the marginal event probabilities and \eqn{\phi_{ij}} are the correlation
+#' coefficients computed by \code{multi.corr}.
+#'@param jp the output of \code{\link{jointprobs}} - a list of joint probability arrays by treatment
+#'@param type one of c("averaged","cluster","mc") - the type of joint probability. By default,
+#'the \code{type} attribute of \code{jp} is used.
+#'@return a list of estimated correlation matrices by treatment group. If cluster-size specific 
+#' estimates were requested (\code{(type="cluster")}), then each list elements are a list of
+#' these matrices for each cluster size.
+#'@export
+#'@seealso \code{\link{jointprobs}} for calculating the joint probability arrays
+#'@examples
+#'data(dehp)
+#'tau <- jointprobs(dehp, type="averaged")
+#'multi.corr(tau)
+#'
+
+multi.corr <- function(jp, type=attr(jp, "type")){
+  type <- match.arg(type, c("averaged","cluster","mc"))
+  
+  if (type=="cluster") {
+    K <- length(dim(jp[[1]])) - 1
+    resmat <- lapply(jp, function(x)apply(x, 1, corr.from.tau))
+    res <- lapply(resmat, function(x){
+                  lapply(1:ncol(x), function(idx)matrix(x[,idx], nrow=K))})
+  } else {
+    res <- lapply(jp, corr.from.tau)
+  }
+  res  
+}
 
 #'@rdname mc.test.chisq
 #'@method mc.test.chisq CMData
@@ -325,10 +454,9 @@ mc.test.chisq.CMData <- function(object, ...){
   
   get.T <- function(x){
       x$Trt <- factor(x$Trt)  #remove unused levels
-      pim <- mc.est.raw(x)[[1]]  #only one treatment group
-      tt <- tau.from.pi(pim)
+      tt <- jointprobs(x, type="mc")[[1]] #only one treatment group
       p <- p.from.tau(tt)
-      phi <- corr.from.pi(pim)
+      phi <- corr.from.tau(tt)
       xx <- x[rep(1:nrow(x), x$Freq),]
       xx$Freq <- 1
       

@@ -63,7 +63,7 @@ mc.est <- function(object,...) UseMethod("mc.est")
 #'group separately: \itemize{ \item chi.sq the test statistic for the group
 #'\item p p-value for the group}}
 #'@author Aniko Szabo
-#'@seealso '\code{\link{mc.est}} for estimating the distribution under marginal
+#'@seealso \code{\link{mc.est}} for estimating the distribution under marginal
 #'compatibility.
 #'@references Stefanescu, C. & Turnbull, B. W. (2003) Likelihood inference for
 #'exchangeable binary data with varying cluster sizes. \emph{Biometrics}, 59,

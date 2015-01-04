@@ -211,11 +211,6 @@ each row is one observation (instead of one cluster). A new `ID' variable is add
 to indicate clusters. 
 
 @O ../R/CMData.R @{
-#'\code{unwrap.CMData} is a utility function that reformats a CMData object so
-#'that each row is one observation (instead of one or more clusters). A new
-#'`ID' variable is added to indicate clusters. This form can be useful for
-#'setting up the data for a different package.
-#'
 #'@@rdname unwrap
 #'@@method unwrap CMData
 #'@@export
@@ -269,7 +264,7 @@ unwrap.CMData <- function(object,...){
 #' Generate a random CMData object
 #'
 #' Generates random exchangeably correlated multinomial data based on a parametric
-#' distribution or using resampling. The Dirichlet-Multinomial, Logistic-Normal mutlinomial,
+#' distribution or using resampling. The Dirichlet-Multinomial, Logistic-Normal multinomial,
 #' and discrete mixture multinomial parametric distributions are implemented.
 #' All observations will be assigned to the same treatment group, and there is no
 #' guarantee of a specific order of the observations in the output.

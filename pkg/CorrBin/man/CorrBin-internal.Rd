@@ -4,6 +4,7 @@
 \alias{DownUpMatrix}
 \alias{Marginals}
 \alias{corr.from.pi}
+\alias{corr.from.tau}
 \alias{mChoose}
 \alias{mChooseTable}
 \alias{mc.est.raw}
@@ -20,6 +21,8 @@ mc.est.raw(object, ...)
 tau.from.pi(pimat)
 
 p.from.tau(taumat)
+
+corr.from.tau(taumat)
 
 corr.from.pi(pimat)
 
