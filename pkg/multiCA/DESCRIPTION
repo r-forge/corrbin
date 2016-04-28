@@ -1,0 +1,12 @@
+Package: multiCA
+Type: Package
+Title: Multinomial Cochran-Armitage Trend Test
+Version: 1.0
+Date: 2016-04-28
+Author: Aniko Szabo
+Depends:
+    R(>= 2.10)
+Maintainer: Aniko Szabo <aszabo@mcw.edu>
+Description: Implements a generalization of the Cochran-Armitage trend test to multinomial data. In addition to an overall test, multiple testing adjusted p-values for trend in individual outcomes and power calculation is available.
+License: GPL (>=2)
+RoxygenNote: 5.0.1

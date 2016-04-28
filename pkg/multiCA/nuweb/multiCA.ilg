@@ -1,0 +1,221 @@
+This is C:\Program Files\MiKTeX 2.9\miktex\bin\x64\makeindex.exe, version 2.15 [MiKTeX 2.9 64-bit] (kpathsea + Thai support).
+Scanning input file multiCA.w...
+!! Input index error (file = multiCA.w, line = 1):
+   -- Unknown index keyword \documentclass[reqno].
+!! Input index error (file = multiCA.w, line = 2):
+   -- Unknown index keyword \usepackage[margin=1in].
+!! Input index error (file = multiCA.w, line = 3):
+   -- Unknown index keyword \usepackage[colorlinks=true,linkcolor=blue].
+!! Input index error (file = multiCA.w, line = 4):
+   -- Unknown index keyword \renewcommand.
+!! Input index error (file = multiCA.w, line = 5):
+   -- Unknown index keyword \renewcommand.
+!! Input index error (file = multiCA.w, line = 6):
+   -- Unknown index keyword \newcommand.
+!! Input index error (file = multiCA.w, line = 7):
+   -- Unknown index keyword \newcommand.
+!! Input index error (file = multiCA.w, line = 8):
+   -- Unknown index keyword \newcommand.
+!! Input index error (file = multiCA.w, line = 9):
+   -- Unknown index keyword \newcommand.
+!! Input index error (file = multiCA.w, line = 10):
+   -- Unknown index keyword \newcommand.
+!! Input index error (file = multiCA.w, line = 11):
+   -- Unknown index keyword \providecommand.
+!! Input index error (file = multiCA.w, line = 13):
+   -- Unknown index keyword \title.
+!! Input index error (file = multiCA.w, line = 14):
+   -- Unknown index keyword \author.
+!! Input index error (file = multiCA.w, line = 15):
+   -- Unknown index keyword \date.
+!! Input index error (file = multiCA.w, line = 17):
+   -- Unknown index keyword \begin.
+!! Input index error (file = multiCA.w, line = 18):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 21):
+   -- Unknown index keyword \section.
+!! Input index error (file = multiCA.w, line = 22):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 23):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 24):
+   -- Unknown index keyword Thesizeofeachgroup,$n_.
+!! Input index error (file = multiCA.w, line = 25):
+   -- Unknown index keyword Let$\pvec_i=(p_.
+!! Input index error (file = multiCA.w, line = 26):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 27):
+   -- Unknown index keyword Formally,weconsidertesting$H_0=\bigcap_.
+!! Input index error (file = multiCA.w, line = 28):
+   -- Unknown index keyword \begin.
+!! Input index error (file = multiCA.w, line = 29):
+   -- Unknown index keyword \begin.
+!! Input index error (file = multiCA.w, line = 30):
+   -- Unknown index keyword H_.
+!! Input index error (file = multiCA.w, line = 31):
+   -- Unknown index keyword H_.
+!! Input index error (file = multiCA.w, line = 32):
+   -- Unknown index keyword \end.
+!! Input index error (file = multiCA.w, line = 33):
+   -- Unknown index keyword \end.
+!! Input index error (file = multiCA.w, line = 35):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 36):
+   -- Unknown index keyword \begin.
+!! Input index error (file = multiCA.w, line = 37):
+   -- Unknown index keyword Let$\setJ\subset\.
+!! Input index error (file = multiCA.w, line = 38):
+   -- Unknown index keyword \begin.
+!! Input index error (file = multiCA.w, line = 39):
+   -- Unknown index keyword W_\setJ=\sum_.
+!! Input index error (file = multiCA.w, line = 40):
+   -- Unknown index keyword \end.
+!! Input index error (file = multiCA.w, line = 41):
+   -- Unknown index keyword where$d=\min(|\setJ|,K-1)$,$T_\setJ=[\sum_.
+!! Input index error (file = multiCA.w, line = 42):
+   -- Unknown index keyword \end.
+!! Input index error (file = multiCA.w, line = 44):
+   -- Unknown index keyword \section.
+!! Input index error (file = multiCA.w, line = 46):
+   -- Unknown index keyword Themain\texttt.
+!! Input index error (file = multiCA.w, line = 48):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 49):
+   -- Unknown index keyword @.
+!! Input index error (file = multiCA.w, line = 50):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 51):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 52):
+   -- Unknown index keyword #'The\code.
+!! Input index error (file = multiCA.w, line = 53):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 54):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 55):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 56):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 57):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 58):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 59):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 60):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 61):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 62):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 63):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 64):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 65):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 66):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 67):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 68):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 69):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 70):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 71):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 72):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 73):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 75):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 77):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 79):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 80):
+   -- Unknown index keyword @O../R/multiCA.R@.
+!! Input index error (file = multiCA.w, line = 81):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 82):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 83):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 84):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 85):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 87):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 88):
+   -- Unknown index keyword ...).
+!! Input index error (file = multiCA.w, line = 89):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 90):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 92):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 93):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 95):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 96):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 98):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 100):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 101):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 102):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 104):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 106):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 108):
+   -- Unknown index keyword if(full||sum(pdot)>=1).
+!! Input index error (file = multiCA.w, line = 109):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 110):
+   -- Unknown index keyword }else.
+!! Input index error (file = multiCA.w, line = 111):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 112):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 114):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 115):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 117):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 118):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 119):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 120):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 121):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 122):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 126):
+   -- Unknown index keyword \section.
+!! Input index error (file = multiCA.w, line = 128):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 130):
+   -- Unknown index keyword \section.
+!! Input index error (file = multiCA.w, line = 132):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 134):
+   -- Unknown index keyword \section.
+!! Input index error (file = multiCA.w, line = 136):
+   -- Missing arguments -- need two (premature LFD).
+!! Input index error (file = multiCA.w, line = 138):
+   -- Unknown index keyword \end.
+done (0 entries accepted, 108 rejected).
+Nothing written in multiCA.ind.
+Transcript written in multiCA.ilg.

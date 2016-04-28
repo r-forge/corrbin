@@ -1,0 +1,183 @@
+\newcommand{\NWtarget}[2]{#2}
+\newcommand{\NWlink}[2]{#2}
+\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
+\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\NWtxtDefBy}{Defined by}
+\newcommand{\NWtxtRefIn}{Referenced in}
+\newcommand{\NWtxtNoRef}{Not referenced}
+\newcommand{\NWtxtFileDefBy}{File defined by}
+\newcommand{\NWtxtIdentsUsed}{Uses:}
+\newcommand{\NWtxtIdentsNotUsed}{Never used}
+\newcommand{\NWtxtIdentsDefed}{Defines:}
+\newcommand{\NWsep}{${\diamond}$}
+\newcommand{\NWnotglobal}{(not defined globally)}
+\newcommand{\NWuseHyperlinks}{}
+\documentclass[reqno]{amsart}
+\usepackage[margin=1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue]{hyperref}
+\renewcommand{\NWtarget}[2]{\hypertarget{#1}{#2}}
+\renewcommand{\NWlink}[2]{\hyperlink{#1}{#2}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\bpi}{\text{\boldmath $\pi$}}
+\newcommand{\leqst}{\mathrel{\preceq^{st}}}
+\newcommand{\geqst}{\mathrel{\succeq^{st}}}
+\providecommand{\tsum}{\textstyle\sum}
+
+\title{Test for trend with a multinomial outcome}
+\author{Aniko Szabo}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+\section{Introduction}
+-
+Consider a study in which a multinomial outcome with $K$ possible unordered values is measured in subjects belonging to one of $G$ ordered groups.
+The size of each group, $n_{i\cdot}$, is defined by the study design, and will be treated as fixed.
+Let $\pvec_i=(p_{i1},\ldots,p_{iK})^\T$ denote the probabilities of the multinomial outcomes in the $i$th group. The hypothesis of interest is to
+evaluate the homogeneity of these probabilities across the groups with a targeted alternative of a trend in at least one of the categories.
+Formally, we consider testing $H_0 = \bigcap_{j=1}^K H_{0j}$ versus $H_1 = \bigcup_{j=1}^K H_{1j}$, where
+\begin{equation}
+\begin{aligned}
+  H_{0j}& :  p_{1j}=\cdots = p_{Gj} \\
+  H_{1j}& : p_{1j} \leq \cdots \leq p_{Gj} \text{ or }  p_{1j} \geq \cdots \geq p_{Gj} \text{ with at least one inequality}
+\end{aligned}
+\end{equation}
+
+The test is based on the following result:
+\begin{theorem}\label{Th:partial}
+Let $\setJ \subset \{1,\ldots,K\}$, then under $H_{0\setJ}=\bigcap_{j\in\setJ}H_{0j}$ as $N\rightarrow\infty$
+\begin{equation}
+  W_\setJ =  \sum_{j\in\setJ} (1-p_{\cdot j})T^2_j + \big(\sum_{j\in\setJ} p_{\cdot j}\big) T^2_\setJ \xrightarrow{d} \chi^2_{d},
+\end{equation}
+where $d = \min(|\setJ|, K-1)$,  $T_\setJ = [\sum_{i=1}^G \sum_{j\in\setJ}n_{ij}(c_i-\bar{c})] \big/ \sqrt{p_{\cdot \setJ}(1-p_{\cdot \setJ})s^2}$ denotes the Cochran-Armitage trend test statistic for testing for marginal trend in $p_{i\setJ}=\sum_{j\in\setJ}p_{ij}$, $i=1,\ldots, G$.
+\end{theorem}
+
+\section{Implementing the overall test}
+
+The main \texttt{multiCA.test} function is a generic, with methods for a matrix and formula input.
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../R/aaa-generics.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@#'Multinomial Cochran-Armitage trend test@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#'The \code{multiCA.test} performs a multinomial generalization of the @\\
+\mbox{}\verb@#' Cochran-Armitage trend test.@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#'@{\tt @}\verb@export@\\
+\mbox{}\verb@#'@{\tt @}\verb@param x a two-dimensional matrix or a formula@\\
+\mbox{}\verb@#'@{\tt @}\verb@param \dots other arguments @\\
+\mbox{}\verb@#'@{\tt @}\verb@return an object of class "htest" with the results of the test@\\
+\mbox{}\verb@#'@{\tt @}\verb@author Aniko Szabo@\\
+\mbox{}\verb@#'@{\tt @}\verb@references Szabo, A. (2016) Test for trend with a multinomial outcome.  @\\
+\mbox{}\verb@#'@{\tt @}\verb@keywords nonparametric @\\
+\mbox{}\verb@#'@{\tt @}\verb@examples@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#'data(stroke)@\\
+\mbox{}\verb@#'## using formula interface@\\
+\mbox{}\verb@#'multiCA.test(Type ~ Year, weight=Count, data=stroke)@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#'## using matrix interface@\\
+\mbox{}\verb@#'strk.mat <- xtabs(Count ~ Type + Year, data=stroke)@\\
+\mbox{}\verb@#'multiCA.test(strk.mat)@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#'@{\tt @}\verb@name multiCA.test@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@multiCA.test <- function(x,...) UseMethod("multiCA.test")@\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtIdentsUsed\nobreak\  \verb@multiCA.test@\nobreak\ \NWlink{nuweb?}{?}.
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+The default method uses a two-dimensional contingency matrix with the outcomes as rows and ordered groups as columns.
+\begin{flushleft} \small\label{scrap2}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@#'@{\tt @}\verb@rdname multiCA.test@\\
+\mbox{}\verb@#'@{\tt @}\verb@method multiCA.test default@\\
+\mbox{}\verb@#'@{\tt @}\verb@export@\\
+\mbox{}\verb@#'@{\tt @}\verb@param scores numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values@\\
+\mbox{}\verb@#'@{\tt @}\verb@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@multiCA.test.default <- function(x, scores=1:ncol(object), outcomes=1:nrow(object),@\\
+\mbox{}\verb@...){@\\
+\mbox{}\verb@  if (!is.matrix(x)) stop("x should be a two-dimensional matrix")@\\
+\mbox{}\verb@  if (length(scores) != ncol(x)) stop("The length of the score vector should equal the number of columns of x")@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  K <- nrow(x)@\\
+\mbox{}\verb@  full <- length(outcomes) == K  #full test@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  nidot <- apply(x, 2, sum)@\\
+\mbox{}\verb@  n <- sum(nidot)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  cbar <- sum(nidot * scores)/n@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  s2 <- sum(nidot * (scores - cbar)^2)@\\
+\mbox{}\verb@  pdot <- prop.table(rowSums(x))[outcomes]@\\
+\mbox{}\verb@  nonz <- (pdot > 0)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  if (!any(nonz)) return(1)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  X <- x[outcomes, ,drop=FALSE] %*% (scores - cbar)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  if (full || sum(pdot) >= 1){@\\
+\mbox{}\verb@    Tt <- ( sum(X[nonz]^2 / pdot[nonz])) / s2@\\
+\mbox{}\verb@  } else {@\\
+\mbox{}\verb@    Tt <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2@\\
+\mbox{}\verb@  }@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  df <- length(outcomes) - full@\\
+\mbox{}\verb@  p.value <- pchisq(Tt, df=df, lower=FALSE)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  res <- list(statistic = Tt, parameter = df, p.value = p.value, @\\
+\mbox{}\verb@              method="Multinomial Cochran-Armitage trend test",@\\
+\mbox{}\verb@              dname <- deparse(substitute(x)))@\\
+\mbox{}\verb@  class(res) <- "htest"@\\
+\mbox{}\verb@  return(res)  @\\
+\mbox{}\verb@}@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test@\nobreak\ \NWlink{nuweb?}{?}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\section{Files}
+
+
+{\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \verb@"../R/aaa-generics.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb?}{?}.}
+\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb?}{?}.}
+\end{list}}
+
+\section{Macros}
+
+None.
+
+
+\section{Identifiers}
+
+
+{\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \verb@multiCA.test@: \NWlink{nuweb?}{?}, \underline{\NWlink{nuweb?}{?}}.
+\end{list}}
+
+\end{document}
