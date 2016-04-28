@@ -66,15 +66,58 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 #'## using formula interface
 #'multiCA.test(Type ~ Year, weights=Freq, data=stroke)
 #'
-#'## using matrix interface
+#'## using matrix interface and testing only the first 3 outcomes
 #'strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)
-#'multiCA.test(strk.mat)
+#'multiCA.test(strk.mat, outcomes=1:3)
 #'
 #'@@name multiCA.test
 
 multiCA.test <- function(x,...) UseMethod("multiCA.test")
  
 @}
+
+The actual calculation of the test statitistic, overall and unadjusted individual p-values is encapsulated in an internal function that operates on a matrix. No error control is provided here.
+
+@O ../R/multiCA.R @{
+#'@@keywords internal
+
+.multiCA.test <- function(x, scores, outcomes){
+  K <- nrow(x)
+  full <- length(outcomes) == K  #full test
+  
+  nidot <- apply(x, 2, sum)
+  n <- sum(nidot)
+  
+  cbar <- sum(nidot * scores)/n
+  
+  s2 <- sum(nidot * (scores - cbar)^2)
+  pdot <- prop.table(rowSums(x))[outcomes]
+  nonz <- (pdot > 0)
+  
+  if (!any(nonz)) return(1)
+  
+  X <- x[outcomes, ,drop=FALSE] %*% (scores - cbar)
+
+  #individual tests
+  CAT <- X[nonz]^2 / (pdot[nonz] * (1-pdot[nonz])) / s2 
+  CAT.p.value <- pchisq(CAT, df=1, lower.tail=FALSE)
+  
+  #overall test
+  if (full || sum(pdot) >= 1){
+    Tt <- ( sum(X[nonz]^2 / pdot[nonz])) / s2
+  } else {
+    Tt <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2
+  }
+
+  df <- length(outcomes) - full
+  p.value <- pchisq(Tt, df=df, lower.tail=FALSE)
+
+  res <- list(statistic = Tt, parameter = df, p.value = p.value, 
+              indiv.statistics = CAT, indiv.p.value = CAT.p.value)
+  return(res)
+}
+@| .multiCA.test@}
+
 
 The default method uses a two-dimensional contingency matrix with the outcomes as rows and ordered groups as columns.
 @O ../R/multiCA.R @{
@@ -92,35 +135,19 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
 }
   if (length(scores) != ncol(x)) stop("The length of the score vector should equal the number of columns of x")
 
-  K <- nrow(x)
-  full <- length(outcomes) == K  #full test
-  
-  nidot <- apply(x, 2, sum)
-  n <- sum(nidot)
-  
-  cbar <- sum(nidot * scores)/n
-  
-  s2 <- sum(nidot * (scores - cbar)^2)
-  pdot <- prop.table(rowSums(x))[outcomes]
-  nonz <- (pdot > 0)
-  
-  if (!any(nonz)) return(1)
-  
-  X <- x[outcomes, ,drop=FALSE] %*% (scores - cbar)
-  
-  if (full || sum(pdot) >= 1){
-    Tt <- ( sum(X[nonz]^2 / pdot[nonz])) / s2
-  } else {
-    Tt <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2
-  }
-  names(Tt) <- "W"
+  testres <- .multiCA.test(x=x, scores=scores, outcomes=outcomes)
+ 
+  Tt <- c(W = testres$statistic)
+  df <- c(df = testres$parameter)
 
-  df <- length(outcomes) - full
-  names(df) <- "df"
-  p.value <- pchisq(Tt, df=df, lower.tail=FALSE)
+  p.value <- testres$p.value
+  null.value <- 0
+  names(null.value) <- sprintf("slope for outcomes %s", deparse(substitute(outcomes)))
 
   res <- list(statistic = Tt, parameter = df, p.value = p.value, 
               method="Multinomial Cochran-Armitage trend test",
+              alternative="two.sided",
+              null.value=null.value,
               data.name = deparse(substitute(x)))
   class(res) <- "htest"
   return(res)  
@@ -161,6 +188,11 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
     multiCA.test(tab, ...)
 }
 @| multiCA.test.formula@}
+
+\section{Multiple testing adjusted inference for individual outcomes}
+
+\subsection{Holm-Schaffer approach}
+
 
 \section{Files}
 

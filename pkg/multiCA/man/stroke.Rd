@@ -26,5 +26,8 @@ a single-centre database from 2003 to 2011. J Rehabil Med 46 (3), 200--205.
 \examples{
 data(stroke)
 xtabs(Freq ~ Type + Year, data=stroke)
+
+strk.props <- prop.table(xtabs(Freq ~ Year+Type, data=stroke), margin=1)
+matplot(strk.props, type="l")
 }
 \keyword{datasets}

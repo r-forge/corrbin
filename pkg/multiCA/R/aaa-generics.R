@@ -18,9 +18,9 @@
 #'## using formula interface
 #'multiCA.test(Type ~ Year, weights=Freq, data=stroke)
 #'
-#'## using matrix interface
+#'## using matrix interface and testing only the first 3 outcomes
 #'strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)
-#'multiCA.test(strk.mat)
+#'multiCA.test(strk.mat, outcomes=1:3)
 #'
 #'@name multiCA.test
 

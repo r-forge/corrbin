@@ -1,18 +1,7 @@
 
-#'@rdname multiCA.test
-#'@method multiCA.test default
-#'@param scores numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
-#'@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.
-#'@export
+#'@keywords internal
 
-multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
-...){
-  if (!is.matrix(x)) {
-    cat(str(x))
-    stop("x should be a two-dimensional matrix")
-}
-  if (length(scores) != ncol(x)) stop("The length of the score vector should equal the number of columns of x")
-
+.multiCA.test <- function(x, scores, outcomes){
   K <- nrow(x)
   full <- length(outcomes) == K  #full test
   
@@ -28,20 +17,53 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
   if (!any(nonz)) return(1)
   
   X <- x[outcomes, ,drop=FALSE] %*% (scores - cbar)
+
+  #individual tests
+  CAT <- X[nonz]^2 / (pdot[nonz] * (1-pdot[nonz])) / s2 
+  CAT.p.value <- pchisq(CAT, df=1, lower.tail=FALSE)
   
+  #overall test
   if (full || sum(pdot) >= 1){
     Tt <- ( sum(X[nonz]^2 / pdot[nonz])) / s2
   } else {
     Tt <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2
   }
-  names(Tt) <- "W"
 
   df <- length(outcomes) - full
-  names(df) <- "df"
   p.value <- pchisq(Tt, df=df, lower.tail=FALSE)
 
   res <- list(statistic = Tt, parameter = df, p.value = p.value, 
+              indiv.statistics = CAT, indiv.p.value = CAT.p.value)
+  return(res)
+}
+
+#'@rdname multiCA.test
+#'@method multiCA.test default
+#'@param scores numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
+#'@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.
+#'@export
+
+multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
+...){
+  if (!is.matrix(x)) {
+    cat(str(x))
+    stop("x should be a two-dimensional matrix")
+}
+  if (length(scores) != ncol(x)) stop("The length of the score vector should equal the number of columns of x")
+
+  testres <- .multiCA.test(x=x, scores=scores, outcomes=outcomes)
+ 
+  Tt <- c(W = testres$statistic)
+  df <- c(df = testres$parameter)
+
+  p.value <- testres$p.value
+  null.value <- 0
+  names(null.value) <- sprintf("slope for outcomes %s", deparse(substitute(outcomes)))
+
+  res <- list(statistic = Tt, parameter = df, p.value = p.value, 
               method="Multinomial Cochran-Armitage trend test",
+              alternative="two.sided",
+              null.value=null.value,
               data.name = deparse(substitute(x)))
   class(res) <- "htest"
   return(res)  

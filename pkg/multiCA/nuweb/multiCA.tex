@@ -85,9 +85,9 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 \mbox{}\verb@#'## using formula interface@\\
 \mbox{}\verb@#'multiCA.test(Type ~ Year, weights=Freq, data=stroke)@\\
 \mbox{}\verb@#'@\\
-\mbox{}\verb@#'## using matrix interface@\\
+\mbox{}\verb@#'## using matrix interface and testing only the first 3 outcomes@\\
 \mbox{}\verb@#'strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)@\\
-\mbox{}\verb@#'multiCA.test(strk.mat)@\\
+\mbox{}\verb@#'multiCA.test(strk.mat, outcomes=1:3)@\\
 \mbox{}\verb@#'@\\
 \mbox{}\verb@#'@{\tt @}\verb@name multiCA.test@\\
 \mbox{}\verb@@\\
@@ -103,9 +103,64 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
-The default method uses a two-dimensional contingency matrix with the outcomes as rows and ordered groups as columns.
+The actual calculation of the test statitistic, overall and unadjusted individual p-values is encapsulated in an internal function that operates on a matrix. No error control is provided here.
+
 \begin{flushleft} \small\label{scrap2}\raggedright\small
 \NWtarget{nuweb2b}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {2b}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@#'@{\tt @}\verb@keywords internal@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@.multiCA.test <- function(x, scores, outcomes){@\\
+\mbox{}\verb@  K <- nrow(x)@\\
+\mbox{}\verb@  full <- length(outcomes) == K  #full test@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  nidot <- apply(x, 2, sum)@\\
+\mbox{}\verb@  n <- sum(nidot)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  cbar <- sum(nidot * scores)/n@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  s2 <- sum(nidot * (scores - cbar)^2)@\\
+\mbox{}\verb@  pdot <- prop.table(rowSums(x))[outcomes]@\\
+\mbox{}\verb@  nonz <- (pdot > 0)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  if (!any(nonz)) return(1)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  X <- x[outcomes, ,drop=FALSE] %*% (scores - cbar)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  #individual tests@\\
+\mbox{}\verb@  CAT <- X[nonz]^2 / (pdot[nonz] * (1-pdot[nonz])) / s2 @\\
+\mbox{}\verb@  CAT.p.value <- pchisq(CAT, df=1, lower.tail=FALSE)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  #overall test@\\
+\mbox{}\verb@  if (full || sum(pdot) >= 1){@\\
+\mbox{}\verb@    Tt <- ( sum(X[nonz]^2 / pdot[nonz])) / s2@\\
+\mbox{}\verb@  } else {@\\
+\mbox{}\verb@    Tt <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2@\\
+\mbox{}\verb@  }@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  df <- length(outcomes) - full@\\
+\mbox{}\verb@  p.value <- pchisq(Tt, df=df, lower.tail=FALSE)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  res <- list(statistic = Tt, parameter = df, p.value = p.value, @\\
+\mbox{}\verb@              indiv.statistics = CAT, indiv.p.value = CAT.p.value)@\\
+\mbox{}\verb@  return(res)@\\
+\mbox{}\verb@}@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+The default method uses a two-dimensional contingency matrix with the outcomes as rows and ordered groups as columns.
+\begin{flushleft} \small\label{scrap3}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -123,35 +178,19 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 \mbox{}\verb@}@\\
 \mbox{}\verb@  if (length(scores) != ncol(x)) stop("The length of the score vector should equal the number of columns of x")@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@  K <- nrow(x)@\\
-\mbox{}\verb@  full <- length(outcomes) == K  #full test@\\
-\mbox{}\verb@  @\\
-\mbox{}\verb@  nidot <- apply(x, 2, sum)@\\
-\mbox{}\verb@  n <- sum(nidot)@\\
-\mbox{}\verb@  @\\
-\mbox{}\verb@  cbar <- sum(nidot * scores)/n@\\
-\mbox{}\verb@  @\\
-\mbox{}\verb@  s2 <- sum(nidot * (scores - cbar)^2)@\\
-\mbox{}\verb@  pdot <- prop.table(rowSums(x))[outcomes]@\\
-\mbox{}\verb@  nonz <- (pdot > 0)@\\
-\mbox{}\verb@  @\\
-\mbox{}\verb@  if (!any(nonz)) return(1)@\\
-\mbox{}\verb@  @\\
-\mbox{}\verb@  X <- x[outcomes, ,drop=FALSE] %*% (scores - cbar)@\\
-\mbox{}\verb@  @\\
-\mbox{}\verb@  if (full || sum(pdot) >= 1){@\\
-\mbox{}\verb@    Tt <- ( sum(X[nonz]^2 / pdot[nonz])) / s2@\\
-\mbox{}\verb@  } else {@\\
-\mbox{}\verb@    Tt <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2@\\
-\mbox{}\verb@  }@\\
-\mbox{}\verb@  names(Tt) <- "W"@\\
+\mbox{}\verb@  testres <- .multiCA.test(x=x, scores=scores, outcomes=outcomes)@\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@  Tt <- c(W = testres$statistic)@\\
+\mbox{}\verb@  df <- c(df = testres$parameter)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@  df <- length(outcomes) - full@\\
-\mbox{}\verb@  names(df) <- "df"@\\
-\mbox{}\verb@  p.value <- pchisq(Tt, df=df, lower.tail=FALSE)@\\
+\mbox{}\verb@  p.value <- testres$p.value@\\
+\mbox{}\verb@  null.value <- 0@\\
+\mbox{}\verb@  names(null.value) <- sprintf("slope for outcomes %s", deparse(substitute(outcomes)))@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@  res <- list(statistic = Tt, parameter = df, p.value = p.value, @\\
 \mbox{}\verb@              method="Multinomial Cochran-Armitage trend test",@\\
+\mbox{}\verb@              alternative="two.sided",@\\
+\mbox{}\verb@              null.value=null.value,@\\
 \mbox{}\verb@              data.name = deparse(substitute(x)))@\\
 \mbox{}\verb@  class(res) <- "htest"@\\
 \mbox{}\verb@  return(res)  @\\
@@ -161,8 +200,8 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.default@\nobreak\ \NWtxtIdentsNotUsed.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.default@\nobreak\ \NWtxtIdentsNotUsed.\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -170,7 +209,7 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 The formula interface converts data into the appropriate contingency matrix for use
 with the default method.
 
-\begin{flushleft} \small\label{scrap3}\raggedright\small
+\begin{flushleft} \small\label{scrap4}\raggedright\small
 \NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -208,18 +247,23 @@ with the default method.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.formula@\nobreak\ \NWtxtIdentsNotUsed.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+\section{Multiple testing adjusted inference for individual outcomes}
+
+\subsection{Holm-Schaffer approach}
+
+
 \section{Files}
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../R/aaa-generics.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2a}{2a}.}
-\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}.
+\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 }
 \end{list}}
 
@@ -232,7 +276,8 @@ None.
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \verb@multiCA.test.default@: \underline{\NWlink{nuweb2b}{2b}}.
+\item \verb@.multiCA.test@: \underline{\NWlink{nuweb2b}{2b}}\NWlink{nuweb?}{, ?}.
+\item \verb@multiCA.test.default@: \underline{\NWlink{nuweb?}{?}}.
 \item \verb@multiCA.test.formula@: \underline{\NWlink{nuweb?}{?}}.
 \end{list}}
 
