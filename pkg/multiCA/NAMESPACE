@@ -2,4 +2,5 @@
 
 S3method(multiCA.test,default)
 S3method(multiCA.test,formula)
+export(cnonct)
 export(multiCA.test)

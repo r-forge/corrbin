@@ -97,3 +97,22 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
     tab <- xtabs(w ~ response + g)
     multiCA.test(tab, ...)
 }
+
+#' Non-centrality parameter for chi-square distribution
+#'
+#' Calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level. This is often needed for sample size calculation for chi-square based tests.
+#'@param df an integer giving the degrees of freedom of the chi-square variable
+#'@param alpha a numeric value giving the significance level of the test
+#'@param beta a numeric value giving the desired type II error (1-\code{beta} is the power)
+#'@examples
+#' cnonct(6, 0.05, 0.2)
+#'@export
+
+cnonct <- function(df, alpha, beta){
+  crit.value <- qchisq(alpha, df=df, lower.tail=FALSE)
+  
+  f <- function(ncp){pchisq(crit.value, df=df, ncp=pmax(0,ncp)) - beta}
+
+  res <- uniroot(f, interval=c(0, 100), extendInt="downX")
+  res$root
+}

@@ -152,7 +152,7 @@ The actual calculation of the test statitistic, overall and unadjusted individua
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}.
 \item{}
 \end{list}
@@ -200,14 +200,14 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.default@\nobreak\ \NWtxtIdentsNotUsed.\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
 The formula interface converts data into the appropriate contingency matrix for use
-with the default method.
+with the default method. The code is based on \texttt{t.test.formula}.
 
 \begin{flushleft} \small\label{scrap4}\raggedright\small
 \NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
@@ -247,7 +247,7 @@ with the default method.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.formula@\nobreak\ \NWtxtIdentsNotUsed.
 \item{}
 \end{list}
@@ -258,12 +258,62 @@ with the default method.
 \subsection{Holm-Schaffer approach}
 
 
+\section{Power and sample size calculation}
+The calculation is based on the following result:
+Let $\nu_i=n_{i\cdot}/N$ denote the proportion
+of subjects in group $i$. 
+
+\begin{theorem}\label{Th:power}
+Under $H_a$, the asymptotic distribution of $W$ is approximately $\chi_{K-1}^2(\lambda)$ with non-centrality parameter
+\begin{equation}\label{E:ncp}
+  \lambda = N  s_\nu^2 \sum_{j=1}^K \frac{\beta_j^2}{p_{\cdot j}},
+\end{equation}
+where $s_\nu^2= \sum_{i=1}^G \nu_i(c_i-\bar{c})^2=s^2/N$ and $\beta_j=\big[\sum_{i=1}^G \nu_{i}(p_{ij}-p_{\cdot
+  j})(c_i-\bar{c})\big] /s_\nu^2$ is the slope of $p_{ij}$, $i=1,\ldots,G$ regressed on $c_i$ with weights $\nu_i$.
+\end{theorem}
+
+A non-centrality parameter calculation function can be useful by itself. It calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level.
+
+\begin{flushleft} \small\label{scrap5}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@#' Non-centrality parameter for chi-square distribution@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#' Calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level. This is often needed for sample size calculation for chi-square based tests.@\\
+\mbox{}\verb@#'@{\tt @}\verb@param df an integer giving the degrees of freedom of the chi-square variable@\\
+\mbox{}\verb@#'@{\tt @}\verb@param alpha a numeric value giving the significance level of the test@\\
+\mbox{}\verb@#'@{\tt @}\verb@param beta a numeric value giving the desired type II error (1-\code{beta} is the power)@\\
+\mbox{}\verb@#'@{\tt @}\verb@examples@\\
+\mbox{}\verb@#' cnonct(6, 0.05, 0.2)@\\
+\mbox{}\verb@#'@{\tt @}\verb@export@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@cnonct <- function(df, alpha, beta){@\\
+\mbox{}\verb@  crit.value <- qchisq(alpha, df=df, lower.tail=FALSE)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  f <- function(ncp){pchisq(crit.value, df=df, ncp=pmax(0,ncp)) - beta}@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  res <- uniroot(f, interval=c(0, 100), extendInt="downX")@\\
+\mbox{}\verb@  res$root@\\
+\mbox{}\verb@}@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@cnonct@\nobreak\ \NWtxtIdentsNotUsed.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
 \section{Files}
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../R/aaa-generics.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2a}{2a}.}
-\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 }
 \end{list}}
 
@@ -277,6 +327,7 @@ None.
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@.multiCA.test@: \underline{\NWlink{nuweb2b}{2b}}\NWlink{nuweb?}{, ?}.
+\item \verb@cnonct@: \underline{\NWlink{nuweb?}{?}}.
 \item \verb@multiCA.test.default@: \underline{\NWlink{nuweb?}{?}}.
 \item \verb@multiCA.test.formula@: \underline{\NWlink{nuweb?}{?}}.
 \end{list}}

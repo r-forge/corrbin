@@ -156,7 +156,7 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
 
 
 The formula interface converts data into the appropriate contingency matrix for use
-with the default method.
+with the default method. The code is based on \texttt{t.test.formula}.
 
 @O ../R/multiCA.R @{
 #'@@rdname multiCA.test
@@ -193,6 +193,43 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
 
 \subsection{Holm-Schaffer approach}
 
+
+\section{Power and sample size calculation}
+The calculation is based on the following result:
+Let $\nu_i=n_{i\cdot}/N$ denote the proportion
+of subjects in group $i$. 
+
+\begin{theorem}\label{Th:power}
+Under $H_a$, the asymptotic distribution of $W$ is approximately $\chi_{K-1}^2(\lambda)$ with non-centrality parameter
+\begin{equation}\label{E:ncp}
+  \lambda = N  s_\nu^2 \sum_{j=1}^K \frac{\beta_j^2}{p_{\cdot j}},
+\end{equation}
+where $s_\nu^2= \sum_{i=1}^G \nu_i(c_i-\bar{c})^2=s^2/N$ and $\beta_j=\big[\sum_{i=1}^G \nu_{i}(p_{ij}-p_{\cdot
+  j})(c_i-\bar{c})\big] /s_\nu^2$ is the slope of $p_{ij}$, $i=1,\ldots,G$ regressed on $c_i$ with weights $\nu_i$.
+\end{theorem}
+
+A non-centrality parameter calculation function can be useful by itself. It calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level.
+
+@O ../R/multiCA.R @{
+#' Non-centrality parameter for chi-square distribution
+#'
+#' Calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level. This is often needed for sample size calculation for chi-square based tests.
+#'@@param df an integer giving the degrees of freedom of the chi-square variable
+#'@@param alpha a numeric value giving the significance level of the test
+#'@@param beta a numeric value giving the desired type II error (1-\code{beta} is the power)
+#'@@examples
+#' cnonct(6, 0.05, 0.2)
+#'@@export
+
+cnonct <- function(df, alpha, beta){
+  crit.value <- qchisq(alpha, df=df, lower.tail=FALSE)
+  
+  f <- function(ncp){pchisq(crit.value, df=df, ncp=pmax(0,ncp)) - beta}
+
+  res <- uniroot(f, interval=c(0, 100), extendInt="downX")
+  res$root
+}
+@| cnonct@}
 
 \section{Files}
 
