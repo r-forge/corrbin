@@ -9,7 +9,7 @@
 multiCA.test(x, ...)
 
 \method{multiCA.test}{default}(x, scores = 1:ncol(x), outcomes = 1:nrow(x),
-  ...)
+  p.adjust.method = c("none", "closed.set", "holm-schaffer"), ...)
 
 \method{multiCA.test}{formula}(formula, data, subset, na.action, weights, ...)
 }
@@ -19,6 +19,8 @@ multiCA.test(x, ...)
 \item{scores}{numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values}
 
 \item{outcomes}{integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.}
+
+\item{p.adjust.method}{character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "holm-schaffer" otherwise.}
 
 \item{formula}{a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the cateogrical outcome and \code{group} is the grouping variableover which the trend is tested.}
 
@@ -33,7 +35,9 @@ multiCA.test(x, ...)
 \item{\dots}{other arguments}
 }
 \value{
-an object of class "htest" with the results of the test
+a list with two components
+\item{overall}{an object of class "htest" with the results of the overall test}
+\item{individual}{a vector with adjusted p-values for individual outcomes}
 }
 \description{
 The \code{multiCA.test} performs a multinomial generalization of the 

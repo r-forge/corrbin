@@ -8,7 +8,9 @@
 #'@export
 #'@param x a two-dimensional matrix or a formula
 #'@param \dots other arguments 
-#'@return an object of class "htest" with the results of the test
+#'@return a list with two components
+#' \item{overall}{an object of class "htest" with the results of the overall test}
+#' \item{individual}{a vector with adjusted p-values for individual outcomes}
 #'@author Aniko Szabo
 #'@references Szabo, A. (2016) Test for trend with a multinomial outcome.  
 #'@keywords nonparametric 

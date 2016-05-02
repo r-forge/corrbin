@@ -34,7 +34,7 @@
 
 
 \section{Introduction}
--
+
 Consider a study in which a multinomial outcome with $K$ possible unordered values is measured in subjects belonging to one of $G$ ordered groups.
 The size of each group, $n_{i\cdot}$, is defined by the study design, and will be treated as fixed.
 Let $\pvec_i=(p_{i1},\ldots,p_{iK})^\T$ denote the probabilities of the multinomial outcomes in the $i$th group. The hypothesis of interest is to
@@ -75,7 +75,9 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 \mbox{}\verb@#'@{\tt @}\verb@export@\\
 \mbox{}\verb@#'@{\tt @}\verb@param x a two-dimensional matrix or a formula@\\
 \mbox{}\verb@#'@{\tt @}\verb@param \dots other arguments @\\
-\mbox{}\verb@#'@{\tt @}\verb@return an object of class "htest" with the results of the test@\\
+\mbox{}\verb@#'@{\tt @}\verb@return a list with two components@\\
+\mbox{}\verb@#' \item{overall}{an object of class "htest" with the results of the overall test}@\\
+\mbox{}\verb@#' \item{individual}{a vector with adjusted p-values for individual outcomes}@\\
 \mbox{}\verb@#'@{\tt @}\verb@author Aniko Szabo@\\
 \mbox{}\verb@#'@{\tt @}\verb@references Szabo, A. (2016) Test for trend with a multinomial outcome.  @\\
 \mbox{}\verb@#'@{\tt @}\verb@keywords nonparametric @\\
@@ -152,15 +154,15 @@ The actual calculation of the test statitistic, overall and unadjusted individua
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb3}{3}\NWlink{nuweb5b}{, 5b}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
 The default method uses a two-dimensional contingency matrix with the outcomes as rows and ordered groups as columns.
 \begin{flushleft} \small\label{scrap3}\raggedright\small
-\NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\NWtarget{nuweb3}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {3}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -168,10 +170,11 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 \mbox{}\verb@#'@{\tt @}\verb@method multiCA.test default@\\
 \mbox{}\verb@#'@{\tt @}\verb@param scores numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values@\\
 \mbox{}\verb@#'@{\tt @}\verb@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.@\\
+\mbox{}\verb@#'@{\tt @}\verb@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "holm-schaffer" otherwise.@\\
 \mbox{}\verb@#'@{\tt @}\verb@export@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),@\\
-\mbox{}\verb@...){@\\
+\mbox{}\verb@  p.adjust.method=c("none","closed.set","holm-schaffer"),...){@\\
 \mbox{}\verb@  if (!is.matrix(x)) {@\\
 \mbox{}\verb@    cat(str(x))@\\
 \mbox{}\verb@    stop("x should be a two-dimensional matrix")@\\
@@ -193,14 +196,17 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 \mbox{}\verb@              null.value=null.value,@\\
 \mbox{}\verb@              data.name = deparse(substitute(x)))@\\
 \mbox{}\verb@  class(res) <- "htest"@\\
-\mbox{}\verb@  return(res)  @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  @\hbox{$\langle\,${\itshape Calculate adjusted p-values}\nobreak\ {\footnotesize \NWlink{nuweb4b}{4b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  return(list(overall = res, individual = indiv.res))  @\\
 \mbox{}\verb@}@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.default@\nobreak\ \NWtxtIdentsNotUsed.\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}.
 \item{}
 \end{list}
@@ -210,7 +216,7 @@ The formula interface converts data into the appropriate contingency matrix for 
 with the default method. The code is based on \texttt{t.test.formula}.
 
 \begin{flushleft} \small\label{scrap4}\raggedright\small
-\NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\NWtarget{nuweb4a}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {4a}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -247,7 +253,7 @@ with the default method. The code is based on \texttt{t.test.formula}.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.formula@\nobreak\ \NWtxtIdentsNotUsed.
 \item{}
 \end{list}
@@ -255,9 +261,164 @@ with the default method. The code is based on \texttt{t.test.formula}.
 \end{flushleft}
 \section{Multiple testing adjusted inference for individual outcomes}
 
+\begin{flushleft} \small\label{scrap5}\raggedright\small
+\NWtarget{nuweb4b}{} $\langle\,${\itshape Calculate adjusted p-values}\nobreak\ {\footnotesize {4b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  if (missing(p.adjust.method)){@\\
+\mbox{}\verb@    if (length(outcomes)<=3) p.adjust.method <- "closed.set"@\\
+\mbox{}\verb@    else p.adjust.method <- "holm-schaffer"@\\
+\mbox{}\verb@  } else {@\\
+\mbox{}\verb@    p.adjust.method <- match.arg(p.adjust.method)@\\
+\mbox{}\verb@  }@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  full.set <- (length(outcomes) == nrow(x)) @\\
+\mbox{}\verb@  if (p.adjust.method=="none") {@\\
+\mbox{}\verb@    indiv.res <- testres$indiv.p.value@\\
+\mbox{}\verb@  } else if (p.adjust.method=="closed.set") {@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Closed set adjustment}\nobreak\ {\footnotesize \NWlink{nuweb5b}{5b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@  } else if (p.adjust.method=="holm-schaffer") {@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Holm-Schaffer adjustment}\nobreak\ {\footnotesize \NWlink{nuweb5a}{5a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@  } @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
 \subsection{Holm-Schaffer approach}
+Schaffer's modification of Holm's adjustment involves multiplying the ordered p-values by $t_s$, the maximum number of possibly true hypotheses, given that at least $s - 1$ hypotheses are false. In our case the logical restriction means that if there is at least one false null hypothesis, then no more than $K-2$ null hypotheses could be true. So
+\begin{gather*}
+p^{HS}_{(j)} = \max_{s\leq j}(\min( t_s p_{(s)}, 1))\\
+\text{where} t_s = \begin{cases}
+                   K-s+1, & s\neq 2\\
+                   K - 2, & s=2
+                  \end{cases}
+\end{gather*}
 
 
+\begin{flushleft} \small\label{scrap6}\raggedright\small
+\NWtarget{nuweb5a}{} $\langle\,${\itshape Holm-Schaffer adjustment}\nobreak\ {\footnotesize {5a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@    s <- seq_along(testres$indiv.p.value)@\\
+\mbox{}\verb@    if (full.set) s[2] <- 3@\\
+\mbox{}\verb@    o <- order(testres$indiv.p.value)@\\
+\mbox{}\verb@    ro <- order(o)@\\
+\mbox{}\verb@    indiv.res <- pmin(1, cummax((length(outcomes) - s + 1L) * testres$indiv.p.value[o]))[ro]@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb4b}{4b}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\subsection{Closed set adjustment}
+
+In a closed testing procedure an elementary hypothesis $H_{0j}$ is rejected if and only if all composite hypotheses $H_{0\setJ}$, where $j\in \setJ$ are rejected. The process can be rewritten using adjusted p-values for $H_{0j}, j=1,\ldots K$:
+\begin{equation}\label{E:adjustp}
+    p^*_j = \max_{\setJ: j\in \setJ} p(\setJ),
+\end{equation}
+where $p(\setJ) = P(W_j \geq \chi^2_{|\setJ|})$ is the unadjusted p-value for testing $H_{0\setJ}$. From the logical constraints sets $\setJ$ of cardinality $K-1$ do not need to be considered.
+
+\begin{flushleft} \small\label{scrap7}\raggedright\small
+\NWtarget{nuweb5b}{} $\langle\,${\itshape Closed set adjustment}\nobreak\ {\footnotesize {5b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  mytest <- function(hypotheses){@\\
+\mbox{}\verb@    .multiCA.test(x, scores, hypotheses)$p.value@\\
+\mbox{}\verb@  }@\\
+\mbox{}\verb@  indiv.res <- .p.adjust.closed(mytest, outcomes, remove=full.set)  @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb4b}{4b}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+The actual adjustment calculation is based on code from \texttt{cherry::closed}, removing
+the $K-1$ element sets if the full set of hypotheses is being tested.
+
+\begin{flushleft} \small\label{scrap8}\raggedright\small
+\NWtarget{nuweb5c}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {5c}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@#' @{\tt @}\verb@importFrom bitops bitAnd@\\
+\mbox{}\verb@#' @{\tt @}\verb@keywords internal@\\
+\mbox{}\verb@.bit2boolean <- function (x, N) @\\
+\mbox{}\verb@{@\\
+\mbox{}\verb@  base <- 2^(1:N - 1)@\\
+\mbox{}\verb@  bitAnd(x, base) != 0@\\
+\mbox{}\verb@}@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@#' @{\tt @}\verb@param test function that performs the local test. The function should accept a subvector of the hypotheses argument as input, and return a p-value.@\\
+\mbox{}\verb@#' @{\tt @}\verb@param  hypotheses identifiers of the collection of elementary hypotheses. @\\
+\mbox{}\verb@#' @{\tt @}\verb@param remove logical indicator of whether hypotheses of length N-1 should be removed@\\
+\mbox{}\verb@#' @{\tt @}\verb@param  ...  additional parameters to the 'test' function@\\
+\mbox{}\verb@#' @{\tt @}\verb@return  numeric vector of adjusted p-values for each hypothesis@\\
+\mbox{}\verb@#' @{\tt @}\verb@keywords internal@\\
+\mbox{}\verb@.p.adjust.closed <- function (test, hypotheses, remove=FALSE, ...) @\\
+\mbox{}\verb@{@\\
+\mbox{}\verb@  N <- length(hypotheses)@\\
+\mbox{}\verb@  Nmax <- log2(.Machine$integer.max + 1)@\\
+\mbox{}\verb@  if (N > Nmax) @\\
+\mbox{}\verb@    stop("no more than ", Nmax, " hypotheses supported in full closed testing.\n Use a shortcut-based test.")@\\
+\mbox{}\verb@  closure <- 1:(2^N - 1)@\\
+\mbox{}\verb@  base <- 2^(1:N - 1)@\\
+\mbox{}\verb@  offspring <- function(x) {@\\
+\mbox{}\verb@    res <- bitAnd(x, closure)@\\
+\mbox{}\verb@    res[res != 0]@\\
+\mbox{}\verb@  }@\\
+\mbox{}\verb@  lengths <- rowSums(sapply(base, function(bs) bitAnd(closure, bs) != 0))@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  idx <- sort.list(lengths, decreasing = TRUE)@\\
+\mbox{}\verb@  closure <- closure[idx]@\\
+\mbox{}\verb@  lengths <- lengths[idx]@\\
+\mbox{}\verb@  if (remove)  closure <- closure[lengths != (N-1)]@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  adjusted <- numeric(2^N - 1)@\\
+\mbox{}\verb@  for (i in closure) {@\\
+\mbox{}\verb@    if (adjusted[i] < 1) {@\\
+\mbox{}\verb@      localtest <- test(hypotheses[.bit2boolean(i,N)], ...)@\\
+\mbox{}\verb@      if (localtest > adjusted[i]) {@\\
+\mbox{}\verb@        offs <- offspring(i)@\\
+\mbox{}\verb@        adjusted[offs] <- pmax(adjusted[offs], localtest)@\\
+\mbox{}\verb@      }@\\
+\mbox{}\verb@    }@\\
+\mbox{}\verb@  }@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  out <- adjusted[base]@\\
+\mbox{}\verb@  names(out) <- hypotheses@\\
+\mbox{}\verb@  return(out)@\\
+\mbox{}\verb@}@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
 \section{Power and sample size calculation}
 The calculation is based on the following result:
 Let $\nu_i=n_{i\cdot}/N$ denote the proportion
@@ -274,8 +435,8 @@ where $s_\nu^2= \sum_{i=1}^G \nu_i(c_i-\bar{c})^2=s^2/N$ and $\beta_j=\big[\sum_
 
 A non-centrality parameter calculation function can be useful by itself. It calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level.
 
-\begin{flushleft} \small\label{scrap5}\raggedright\small
-\NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\begin{flushleft} \small\label{scrap9}\raggedright\small
+\NWtarget{nuweb7}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {7}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -302,7 +463,7 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@cnonct@\nobreak\ \NWtxtIdentsNotUsed.
 \item{}
 \end{list}
@@ -313,23 +474,27 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../R/aaa-generics.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2a}{2a}.}
-\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}.
 }
 \end{list}}
 
 \section{Macros}
 
-None.
 
+{\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item $\langle\,$Calculate adjusted p-values\nobreak\ {\footnotesize \NWlink{nuweb4b}{4b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb3}{3}.}
+\item $\langle\,$Closed set adjustment\nobreak\ {\footnotesize \NWlink{nuweb5b}{5b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb4b}{4b}.}
+\item $\langle\,$Holm-Schaffer adjustment\nobreak\ {\footnotesize \NWlink{nuweb5a}{5a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb4b}{4b}.}
+\end{list}}
 
 \section{Identifiers}
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \verb@.multiCA.test@: \underline{\NWlink{nuweb2b}{2b}}\NWlink{nuweb?}{, ?}.
-\item \verb@cnonct@: \underline{\NWlink{nuweb?}{?}}.
-\item \verb@multiCA.test.default@: \underline{\NWlink{nuweb?}{?}}.
-\item \verb@multiCA.test.formula@: \underline{\NWlink{nuweb?}{?}}.
+\item \verb@.multiCA.test@: \underline{\NWlink{nuweb2b}{2b}}\NWlink{nuweb3}{, 3}\NWlink{nuweb5b}{, 5b}.
+\item \verb@cnonct@: \underline{\NWlink{nuweb7}{7}}.
+\item \verb@multiCA.test.default@: \underline{\NWlink{nuweb3}{3}}.
+\item \verb@multiCA.test.formula@: \underline{\NWlink{nuweb4a}{4a}}.
 \end{list}}
 
 \end{document}

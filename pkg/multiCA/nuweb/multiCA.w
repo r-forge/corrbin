@@ -19,7 +19,7 @@
 
 
 \section{Introduction}
--
+
 Consider a study in which a multinomial outcome with $K$ possible unordered values is measured in subjects belonging to one of $G$ ordered groups.
 The size of each group, $n_{i\cdot}$, is defined by the study design, and will be treated as fixed.
 Let $\pvec_i=(p_{i1},\ldots,p_{iK})^\T$ denote the probabilities of the multinomial outcomes in the $i$th group. The hypothesis of interest is to
@@ -56,7 +56,9 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 #'@@export
 #'@@param x a two-dimensional matrix or a formula
 #'@@param \dots other arguments 
-#'@@return an object of class "htest" with the results of the test
+#'@@return a list with two components
+#' \item{overall}{an object of class "htest" with the results of the overall test}
+#' \item{individual}{a vector with adjusted p-values for individual outcomes}
 #'@@author Aniko Szabo
 #'@@references Szabo, A. (2016) Test for trend with a multinomial outcome.  
 #'@@keywords nonparametric 
@@ -125,10 +127,11 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 #'@@method multiCA.test default
 #'@@param scores numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
 #'@@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.
+#'@@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "holm-schaffer" otherwise.
 #'@@export
 
 multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
-...){
+  p.adjust.method=c("none","closed.set","holm-schaffer"),...){
   if (!is.matrix(x)) {
     cat(str(x))
     stop("x should be a two-dimensional matrix")
@@ -150,7 +153,10 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
               null.value=null.value,
               data.name = deparse(substitute(x)))
   class(res) <- "htest"
-  return(res)  
+
+  @< Calculate adjusted p-values @>
+
+  return(list(overall = res, individual = indiv.res))  
 }
 @| multiCA.test.default@}
 
@@ -161,7 +167,7 @@ with the default method. The code is based on \texttt{t.test.formula}.
 @O ../R/multiCA.R @{
 #'@@rdname multiCA.test
 #'@@method multiCA.test formula
-#'@@param formula a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the cateogrical outcome and \code{group} is the grouping variableover which the trend is tested.
+#'@@param formula a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the cateogrical outcome and \code{group} is the grouping variable over which the trend is tested.
 #'@@param data  an optional matrix or data frame containing the variables in the formula \code{formula}. By default the variables are taken from \code{environment(formula).}
 #'@@param subset	an optional vector specifying a subset of observations to be used.
 #'@@param na.action	a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").
@@ -191,7 +197,111 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
 
 \section{Multiple testing adjusted inference for individual outcomes}
 
+@D Calculate adjusted p-values @{
+  if (missing(p.adjust.method)){
+    if (length(outcomes)<=3) p.adjust.method <- "closed.set"
+    else p.adjust.method <- "holm-schaffer"
+  } else {
+    p.adjust.method <- match.arg(p.adjust.method)
+  }
+
+  full.set <- (length(outcomes) == nrow(x)) 
+  if (p.adjust.method=="none") {
+    indiv.res <- testres$indiv.p.value
+  } else if (p.adjust.method=="closed.set") {
+    @< Closed set adjustment @>
+  } else if (p.adjust.method=="holm-schaffer") {
+    @< Holm-Schaffer adjustment @>
+  } 
+@}
+
 \subsection{Holm-Schaffer approach}
+Schaffer's modification of Holm's adjustment involves multiplying the ordered p-values by $t_s$, the maximum number of possibly true hypotheses, given that at least $s - 1$ hypotheses are false. In our case the logical restriction means that if there is at least one false null hypothesis, then no more than $K-2$ null hypotheses could be true. So
+\begin{gather*}
+p^{HS}_{(j)} = \max_{s\leq j}(\min( t_s p_{(s)}, 1))\\
+\text{where} t_s = \begin{cases}
+                   K-s+1, & s\neq 2\\
+                   K - 2, & s=2
+                  \end{cases}
+\end{gather*}
+
+
+@D Holm-Schaffer adjustment @{
+    s <- seq_along(testres$indiv.p.value)
+    if (full.set) s[2] <- 3
+    o <- order(testres$indiv.p.value)
+    ro <- order(o)
+    indiv.res <- pmin(1, cummax((length(outcomes) - s + 1L) * testres$indiv.p.value[o]))[ro]
+@}
+
+\subsection{Closed set adjustment}
+
+In a closed testing procedure an elementary hypothesis $H_{0j}$ is rejected if and only if all composite hypotheses $H_{0\setJ}$, where $j\in \setJ$ are rejected. The process can be rewritten using adjusted p-values for $H_{0j}, j=1,\ldots K$:
+\begin{equation}\label{E:adjustp}
+    p^*_j = \max_{\setJ: j\in \setJ} p(\setJ),
+\end{equation}
+where $p(\setJ) = P(W_j \geq \chi^2_{|\setJ|})$ is the unadjusted p-value for testing $H_{0\setJ}$. From the logical constraints sets $\setJ$ of cardinality $K-1$ do not need to be considered.
+
+@D Closed set adjustment @{
+  mytest <- function(hypotheses){
+    .multiCA.test(x, scores, hypotheses)$p.value
+  }
+  indiv.res <- .p.adjust.closed(mytest, outcomes, remove=full.set)  
+@}
+
+The actual adjustment calculation is based on code from \texttt{cherry::closed}, removing
+the $K-1$ element sets if the full set of hypotheses is being tested.
+
+@O ../R/multiCA.R @{
+#' @@importFrom bitops bitAnd
+#' @@keywords internal
+.bit2boolean <- function (x, N) 
+{
+  base <- 2^(1:N - 1)
+  bitAnd(x, base) != 0
+}
+
+#' @@param test function that performs the local test. The function should accept a subvector of the hypotheses argument as input, and return a p-value.
+#' @@param  hypotheses identifiers of the collection of elementary hypotheses. 
+#' @@param remove logical indicator of whether hypotheses of length N-1 should be removed
+#' @@param  ...  additional parameters to the 'test' function
+#' @@return  numeric vector of adjusted p-values for each hypothesis
+#' @@keywords internal
+.p.adjust.closed <- function (test, hypotheses, remove=FALSE, ...) 
+{
+  N <- length(hypotheses)
+  Nmax <- log2(.Machine$integer.max + 1)
+  if (N > Nmax) 
+    stop("no more than ", Nmax, " hypotheses supported in full closed testing.\n Use a shortcut-based test.")
+  closure <- 1:(2^N - 1)
+  base <- 2^(1:N - 1)
+  offspring <- function(x) {
+    res <- bitAnd(x, closure)
+    res[res != 0]
+  }
+  lengths <- rowSums(sapply(base, function(bs) bitAnd(closure, bs) != 0))
+  
+  idx <- sort.list(lengths, decreasing = TRUE)
+  closure <- closure[idx]
+  lengths <- lengths[idx]
+  if (remove)  closure <- closure[lengths != (N-1)]
+  
+  adjusted <- numeric(2^N - 1)
+  for (i in closure) {
+    if (adjusted[i] < 1) {
+      localtest <- test(hypotheses[.bit2boolean(i,N)], ...)
+      if (localtest > adjusted[i]) {
+        offs <- offspring(i)
+        adjusted[offs] <- pmax(adjusted[offs], localtest)
+      }
+    }
+  }
+  
+  out <- adjusted[base]
+  names(out) <- hypotheses
+  return(out)
+}
+@}
 
 
 \section{Power and sample size calculation}
