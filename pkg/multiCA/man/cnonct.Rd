@@ -4,19 +4,27 @@
 \alias{cnonct}
 \title{Non-centrality parameter for chi-square distribution}
 \usage{
-cnonct(df, alpha, beta)
+cnonct(x, p, df)
 }
 \arguments{
+\item{x}{a numeric value at which the distribution was evaluated}
+
+\item{p}{a numeric value giving the cumulative probability at \code{x}}
+
 \item{df}{an integer giving the degrees of freedom of the chi-square variable}
-
-\item{alpha}{a numeric value giving the significance level of the test}
-
-\item{beta}{a numeric value giving the desired type II error (1-\code{beta} is the power)}
 }
 \description{
-Calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level. This is often needed for sample size calculation for chi-square based tests.
+Calculates the non-centrality parameter for a chi-square distribution for a given 
+quantile. This is often needed for sample size calculation for chi-square based tests.
+}
+\details{
+The function is modeled after the SAS function CNONCT. If \code{p} is larger 
+than the cumulative probability of the central chi-square distribution at \code{x}, then
+there is no solution and NA is returned.
 }
 \examples{
-cnonct(6, 0.05, 0.2)
+(ncp <- cnonct(qchisq(0.95, df=10), 0.8, df=10))
+## check
+pchisq(qchisq(0.95, df=10), df=10, ncp=ncp)  ## 0.8
 }
 

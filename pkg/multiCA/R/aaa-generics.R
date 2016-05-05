@@ -6,7 +6,7 @@
 #'
 #'
 #'@export
-#'@param x a two-dimensional matrix or a formula
+#'@param x a two-dimensional matrix of event counts with the outcomes as rows and ordered groups as columns.
 #'@param \dots other arguments 
 #'@return a list with two components
 #' \item{overall}{an object of class "htest" with the results of the overall test}

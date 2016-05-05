@@ -14,15 +14,15 @@ multiCA.test(x, ...)
 \method{multiCA.test}{formula}(formula, data, subset, na.action, weights, ...)
 }
 \arguments{
-\item{x}{a two-dimensional matrix or a formula}
+\item{x}{a two-dimensional matrix of event counts with the outcomes as rows and ordered groups as columns.}
 
-\item{scores}{numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values}
+\item{scores}{non-decreaseing numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values}
 
 \item{outcomes}{integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.}
 
 \item{p.adjust.method}{character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "holm-schaffer" otherwise.}
 
-\item{formula}{a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the cateogrical outcome and \code{group} is the grouping variableover which the trend is tested.}
+\item{formula}{a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the cateogrical outcome and \code{group} is the grouping variable over which the trend is tested.}
 
 \item{data}{an optional matrix or data frame containing the variables in the formula \code{formula}. By default the variables are taken from \code{environment(formula).}}
 

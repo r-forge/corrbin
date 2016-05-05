@@ -39,7 +39,7 @@
 
 #'@rdname multiCA.test
 #'@method multiCA.test default
-#'@param scores numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
+#'@param scores non-decreaseing numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
 #'@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.
 #'@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "holm-schaffer" otherwise.
 #'@export
@@ -102,7 +102,7 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
 
 #'@rdname multiCA.test
 #'@method multiCA.test formula
-#'@param formula a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the cateogrical outcome and \code{group} is the grouping variableover which the trend is tested.
+#'@param formula a formula of the form \code{outcome ~ group} where \code{outcome} is a factor representing the cateogrical outcome and \code{group} is the grouping variable over which the trend is tested.
 #'@param data  an optional matrix or data frame containing the variables in the formula \code{formula}. By default the variables are taken from \code{environment(formula).}
 #'@param subset an optional vector specifying a subset of observations to be used.
 #'@param na.action      a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").
@@ -180,19 +180,223 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
 
 #' Non-centrality parameter for chi-square distribution
 #'
-#' Calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level. This is often needed for sample size calculation for chi-square based tests.
+#' Calculates the non-centrality parameter for a chi-square distribution for a given 
+#' quantile. This is often needed for sample size calculation for chi-square based tests.
+#'
+#'@details The function is modeled after the SAS function CNONCT. If \code{p} is larger 
+#' than the cumulative probability of the central chi-square distribution at \code{x}, then
+#' there is no solution and NA is returned.
+#'
+#'@param x a numeric value at which the distribution was evaluated
+#'@param p a numeric value giving the cumulative probability at \code{x}
 #'@param df an integer giving the degrees of freedom of the chi-square variable
-#'@param alpha a numeric value giving the significance level of the test
-#'@param beta a numeric value giving the desired type II error (1-\code{beta} is the power)
 #'@examples
-#' cnonct(6, 0.05, 0.2)
+#' (ncp <- cnonct(qchisq(0.95, df=10), 0.8, df=10))
+#' ## check
+#' pchisq(qchisq(0.95, df=10), df=10, ncp=ncp)  ## 0.8
 #'@export
 
-cnonct <- function(df, alpha, beta){
-  crit.value <- qchisq(alpha, df=df, lower.tail=FALSE)
-  
-  f <- function(ncp){pchisq(crit.value, df=df, ncp=pmax(0,ncp)) - beta}
+cnonct <- function(x, p, df){
+ 
+  if (pchisq(x, df=df) < p) return(NA)
+
+  f <- function(ncp){pchisq(x, df=df, ncp=pmax(0,ncp)) - p}
 
   res <- uniroot(f, interval=c(0, 100), extendInt="downX")
   res$root
 }
+
+#' Power calculations for the multinomial Cochran-Armitage trend test
+#'
+#' Given the probabilities of outcomes, compute the power of the overall multinomial 
+#' Cochran-Armitage trend test or determine the sample size to obtain a target power. 
+#'
+#'@details 
+#' The distribution of the outcomes can be specified in two ways: either the full matrix of #' outcome probabilities \code{pmatrix} can be specified, or exactly two of the parameters #' \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} must be specified, while #' #' the other two should be set to \code{NULL}.
+#' 
+#' @param N integer, the total sample size of the study. If \code{NULL} then \code{power} needs to be specified.
+#' @param power target power. If \code{NULL} then \code{N} needs to be specified.
+#' @param pmatrix numeric matrix of hypothesized outcome probabilities in each group,  with #' the outcomes as rows and ordered groups as columns. The columns should add up to 1. 
+#' @param p.ave numeric vector of average probability of each outcome over the groups  
+#' weighted by \code{n.prop}.
+#' @param p.start,p.end numeric vectors of the probability of each outcome for the  
+#' first / last ordered group
+#' @param slopes numeric vector of the hypothesized slope of each outcome when regressed  
+#' against the column \code{scores} wiht weights \code{n.prop}
+#' @param scores non-decreasing numeric vector of the same length as the number of ordered groups  
+#' giving the trend test scores. Defaults to linearly increasing values.
+#' @param n.prop numeric vector describing relative sample sizes of the ordered groups.  
+#' Will be normalized to sum to 1. Defaults to equal sample sizes.
+#' @param G integer, number of ordered groups
+#' @param sig.level significance level
+#' @return object of class "power.htest"
+#'
+#' @examples
+#' power.multiCA.test(power=0.8, p.start=c(0.1,0.2,0.3,0.4), p.end=c(0.4, 0.3, 0.2, 0.1), 
+#'                      G=5, n.prop=c(3,2,1,2,3))
+#'
+#' ## Power of stroke study with 100 subjects per year and observed trends
+#' data(stroke)
+#' strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)
+#' power.multiCA.test(N=900, pmatrix=prop.table(strk.mat, margin=2))
+#' @export
+
+power.multiCA.test <- function(N=NULL, power=NULL, pmatrix=NULL, p.ave=NULL, p.start=NULL, 
+                               p.end=NULL, slopes=NULL, scores=1:G, n.prop=rep(1, G),
+                               G=length(p.ave), sig.level=0.05){
+  if (sum(sapply(list(N, power), is.null)) != 1) 
+        stop("exactly one of 'N',  and 'power' must be NULL")
+  if (!is.numeric(sig.level) || any(0 > sig.level | sig.level > 1)) 
+        stop("'sig.level' must be numeric in [0, 1]")
+
+
+  if (!is.null(pmatrix)){
+    K <- nrow(pmatrix)
+    G <- ncol(pmatrix)
+    if (!isTRUE(all.equal(colSums(pmatrix), rep(1, G), 
+                          check.attributes=FALSE, use.names=FALSE))) 
+      stop("pmatrix should have column sums of 1.")
+    
+        if (missing(G)){
+          if (!missing(scores)) G <- length(scores)
+          else if (!missing(n.prop)) G <- length(n.prop)
+          else stop("The number of groups G needs to be specified explicitly or implicitly through the dimensions of pmatrix, the scores, or the n.prop vector.")
+        }
+        if (sum(n.prop) != 1) n.prop <- n.prop/sum(n.prop)
+        cbar <- weighted.mean(scores, w=n.prop)
+        s2 <- sum(n.prop * (scores-cbar)^2)
+    
+    slopes <- as.vector(pmatrix %*% (n.prop * (scores-cbar))) / s2
+    p.ave <- as.vector(pmatrix %*% n.prop)
+  }
+  else {
+   if (sum(sapply(list(p.ave, slopes, p.start, p.end), is.null)) != 2) 
+        stop("Either  pmatrix, or exactly two of 'p.ave', 'slopes', 'p.start', and 'p.end' must be specified (ie not NULL)")
+
+  if (!is.null(p.ave) & !is.null(slopes)){
+    if (length(p.ave) != length(slopes)) 
+      stop("p.ave and slopes should have the same length")
+    K <- length(p.ave)
+    
+        if (missing(G)){
+          if (!missing(scores)) G <- length(scores)
+          else if (!missing(n.prop)) G <- length(n.prop)
+          else stop("The number of groups G needs to be specified explicitly or implicitly through the dimensions of pmatrix, the scores, or the n.prop vector.")
+        }
+        if (sum(n.prop) != 1) n.prop <- n.prop/sum(n.prop)
+        cbar <- weighted.mean(scores, w=n.prop)
+        s2 <- sum(n.prop * (scores-cbar)^2)
+    
+  }
+  else if (!is.null(p.ave) & !is.null(p.start)){
+    if (length(p.ave) != length(p.start)) 
+      stop("p.ave and p.start should have the same length")
+    K <- length(p.ave)
+    
+        if (missing(G)){
+          if (!missing(scores)) G <- length(scores)
+          else if (!missing(n.prop)) G <- length(n.prop)
+          else stop("The number of groups G needs to be specified explicitly or implicitly through the dimensions of pmatrix, the scores, or the n.prop vector.")
+        }
+        if (sum(n.prop) != 1) n.prop <- n.prop/sum(n.prop)
+        cbar <- weighted.mean(scores, w=n.prop)
+        s2 <- sum(n.prop * (scores-cbar)^2)
+    
+    slopes <- (p.start - p.ave) / (scores[1] - cbar)
+  }
+  else if (!is.null(p.ave) & !is.null(p.end)){
+    if (length(p.ave) != length(p.end)) 
+      stop("p.ave and p.end should have the same length")
+    K <- length(p.ave)
+    
+        if (missing(G)){
+          if (!missing(scores)) G <- length(scores)
+          else if (!missing(n.prop)) G <- length(n.prop)
+          else stop("The number of groups G needs to be specified explicitly or implicitly through the dimensions of pmatrix, the scores, or the n.prop vector.")
+        }
+        if (sum(n.prop) != 1) n.prop <- n.prop/sum(n.prop)
+        cbar <- weighted.mean(scores, w=n.prop)
+        s2 <- sum(n.prop * (scores-cbar)^2)
+    
+    slopes <- (p.end - p.ave) / (scores[G] - cbar)
+  }
+  else if (!is.null(p.start) & !is.null(p.end)){
+    if (length(p.start) != length(p.end)) 
+      stop("p.start and p.end should have the same length")
+    K <- length(p.start)
+    
+        if (missing(G)){
+          if (!missing(scores)) G <- length(scores)
+          else if (!missing(n.prop)) G <- length(n.prop)
+          else stop("The number of groups G needs to be specified explicitly or implicitly through the dimensions of pmatrix, the scores, or the n.prop vector.")
+        }
+        if (sum(n.prop) != 1) n.prop <- n.prop/sum(n.prop)
+        cbar <- weighted.mean(scores, w=n.prop)
+        s2 <- sum(n.prop * (scores-cbar)^2)
+    
+    slopes <- (p.end - p.start) / (scores[G] - scores[1])
+    p.ave <- p.start - slopes * (scores[1] - cbar)
+  }
+  else if (!is.null(p.start) & !is.null(slopes)){
+    if (length(p.start) != length(slopes)) 
+      stop("p.start and slopes should have the same length")
+    K <- length(p.start)
+    
+        if (missing(G)){
+          if (!missing(scores)) G <- length(scores)
+          else if (!missing(n.prop)) G <- length(n.prop)
+          else stop("The number of groups G needs to be specified explicitly or implicitly through the dimensions of pmatrix, the scores, or the n.prop vector.")
+        }
+        if (sum(n.prop) != 1) n.prop <- n.prop/sum(n.prop)
+        cbar <- weighted.mean(scores, w=n.prop)
+        s2 <- sum(n.prop * (scores-cbar)^2)
+    
+    p.ave <- p.start - slopes * (scores[1] - cbar)
+  }
+  else if (!is.null(p.end) & !is.null(slopes)){
+    if (length(p.end) != length(slopes)) 
+      stop("p.end and slopes should have the same length")
+    K <- length(p.end)
+    
+        if (missing(G)){
+          if (!missing(scores)) G <- length(scores)
+          else if (!missing(n.prop)) G <- length(n.prop)
+          else stop("The number of groups G needs to be specified explicitly or implicitly through the dimensions of pmatrix, the scores, or the n.prop vector.")
+        }
+        if (sum(n.prop) != 1) n.prop <- n.prop/sum(n.prop)
+        cbar <- weighted.mean(scores, w=n.prop)
+        s2 <- sum(n.prop * (scores-cbar)^2)
+    
+    p.ave <- p.end - slopes * (scores[G] - cbar)
+  }
+    
+  
+    if (!isTRUE(all.equal(sum(slopes), 0, check.attributes=FALSE, use.names=FALSE))) 
+        stop("Implied or specified values of slopes should sum to 0.")
+    if (!isTRUE(all.equal(sum(p.ave), 1, check.attributes=FALSE, use.names=FALSE))) 
+        stop("Implied or specified values of p.ave should sum to 1.")
+    check <- outer(1:K, 1:G, function(j,i)p.ave[j] + slopes[j]*(scores[i]-cbar))
+    if (!all(check >= 0) || !(all(check <=1)))
+      stop("The parameters do not define a valid probability matrix")  
+  
+}
+
+  
+  df <- K - 1
+  crit <- qchisq(sig.level, df=df, lower.tail=FALSE)
+  ncp0 <- sum(slopes^2 / p.ave) * s2 
+  if (missing(power)){
+    ncp <- ncp0 * N
+    power <- pchisq(crit, df=df, ncp=ncp, lower.tail=FALSE)
+   } 
+   else {
+     ncp <- cnonct(crit, p=1-power, df=df)
+     N <-  ncp / ncp0
+   }
+
+   res <- structure(list(n = N, n.prop = n.prop, p.ave=p.ave, slopes = slopes, G = G, 
+                         sig.level = sig.level, power = power,  
+                         method = "Multinomial Cochran-Armitage trend test"), 
+                     class = "power.htest")
+   res
+   }
