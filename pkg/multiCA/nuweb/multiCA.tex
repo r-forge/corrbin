@@ -155,7 +155,7 @@ The actual calculation of the test statitistic, overall and unadjusted individua
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb3}{3}\NWlink{nuweb5b}{, 5b}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb3}{3}\NWlink{nuweb5b}{, 5b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -464,7 +464,7 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \mbox{}\verb@@\\
 \mbox{}\verb@  f <- function(ncp){pchisq(x, df=df, ncp=pmax(0,ncp)) - p}@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@  res <- uniroot(f, interval=c(0, 100), extendInt="downX")@\\
+\mbox{}\verb@  res <- uniroot(f, interval=c(0, 100), extendInt="downX", tol=.Machine$double.eps^0.5)@\\
 \mbox{}\verb@  res$root@\\
 \mbox{}\verb@}@\\
 \mbox{}\verb@@{\NWsep}
@@ -473,12 +473,36 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@cnonct@\nobreak\ \NWlink{nuweb?}{?}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@cnonct@\nobreak\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
 \begin{flushleft} \small\label{scrap10}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../tests/testthat/test_power.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  context("Power calculations")@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  test_that("non-centrality calculation works", {@\\
+\mbox{}\verb@    x <- qchisq(0.75, df=10) @\\
+\mbox{}\verb@    expect_equal(cnonct(x, df=10, p=0.75), 0)@\\
+\mbox{}\verb@    expect_equal(cnonct(x, df=10, p=0.9), NA)@\\
+\mbox{}\verb@    expect_equal(pchisq(x, df=10, ncp=cnonct(x, p=0.6, df=10)), 0.6)@\\
+\mbox{}\verb@  })@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@cnonct@\nobreak\ \NWlink{nuweb7}{7}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\begin{flushleft} \small\label{scrap11}\raggedright\small
 \NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -552,7 +576,52 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@power.multiCA.test@\nobreak\ \NWtxtIdentsNotUsed.\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}, \verb@cnonct@\nobreak\ \NWlink{nuweb7}{7}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@power.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}, \verb@cnonct@\nobreak\ \NWlink{nuweb7}{7}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\begin{flushleft} \small\label{scrap12}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../tests/testthat/test_power.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  test_that("calculated power is independent of the input format", {@\\
+\mbox{}\verb@    pmat <- rbind(seq(0.1, 0.4, length=5),@\\
+\mbox{}\verb@                  seq(0.2, 0.3, length=5),@\\
+\mbox{}\verb@                  seq(0.3, 0.1, length=5),@\\
+\mbox{}\verb@                  seq(0.4, 0.2, length=5))@\\
+\mbox{}\verb@    res0 <- power.multiCA.test(N=100, pmatrix=pmat)@\\
+\mbox{}\verb@    expect_equal(res0, power.multiCA.test(N=100, p.start=pmat[,1], p.end=pmat[,5], G=5))@\\
+\mbox{}\verb@    expect_equal(res0, power.multiCA.test(N=100, p.start=pmat[,1], p.ave=rowMeans(pmat),@\\
+\mbox{}\verb@                 G=5))@\\
+\mbox{}\verb@    expect_equal(res0, power.multiCA.test(N=100, p.end=pmat[,5], p.ave=rowMeans(pmat),@\\
+\mbox{}\verb@                 G=5))@\\
+\mbox{}\verb@    expect_equal(res0, power.multiCA.test(N=100, p.ave=rowMeans(pmat), @\\
+\mbox{}\verb@                 slopes=pmat[,2]-pmat[,1], G=5))@\\
+\mbox{}\verb@    expect_equal(res0, power.multiCA.test(N=100, p.start=pmat[,1], @\\
+\mbox{}\verb@                 slopes=pmat[,2]-pmat[,1], G=5))@\\
+\mbox{}\verb@    expect_equal(res0, power.multiCA.test(N=100, p.end=pmat[,5], @\\
+\mbox{}\verb@                 slopes=pmat[,2]-pmat[,1], G=5))@\\
+\mbox{}\verb@  })@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  test_that("Power is computed correctly", {@\\
+\mbox{}\verb@    pmat <- rbind(seq(0.1, 0.4, length=5),@\\
+\mbox{}\verb@                  seq(0.2, 0.3, length=5),@\\
+\mbox{}\verb@                  seq(0.3, 0.1, length=5),@\\
+\mbox{}\verb@                  seq(0.4, 0.2, length=5))@\\
+\mbox{}\verb@    res0 <- power.multiCA.test(N=100, pmatrix=pmat)@\\
+\mbox{}\verb@    expect_equal(100, power.multiCA.test(power=res0$power, pmatrix=pmat)$n)@\\
+\mbox{}\verb@    expect_equal(0.1, power.multiCA.test(N=100, p.ave=c(0.5, rep(0.1, 5)),@\\
+\mbox{}\verb@                 slopes=rep(0,6), G=6, sig.level=0.1)$power)@\\
+\mbox{}\verb@  })@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}, \verb@power.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -562,7 +631,7 @@ When \texttt{slopes} is not specified, then a linear trend for each outcome is a
   p_{ij} = \bar{p}_j + \beta_j (c_i-\bar{c})
 \end{equation*}
 
-\begin{flushleft} \small\label{scrap11}\raggedright\small
+\begin{flushleft} \small\label{scrap13}\raggedright\small
 \NWtarget{nuweb?}{} $\langle\,${\itshape Calculate p.ave and slopes from specification}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -637,7 +706,7 @@ When \texttt{slopes} is not specified, then a linear trend for each outcome is a
 \end{list}
 \vspace{4ex}
 \end{flushleft}
-\begin{flushleft} \small\label{scrap12}\raggedright\small
+\begin{flushleft} \small\label{scrap14}\raggedright\small
 \NWtarget{nuweb?}{} $\langle\,${\itshape Get cbar and s2}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -661,9 +730,40 @@ When \texttt{slopes} is not specified, then a linear trend for each outcome is a
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+\begin{flushleft} \small\label{scrap15}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../tests/testthat/test_power.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  test_that("G is properly identified", {@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2)))@\\
+\mbox{}\verb@    expect_equal(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2),@\\
+\mbox{}\verb@                 n.prop=rep(1,4))$G, 4)@\\
+\mbox{}\verb@    expect_equal(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2),@\\
+\mbox{}\verb@                 scores=1:4)$G, 4)@\\
+\mbox{}\verb@  })@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  test_that("Scaling of n.prop does not matter", {@\\
+\mbox{}\verb@    expect_equal(@\\
+\mbox{}\verb@       power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2), G=6,@\\
+\mbox{}\verb@                               n.prop=rep(1,6)),@\\
+\mbox{}\verb@       power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2), G=6,@\\
+\mbox{}\verb@                               n.prop=rep(2,6)))@\\
+\mbox{}\verb@  })@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}, \verb@power.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
 To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s implied by a linear trend should be between 0 and 1. 
 
-\begin{flushleft} \small\label{scrap13}\raggedright\small
+\begin{flushleft} \small\label{scrap16}\raggedright\small
 \NWtarget{nuweb?}{} $\langle\,${\itshape Check validity of p.ave and slopes}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -686,12 +786,35 @@ To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s im
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+\begin{flushleft} \small\label{scrap17}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../tests/testthat/test_power.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  test_that("p.ave and slopes are checked for validity", {@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.3), p.end=c(0.8, 0.2), G=3))@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.ave=c(0.1, 0.9), slopes=c(0.1, -0.1), G=4))@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.ave=c(0.4, 0.6), slopes=c(0.1, 0.1), G=3))@\\
+\mbox{}\verb@  })@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}, \verb@power.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
 \section{Files}
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../R/aaa-generics.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2a}{2a}.}
 \item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
+}
+\item \verb@"../tests/testthat/test_power.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 }
 \end{list}}
 
@@ -711,11 +834,11 @@ To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s im
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \verb@.multiCA.test@: \underline{\NWlink{nuweb2b}{2b}}\NWlink{nuweb3}{, 3}\NWlink{nuweb5b}{, 5b}\NWlink{nuweb?}{, ?}.
-\item \verb@cnonct@: \underline{\NWlink{nuweb7}{7}}\NWlink{nuweb?}{, ?}.
+\item \verb@.multiCA.test@: \underline{\NWlink{nuweb2b}{2b}}\NWlink{nuweb3}{, 3}\NWlink{nuweb5b}{, 5b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \verb@cnonct@: \underline{\NWlink{nuweb7}{7}}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \verb@multiCA.test.default@: \underline{\NWlink{nuweb3}{3}}.
 \item \verb@multiCA.test.formula@: \underline{\NWlink{nuweb4a}{4a}}.
-\item \verb@power.multiCA.test@: \underline{\NWlink{nuweb?}{?}}.
+\item \verb@power.multiCA.test@: \underline{\NWlink{nuweb?}{?}}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \end{list}}
 
 \end{document}

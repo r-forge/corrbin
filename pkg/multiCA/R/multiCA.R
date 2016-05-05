@@ -202,7 +202,7 @@ cnonct <- function(x, p, df){
 
   f <- function(ncp){pchisq(x, df=df, ncp=pmax(0,ncp)) - p}
 
-  res <- uniroot(f, interval=c(0, 100), extendInt="downX")
+  res <- uniroot(f, interval=c(0, 100), extendInt="downX", tol=.Machine$double.eps^0.5)
   res$root
 }
 
