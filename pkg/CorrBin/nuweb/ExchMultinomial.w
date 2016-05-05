@@ -104,7 +104,8 @@ level uses a different sample-size distribution for averaging.
 #'@@return a list with an array of estimates for each treatment. For a multinomial distribution with
 #' \eqn{K+1} categories the arrays will have either \eqn{K+1} or {K} dimensions, depending on whether 
 #' cluster-size specific estimates (\code{type="cluster"}) or pooled estimates 
-#' (\code{type="averaged"} or \code{type="mc"}) are requested. For the cluster-size specific estimates #' the first dimension is the cluster-size. Each additional dimension is a possible outcome. 
+#' (\code{type="averaged"} or \code{type="mc"}) are requested. For the cluster-size specific estimates 
+#' the first dimension is the cluster-size. Each additional dimension is a possible outcome. 
 #'
 #'@@seealso \code{\link{mc.est}} for estimating the distribution under marginal compatibility,
 #'\code{\link{uniprobs}} and \code{\link{multi.corr}} for extracting the univariate marginal event
