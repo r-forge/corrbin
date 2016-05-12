@@ -154,8 +154,8 @@ The actual calculation of the test statitistic, overall and unadjusted individua
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb3}{3}\NWlink{nuweb5b}{, 5b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb3}{3}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -197,7 +197,7 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 \mbox{}\verb@              data.name = deparse(substitute(x)))@\\
 \mbox{}\verb@  class(res) <- "htest"@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@  @\hbox{$\langle\,${\itshape Calculate adjusted p-values}\nobreak\ {\footnotesize \NWlink{nuweb4b}{4b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@  @\hbox{$\langle\,${\itshape Calculate adjusted p-values}\nobreak\ {\footnotesize \NWlink{nuweb5a}{5a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@  return(list(overall = res, individual = indiv.res))  @\\
 \mbox{}\verb@}@\\
@@ -206,7 +206,7 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.default@\nobreak\ \NWtxtIdentsNotUsed.\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}.
 \item{}
 \end{list}
@@ -253,16 +253,49 @@ with the default method. The code is based on \texttt{t.test.formula}.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@multiCA.test.formula@\nobreak\ \NWtxtIdentsNotUsed.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\begin{flushleft} \small\label{scrap5}\raggedright\small
+\NWtarget{nuweb4b}{} \verb@"../tests/testthat/test_overall.R"@\nobreak\ {\footnotesize {4b}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  context("Multinomial CA test")@\\
+\mbox{}\verb@  test_that("Overall test works on stroke data", {@\\
+\mbox{}\verb@    data(stroke)@\\
+\mbox{}\verb@    res0 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="none")@\\
+\mbox{}\verb@    expect_equivalent(res0$overall$statistic, 40.06580869)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)@\\
+\mbox{}\verb@    res1 <- multiCA.test(strk.mat, p.adjust="none")@\\
+\mbox{}\verb@    expect_equal(res0$overall[c("statistic","paramater", "p.value")], @\\
+\mbox{}\verb@                 res1$overall[c("statistic","paramater", "p.value")])    @\\
+\mbox{}\verb@    expect_equivalent(res0$individual, res1$individual)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    res2 <- multiCA.test(strk.mat, outcomes=1:5, p.adjust="none")@\\
+\mbox{}\verb@    expect_equal(res1$overall[c("statistic","paramater", "p.value")], @\\
+\mbox{}\verb@                 res2$overall[c("statistic","paramater", "p.value")])    @\\
+\mbox{}\verb@    expect_equivalent(res1$individual, res2$individual)@\\
+\mbox{}\verb@  })@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb4b}{4b}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb?}{, ?}.
+
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
 \section{Multiple testing adjusted inference for individual outcomes}
 
-\begin{flushleft} \small\label{scrap5}\raggedright\small
-\NWtarget{nuweb4b}{} $\langle\,${\itshape Calculate adjusted p-values}\nobreak\ {\footnotesize {4b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap6}\raggedright\small
+\NWtarget{nuweb5a}{} $\langle\,${\itshape Calculate adjusted p-values}\nobreak\ {\footnotesize {5a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -277,10 +310,11 @@ with the default method. The code is based on \texttt{t.test.formula}.
 \mbox{}\verb@  if (p.adjust.method=="none") {@\\
 \mbox{}\verb@    indiv.res <- testres$indiv.p.value@\\
 \mbox{}\verb@  } else if (p.adjust.method=="closed.set") {@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Closed set adjustment}\nobreak\ {\footnotesize \NWlink{nuweb5b}{5b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Closed set adjustment}\nobreak\ {\footnotesize \NWlink{nuweb7}{7}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@  } else if (p.adjust.method=="holm-schaffer") {@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Holm-Schaffer adjustment}\nobreak\ {\footnotesize \NWlink{nuweb5a}{5a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Holm-Schaffer adjustment}\nobreak\ {\footnotesize \NWlink{nuweb5b}{5b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@  } @\\
+\mbox{}\verb@  attr(indiv.res, "method") <- p.adjust.method@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -303,8 +337,8 @@ p^{HS}_{(j)} = \max_{s\leq j}(\min( t_s p_{(s)}, 1))\\
 \end{gather*}
 
 
-\begin{flushleft} \small\label{scrap6}\raggedright\small
-\NWtarget{nuweb5a}{} $\langle\,${\itshape Holm-Schaffer adjustment}\nobreak\ {\footnotesize {5a}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap7}\raggedright\small
+\NWtarget{nuweb5b}{} $\langle\,${\itshape Holm-Schaffer adjustment}\nobreak\ {\footnotesize {5b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -318,7 +352,40 @@ p^{HS}_{(j)} = \max_{s\leq j}(\min( t_s p_{(s)}, 1))\\
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb4b}{4b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb5a}{5a}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\begin{flushleft} \small\label{scrap8}\raggedright\small
+\NWtarget{nuweb5c}{} \verb@"../tests/testthat/test_overall.R"@\nobreak\ {\footnotesize {5c}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  test_that("Holm-Schaffer consistent with Holm", {@\\
+\mbox{}\verb@    data(stroke)@\\
+\mbox{}\verb@    res0 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="none")@\\
+\mbox{}\verb@    expect_equal(attr(res0$individual, "method"), "none")@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    res1 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="holm-schaffer")@\\
+\mbox{}\verb@    expect_equal(attr(res1$individual, "method"), "holm-schaffer")@\\
+\mbox{}\verb@    expect_equivalent(sort(p.adjust(res0$individual, method="holm"))[-2],@\\
+\mbox{}\verb@                      sort(res1$individual)[-2])    @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    res0a <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="none", @\\
+\mbox{}\verb@                          outcomes=1:4)@\\
+\mbox{}\verb@    res1a <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="holm-schaffer", @\\
+\mbox{}\verb@                          outcomes=1:4)@\\
+\mbox{}\verb@    expect_equivalent(sort(p.adjust(res0a$individual, method="holm")),@\\
+\mbox{}\verb@                      sort(res1a$individual))    @\\
+\mbox{}\verb@})@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb4b}{4b}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb?}{, ?}.
 
 \item{}
 \end{list}
@@ -332,8 +399,8 @@ In a closed testing procedure an elementary hypothesis $H_{0j}$ is rejected if a
 \end{equation}
 where $p(\setJ) = P(W_j \geq \chi^2_{|\setJ|})$ is the unadjusted p-value for testing $H_{0\setJ}$. From the logical constraints sets $\setJ$ of cardinality $K-1$ do not need to be considered.
 
-\begin{flushleft} \small\label{scrap7}\raggedright\small
-\NWtarget{nuweb5b}{} $\langle\,${\itshape Closed set adjustment}\nobreak\ {\footnotesize {5b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap9}\raggedright\small
+\NWtarget{nuweb7}{} $\langle\,${\itshape Closed set adjustment}\nobreak\ {\footnotesize {7}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -346,8 +413,32 @@ where $p(\setJ) = P(W_j \geq \chi^2_{|\setJ|})$ is the unadjusted p-value for te
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb4b}{4b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb5a}{5a}.
 \item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\begin{flushleft} \small\label{scrap10}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../tests/testthat/test_overall.R"@\nobreak\ {\footnotesize {?}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@  test_that("Closed set works with 3 outcomes", {@\\
+\mbox{}\verb@    data(stroke)@\\
+\mbox{}\verb@    strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)    @\\
+\mbox{}\verb@    res0 <- multiCA.test(strk.mat[1:3,], p.adjust="none")@\\
+\mbox{}\verb@    res1 <- multiCA.test(strk.mat[1:3,], p.adjust="closed.set")@\\
+\mbox{}\verb@    expect_equivalent(pmax(res0$individual, res0$overall$p.value),@\\
+\mbox{}\verb@                      res1$individual)    @\\
+\mbox{}\verb@})@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb4b}{4b}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb?}{, ?}.
+
 \item{}
 \end{list}
 \vspace{4ex}
@@ -355,8 +446,8 @@ where $p(\setJ) = P(W_j \geq \chi^2_{|\setJ|})$ is the unadjusted p-value for te
 The actual adjustment calculation is based on code from \texttt{cherry::closed}, removing
 the $K-1$ element sets if the full set of hypotheses is being tested.
 
-\begin{flushleft} \small\label{scrap8}\raggedright\small
-\NWtarget{nuweb5c}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {5c}}$\equiv$
+\begin{flushleft} \small\label{scrap11}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -413,7 +504,7 @@ the $K-1$ element sets if the full set of hypotheses is being tested.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 
 \item{}
 \end{list}
@@ -435,8 +526,8 @@ where $s_\nu^2= \sum_{i=1}^G \nu_i(c_i-\bar{c})^2=s^2/N$ and $\beta_j=\big[\sum_
 
 A non-centrality parameter calculation function can be useful by itself. It calculates the non-centrality parameter for a chi-square distribution that achieves the target power at a given significance level.
 
-\begin{flushleft} \small\label{scrap9}\raggedright\small
-\NWtarget{nuweb7}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {7}}$\equiv$
+\begin{flushleft} \small\label{scrap12}\raggedright\small
+\NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -472,13 +563,13 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@cnonct@\nobreak\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
-\begin{flushleft} \small\label{scrap10}\raggedright\small
+\begin{flushleft} \small\label{scrap13}\raggedright\small
 \NWtarget{nuweb?}{} \verb@"../tests/testthat/test_power.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -497,12 +588,12 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtFileDefBy\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@cnonct@\nobreak\ \NWlink{nuweb7}{7}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@cnonct@\nobreak\ \NWlink{nuweb?}{?}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
-\begin{flushleft} \small\label{scrap11}\raggedright\small
+\begin{flushleft} \small\label{scrap14}\raggedright\small
 \NWtarget{nuweb?}{} \verb@"../R/multiCA.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -575,13 +666,13 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@power.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}, \verb@cnonct@\nobreak\ \NWlink{nuweb7}{7}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@power.multiCA.test@\nobreak\ \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.\item \NWtxtIdentsUsed\nobreak\  \verb@.multiCA.test@\nobreak\ \NWlink{nuweb2b}{2b}, \verb@cnonct@\nobreak\ \NWlink{nuweb?}{?}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
-\begin{flushleft} \small\label{scrap12}\raggedright\small
+\begin{flushleft} \small\label{scrap15}\raggedright\small
 \NWtarget{nuweb?}{} \verb@"../tests/testthat/test_power.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -631,7 +722,7 @@ When \texttt{slopes} is not specified, then a linear trend for each outcome is a
   p_{ij} = \bar{p}_j + \beta_j (c_i-\bar{c})
 \end{equation*}
 
-\begin{flushleft} \small\label{scrap13}\raggedright\small
+\begin{flushleft} \small\label{scrap16}\raggedright\small
 \NWtarget{nuweb?}{} $\langle\,${\itshape Calculate p.ave and slopes from specification}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -706,7 +797,7 @@ When \texttt{slopes} is not specified, then a linear trend for each outcome is a
 \end{list}
 \vspace{4ex}
 \end{flushleft}
-\begin{flushleft} \small\label{scrap14}\raggedright\small
+\begin{flushleft} \small\label{scrap17}\raggedright\small
 \NWtarget{nuweb?}{} $\langle\,${\itshape Get cbar and s2}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -730,13 +821,14 @@ When \texttt{slopes} is not specified, then a linear trend for each outcome is a
 \end{list}
 \vspace{4ex}
 \end{flushleft}
-\begin{flushleft} \small\label{scrap15}\raggedright\small
+\begin{flushleft} \small\label{scrap18}\raggedright\small
 \NWtarget{nuweb?}{} \verb@"../tests/testthat/test_power.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@  test_that("G is properly identified", {@\\
-\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2)))@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2)),@\\
+\mbox{}\verb@                 "G needs to be specified")@\\
 \mbox{}\verb@    expect_equal(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2),@\\
 \mbox{}\verb@                 n.prop=rep(1,4))$G, 4)@\\
 \mbox{}\verb@    expect_equal(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2),@\\
@@ -763,7 +855,7 @@ When \texttt{slopes} is not specified, then a linear trend for each outcome is a
 \end{flushleft}
 To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s implied by a linear trend should be between 0 and 1. 
 
-\begin{flushleft} \small\label{scrap16}\raggedright\small
+\begin{flushleft} \small\label{scrap19}\raggedright\small
 \NWtarget{nuweb?}{} $\langle\,${\itshape Check validity of p.ave and slopes}\nobreak\ {\footnotesize {?}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -786,15 +878,20 @@ To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s im
 \end{list}
 \vspace{4ex}
 \end{flushleft}
-\begin{flushleft} \small\label{scrap17}\raggedright\small
+\begin{flushleft} \small\label{scrap20}\raggedright\small
 \NWtarget{nuweb?}{} \verb@"../tests/testthat/test_power.R"@\nobreak\ {\footnotesize {?}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@  test_that("p.ave and slopes are checked for validity", {@\\
-\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.3), p.end=c(0.8, 0.2), G=3))@\\
-\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.ave=c(0.1, 0.9), slopes=c(0.1, -0.1), G=4))@\\
-\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.ave=c(0.4, 0.6), slopes=c(0.1, 0.1), G=3))@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.3), p.end=c(0.8, 0.2), G=3),@\\
+\mbox{}\verb@                "slopes should sum to 0")@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.ave=c(0.1, 0.8), slopes=c(0.1, -0.1), G=4),@\\
+\mbox{}\verb@                  "p.ave should sum to 1")@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.ave=c(0.1, 0.9), slopes=c(0.1, -0.1), G=4),@\\
+\mbox{}\verb@                  "valid probability matrix")@\\
+\mbox{}\verb@    expect_error(power.multiCA.test(N=100, p.ave=c(0.4, 0.6), slopes=c(0.1, 0.1), G=3),@\\
+\mbox{}\verb@                "slopes should sum to 0")@\\
 \mbox{}\verb@  })@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
@@ -812,7 +909,9 @@ To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s im
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../R/aaa-generics.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2a}{2a}.}
-\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}.
+\item \verb@"../R/multiCA.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb2b}{2b}\NWlink{nuweb3}{, 3}\NWlink{nuweb4a}{, 4a}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+}
+\item \verb@"../tests/testthat/test_overall.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb4b}{4b}\NWlink{nuweb5c}{, 5c}\NWlink{nuweb?}{, ?}.
 }
 \item \verb@"../tests/testthat/test_power.R"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb?}{?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 }
@@ -822,20 +921,20 @@ To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s im
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Calculate adjusted p-values\nobreak\ {\footnotesize \NWlink{nuweb4b}{4b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb3}{3}.}
+\item $\langle\,$Calculate adjusted p-values\nobreak\ {\footnotesize \NWlink{nuweb5a}{5a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb3}{3}.}
 \item $\langle\,$Calculate p.ave and slopes from specification\nobreak\ {\footnotesize \NWlink{nuweb?}{?}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb?}{?}.}
 \item $\langle\,$Check validity of p.ave and slopes\nobreak\ {\footnotesize \NWlink{nuweb?}{?}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb?}{?}.}
-\item $\langle\,$Closed set adjustment\nobreak\ {\footnotesize \NWlink{nuweb5b}{5b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb4b}{4b}.}
+\item $\langle\,$Closed set adjustment\nobreak\ {\footnotesize \NWlink{nuweb7}{7}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb5a}{5a}.}
 \item $\langle\,$Get cbar and s2\nobreak\ {\footnotesize \NWlink{nuweb?}{?}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb?}{?}.}
-\item $\langle\,$Holm-Schaffer adjustment\nobreak\ {\footnotesize \NWlink{nuweb5a}{5a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb4b}{4b}.}
+\item $\langle\,$Holm-Schaffer adjustment\nobreak\ {\footnotesize \NWlink{nuweb5b}{5b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb5a}{5a}.}
 \end{list}}
 
 \section{Identifiers}
 
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \verb@.multiCA.test@: \underline{\NWlink{nuweb2b}{2b}}\NWlink{nuweb3}{, 3}\NWlink{nuweb5b}{, 5b}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
-\item \verb@cnonct@: \underline{\NWlink{nuweb7}{7}}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \verb@.multiCA.test@: \underline{\NWlink{nuweb2b}{2b}}\NWlink{nuweb3}{, 3}\NWlink{nuweb7}{, 7}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
+\item \verb@cnonct@: \underline{\NWlink{nuweb?}{?}}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.
 \item \verb@multiCA.test.default@: \underline{\NWlink{nuweb3}{3}}.
 \item \verb@multiCA.test.formula@: \underline{\NWlink{nuweb4a}{4a}}.
 \item \verb@power.multiCA.test@: \underline{\NWlink{nuweb?}{?}}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}\NWlink{nuweb?}{, ?}.

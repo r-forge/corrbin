@@ -95,6 +95,7 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
           indiv.res <- pmin(1, cummax((length(outcomes) - s + 1L) * testres$indiv.p.value[o]))[ro]
       
     } 
+    attr(indiv.res, "method") <- p.adjust.method
   
 
   return(list(overall = res, individual = indiv.res))  

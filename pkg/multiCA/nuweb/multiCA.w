@@ -195,6 +195,27 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
 }
 @| multiCA.test.formula@}
 
+@O ../tests/testthat/test_overall.R @{
+  context("Multinomial CA test")
+  test_that("Overall test works on stroke data", {
+    data(stroke)
+    res0 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="none")
+    expect_equivalent(res0$overall$statistic, 40.06580869)
+
+    strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)
+    res1 <- multiCA.test(strk.mat, p.adjust="none")
+    expect_equal(res0$overall[c("statistic","paramater", "p.value")], 
+                 res1$overall[c("statistic","paramater", "p.value")])    
+    expect_equivalent(res0$individual, res1$individual)
+
+    res2 <- multiCA.test(strk.mat, outcomes=1:5, p.adjust="none")
+    expect_equal(res1$overall[c("statistic","paramater", "p.value")], 
+                 res2$overall[c("statistic","paramater", "p.value")])    
+    expect_equivalent(res1$individual, res2$individual)
+  })
+@}
+
+
 \section{Multiple testing adjusted inference for individual outcomes}
 
 @D Calculate adjusted p-values @{
@@ -213,6 +234,7 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
   } else if (p.adjust.method=="holm-schaffer") {
     @< Holm-Schaffer adjustment @>
   } 
+  attr(indiv.res, "method") <- p.adjust.method
 @}
 
 \subsection{Holm-Schaffer approach}
@@ -234,6 +256,26 @@ p^{HS}_{(j)} = \max_{s\leq j}(\min( t_s p_{(s)}, 1))\\
     indiv.res <- pmin(1, cummax((length(outcomes) - s + 1L) * testres$indiv.p.value[o]))[ro]
 @}
 
+@O ../tests/testthat/test_overall.R @{
+  test_that("Holm-Schaffer consistent with Holm", {
+    data(stroke)
+    res0 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="none")
+    expect_equal(attr(res0$individual, "method"), "none")
+
+    res1 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="holm-schaffer")
+    expect_equal(attr(res1$individual, "method"), "holm-schaffer")
+    expect_equivalent(sort(p.adjust(res0$individual, method="holm"))[-2],
+                      sort(res1$individual)[-2])    
+
+    res0a <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="none", 
+                          outcomes=1:4)
+    res1a <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="holm-schaffer", 
+                          outcomes=1:4)
+    expect_equivalent(sort(p.adjust(res0a$individual, method="holm")),
+                      sort(res1a$individual))    
+})
+@}
+
 \subsection{Closed set adjustment}
 
 In a closed testing procedure an elementary hypothesis $H_{0j}$ is rejected if and only if all composite hypotheses $H_{0\setJ}$, where $j\in \setJ$ are rejected. The process can be rewritten using adjusted p-values for $H_{0j}, j=1,\ldots K$:
@@ -247,6 +289,17 @@ where $p(\setJ) = P(W_j \geq \chi^2_{|\setJ|})$ is the unadjusted p-value for te
     .multiCA.test(x, scores, hypotheses)$p.value
   }
   indiv.res <- .p.adjust.closed(mytest, outcomes, remove=full.set)  
+@}
+
+@O ../tests/testthat/test_overall.R @{
+  test_that("Closed set works with 3 outcomes", {
+    data(stroke)
+    strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)    
+    res0 <- multiCA.test(strk.mat[1:3,], p.adjust="none")
+    res1 <- multiCA.test(strk.mat[1:3,], p.adjust="closed.set")
+    expect_equivalent(pmax(res0$individual, res0$overall$p.value),
+                      res1$individual)    
+})
 @}
 
 The actual adjustment calculation is based on code from \texttt{cherry::closed}, removing
@@ -540,7 +593,8 @@ When \texttt{slopes} is not specified, then a linear trend for each outcome is a
 
 @O ../tests/testthat/test_power.R @{
   test_that("G is properly identified", {
-    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2)))
+    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2)),
+                 "G needs to be specified")
     expect_equal(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2),
                  n.prop=rep(1,4))$G, 4)
     expect_equal(power.multiCA.test(N=100, p.start=c(0.1, 0.9), p.end=c(0.8, 0.2),
@@ -570,9 +624,14 @@ To ensure a valid setup, slopes should add up to 0, and all of the $p_{ij}$'s im
 
 @O ../tests/testthat/test_power.R @{
   test_that("p.ave and slopes are checked for validity", {
-    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.3), p.end=c(0.8, 0.2), G=3))
-    expect_error(power.multiCA.test(N=100, p.ave=c(0.1, 0.9), slopes=c(0.1, -0.1), G=4))
-    expect_error(power.multiCA.test(N=100, p.ave=c(0.4, 0.6), slopes=c(0.1, 0.1), G=3))
+    expect_error(power.multiCA.test(N=100, p.start=c(0.1, 0.3), p.end=c(0.8, 0.2), G=3),
+                "slopes should sum to 0")
+    expect_error(power.multiCA.test(N=100, p.ave=c(0.1, 0.8), slopes=c(0.1, -0.1), G=4),
+                  "p.ave should sum to 1")
+    expect_error(power.multiCA.test(N=100, p.ave=c(0.1, 0.9), slopes=c(0.1, -0.1), G=4),
+                  "valid probability matrix")
+    expect_error(power.multiCA.test(N=100, p.ave=c(0.4, 0.6), slopes=c(0.1, 0.1), G=3),
+                "slopes should sum to 0")
   })
 @}
 
