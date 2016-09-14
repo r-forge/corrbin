@@ -127,11 +127,11 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 #'@@method multiCA.test default
 #'@@param scores non-decreaseing numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
 #'@@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.
-#'@@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "holm-schaffer" otherwise.
+#'@@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "Holm-Shaffer" otherwise.
 #'@@export
 
 multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
-  p.adjust.method=c("none","closed.set","holm-schaffer"),...){
+  p.adjust.method=c("none","closed.set","Holm-Shaffer"),...){
   if (!is.matrix(x)) {
     cat(str(x))
     stop("x should be a two-dimensional matrix")
@@ -221,7 +221,7 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
 @D Calculate adjusted p-values @{
   if (missing(p.adjust.method)){
     if (length(outcomes)<=3) p.adjust.method <- "closed.set"
-    else p.adjust.method <- "holm-schaffer"
+    else p.adjust.method <- "Holm-Shaffer"
   } else {
     p.adjust.method <- match.arg(p.adjust.method)
   }
@@ -231,14 +231,14 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
     indiv.res <- testres$indiv.p.value
   } else if (p.adjust.method=="closed.set") {
     @< Closed set adjustment @>
-  } else if (p.adjust.method=="holm-schaffer") {
-    @< Holm-Schaffer adjustment @>
+  } else if (p.adjust.method=="Holm-Shaffer") {
+    @< Holm-Shaffer adjustment @>
   } 
   attr(indiv.res, "method") <- p.adjust.method
 @}
 
-\subsection{Holm-Schaffer approach}
-Schaffer's modification of Holm's adjustment involves multiplying the ordered p-values by $t_s$, the maximum number of possibly true hypotheses, given that at least $s - 1$ hypotheses are false. In our case the logical restriction means that if there is at least one false null hypothesis, then no more than $K-2$ null hypotheses could be true. So
+\subsection{Holm-Shaffer approach}
+Shaffer's modification of Holm's adjustment involves multiplying the ordered p-values by $t_s$, the maximum number of possibly true hypotheses, given that at least $s - 1$ hypotheses are false. In our case the logical restriction means that if there is at least one false null hypothesis, then no more than $K-2$ null hypotheses could be true. So
 \begin{gather*}
 p^{HS}_{(j)} = \max_{s\leq j}(\min( t_s p_{(s)}, 1))\\
 \text{where } t_s = \begin{cases}
@@ -248,7 +248,7 @@ p^{HS}_{(j)} = \max_{s\leq j}(\min( t_s p_{(s)}, 1))\\
 \end{gather*}
 
 
-@D Holm-Schaffer adjustment @{
+@D Holm-Shaffer adjustment @{
     s <- seq_along(testres$indiv.p.value)
     if (full.set) s[2] <- 3
     o <- order(testres$indiv.p.value)
@@ -257,19 +257,19 @@ p^{HS}_{(j)} = \max_{s\leq j}(\min( t_s p_{(s)}, 1))\\
 @}
 
 @O ../tests/testthat/test_overall.R @{
-  test_that("Holm-Schaffer consistent with Holm", {
+  test_that("Holm-Shaffer consistent with Holm", {
     data(stroke)
     res0 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="none")
     expect_equal(attr(res0$individual, "method"), "none")
 
-    res1 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="holm-schaffer")
-    expect_equal(attr(res1$individual, "method"), "holm-schaffer")
+    res1 <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="Holm-Shaffer")
+    expect_equal(attr(res1$individual, "method"), "Holm-Shaffer")
     expect_equivalent(sort(p.adjust(res0$individual, method="holm"))[-2],
                       sort(res1$individual)[-2])    
 
     res0a <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="none", 
                           outcomes=1:4)
-    res1a <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="holm-schaffer", 
+    res1a <- multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust="Holm-Shaffer", 
                           outcomes=1:4)
     expect_equivalent(sort(p.adjust(res0a$individual, method="holm")),
                       sort(res1a$individual))    

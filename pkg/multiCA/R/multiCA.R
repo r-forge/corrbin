@@ -41,11 +41,11 @@
 #'@method multiCA.test default
 #'@param scores non-decreaseing numeric vector of the same length as the number of ordered groups. Defaults to linearly increasing values
 #'@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.
-#'@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "holm-schaffer" otherwise.
+#'@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "Holm-Shaffer" otherwise.
 #'@export
 
 multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
-  p.adjust.method=c("none","closed.set","holm-schaffer"),...){
+  p.adjust.method=c("none","closed.set","Holm-Shaffer"),...){
   if (!is.matrix(x)) {
     cat(str(x))
     stop("x should be a two-dimensional matrix")
@@ -71,7 +71,7 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
   
     if (missing(p.adjust.method)){
       if (length(outcomes)<=3) p.adjust.method <- "closed.set"
-      else p.adjust.method <- "holm-schaffer"
+      else p.adjust.method <- "Holm-Shaffer"
     } else {
       p.adjust.method <- match.arg(p.adjust.method)
     }
@@ -86,7 +86,7 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
         }
         indiv.res <- .p.adjust.closed(mytest, outcomes, remove=full.set)  
       
-    } else if (p.adjust.method=="holm-schaffer") {
+    } else if (p.adjust.method=="Holm-Shaffer") {
       
           s <- seq_along(testres$indiv.p.value)
           if (full.set) s[2] <- 3

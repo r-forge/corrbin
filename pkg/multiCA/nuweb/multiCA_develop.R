@@ -15,7 +15,7 @@ shine(cov)
 
 
 check(mc, cleanup = FALSE, check_dir = "c:/RForge", check_version = TRUE, cran = TRUE)
-
+install(mc)
 
 #create data set
 strk <- data.matrix(read.delim("z:/EOGeorge/MultiTrend/StrokeData.txt", row.names=1))

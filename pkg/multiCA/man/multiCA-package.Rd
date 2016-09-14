@@ -28,8 +28,4 @@ Szabo, A. (2016) Test for trend with a multinomial outcome.
 \keyword{ package
 htest
 nonparametric}
-\seealso{
-}
-\examples{
 
-}
