@@ -1,7 +1,7 @@
 
 #'Multinomial Cochran-Armitage trend test
 #'
-#'The \code{multiCA.test} performs a multinomial generalization of the 
+#'The \code{multiCA.test} function performs a multinomial generalization of the 
 #' Cochran-Armitage trend test.
 #'
 #'

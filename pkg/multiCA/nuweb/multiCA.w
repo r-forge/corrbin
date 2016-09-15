@@ -49,7 +49,7 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 @{
 #'Multinomial Cochran-Armitage trend test
 #'
-#'The \code{multiCA.test} performs a multinomial generalization of the 
+#'The \code{multiCA.test} function performs a multinomial generalization of the 
 #' Cochran-Armitage trend test.
 #'
 #'
@@ -81,7 +81,9 @@ multiCA.test <- function(x,...) UseMethod("multiCA.test")
 The actual calculation of the test statitistic, overall and unadjusted individual p-values is encapsulated in an internal function that operates on a matrix. No error control is provided here.
 
 @O ../R/multiCA.R @{
-#'@@keywords internal
+#' @@keywords internal
+#' @@importFrom stats terms xtabs
+
 
 .multiCA.test <- function(x, scores, outcomes){
   K <- nrow(x)
@@ -129,6 +131,7 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 #'@@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.
 #'@@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "Holm-Shaffer" otherwise.
 #'@@export
+#' @@importFrom utils str
 
 multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
   p.adjust.method=c("none","closed.set","Holm-Shaffer"),...){
@@ -173,6 +176,7 @@ with the default method. The code is based on \texttt{t.test.formula}.
 #'@@param na.action	a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").
 #'@@param weights an integer-valued variable representing the number of times each \code{outcome} - \code{group} combination was observed.
 #'@@export
+#' @@importFrom stats terms xtabs
 
 multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...){
     if (missing(formula) || (length(formula) != 3L) || (length(attr(terms(formula[-2L]), 
@@ -306,6 +310,14 @@ The actual adjustment calculation is based on code from \texttt{cherry::closed},
 the $K-1$ element sets if the full set of hypotheses is being tested.
 
 @O ../R/multiCA.R @{
+#'Internal functions
+#'
+#' These internal functions perform the closed set p-value adjustment calculation
+#' for the multivariate Cochran-Armitage trend test. The logical constraint
+#' on the possible number of true null hypotheses is incorporated.
+#'
+#'
+#' @@name internal
 #' @@importFrom bitops bitAnd
 #' @@keywords internal
 .bit2boolean <- function (x, N) 
@@ -320,6 +332,7 @@ the $K-1$ element sets if the full set of hypotheses is being tested.
 #' @@param  ...  additional parameters to the 'test' function
 #' @@return  numeric vector of adjusted p-values for each hypothesis
 #' @@keywords internal
+#' @@name internal
 .p.adjust.closed <- function (test, hypotheses, remove=FALSE, ...) 
 {
   N <- length(hypotheses)
@@ -391,6 +404,7 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 #' ## check
 #' pchisq(qchisq(0.95, df=10), df=10, ncp=ncp)  ## 0.8
 #'@@export
+#'@@importFrom stats pchisq uniroot
 
 cnonct <- function(x, p, df){
  
@@ -422,7 +436,9 @@ cnonct <- function(x, p, df){
 #' Cochran-Armitage trend test or determine the sample size to obtain a target power. 
 #'
 #'@@details 
-#' The distribution of the outcomes can be specified in two ways: either the full matrix of #' outcome probabilities \code{pmatrix} can be specified, or exactly two of the parameters #' \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} must be specified, while #' #' the other two should be set to \code{NULL}.
+#' The distribution of the outcomes can be specified in two ways: either the full matrix of 
+#' outcome probabilities \code{pmatrix} can be specified, or exactly two of the parameters 
+#' \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} must be specified, while 
 #' 
 #' @@param N integer, the total sample size of the study. If \code{NULL} then \code{power} needs to be specified.
 #' @@param power target power. If \code{NULL} then \code{N} needs to be specified.
@@ -450,6 +466,8 @@ cnonct <- function(x, p, df){
 #' strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)
 #' power.multiCA.test(N=900, pmatrix=prop.table(strk.mat, margin=2))
 #' @@export
+#' @@importFrom stats pchisq qchisq weighted.mean
+
 
 power.multiCA.test <- function(N=NULL, power=NULL, pmatrix=NULL, p.ave=NULL, p.start=NULL, 
                                p.end=NULL, slopes=NULL, scores=1:G, n.prop=rep(1, G),

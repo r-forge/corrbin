@@ -68,7 +68,7 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 \mbox{}\verb@@\\
 \mbox{}\verb@#'Multinomial Cochran-Armitage trend test@\\
 \mbox{}\verb@#'@\\
-\mbox{}\verb@#'The \code{multiCA.test} performs a multinomial generalization of the @\\
+\mbox{}\verb@#'The \code{multiCA.test} function performs a multinomial generalization of the @\\
 \mbox{}\verb@#' Cochran-Armitage trend test.@\\
 \mbox{}\verb@#'@\\
 \mbox{}\verb@#'@\\
@@ -112,7 +112,9 @@ The actual calculation of the test statitistic, overall and unadjusted individua
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@#'@{\tt @}\verb@keywords internal@\\
+\mbox{}\verb@#' @{\tt @}\verb@keywords internal@\\
+\mbox{}\verb@#' @{\tt @}\verb@importFrom stats terms xtabs@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@.multiCA.test <- function(x, scores, outcomes){@\\
 \mbox{}\verb@  K <- nrow(x)@\\
@@ -172,6 +174,7 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 \mbox{}\verb@#'@{\tt @}\verb@param outcomes integer or character vector defining the set of outcomes (by row index or row name) over which the trend should be tested. Defaults to all outcomes.@\\
 \mbox{}\verb@#'@{\tt @}\verb@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "Holm-Shaffer" otherwise.@\\
 \mbox{}\verb@#'@{\tt @}\verb@export@\\
+\mbox{}\verb@#' @{\tt @}\verb@importFrom utils str@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),@\\
 \mbox{}\verb@  p.adjust.method=c("none","closed.set","Holm-Shaffer"),...){@\\
@@ -228,6 +231,7 @@ with the default method. The code is based on \texttt{t.test.formula}.
 \mbox{}\verb@#'@{\tt @}\verb@param na.action       a function which indicates what should happen when the data contain NAs. Defaults to getOption("na.action").@\\
 \mbox{}\verb@#'@{\tt @}\verb@param weights an integer-valued variable representing the number of times each \code{outcome} - \code{group} combination was observed.@\\
 \mbox{}\verb@#'@{\tt @}\verb@export@\\
+\mbox{}\verb@#' @{\tt @}\verb@importFrom stats terms xtabs@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...){@\\
 \mbox{}\verb@    if (missing(formula) || (length(formula) != 3L) || (length(attr(terms(formula[-2L]), @\\
@@ -451,6 +455,14 @@ the $K-1$ element sets if the full set of hypotheses is being tested.
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
+\mbox{}\verb@#'Internal functions@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#' These internal functions perform the closed set p-value adjustment calculation@\\
+\mbox{}\verb@#' for the multivariate Cochran-Armitage trend test. The logical constraint@\\
+\mbox{}\verb@#' on the possible number of true null hypotheses is incorporated.@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#'@\\
+\mbox{}\verb@#' @{\tt @}\verb@name internal@\\
 \mbox{}\verb@#' @{\tt @}\verb@importFrom bitops bitAnd@\\
 \mbox{}\verb@#' @{\tt @}\verb@keywords internal@\\
 \mbox{}\verb@.bit2boolean <- function (x, N) @\\
@@ -465,6 +477,7 @@ the $K-1$ element sets if the full set of hypotheses is being tested.
 \mbox{}\verb@#' @{\tt @}\verb@param  ...  additional parameters to the 'test' function@\\
 \mbox{}\verb@#' @{\tt @}\verb@return  numeric vector of adjusted p-values for each hypothesis@\\
 \mbox{}\verb@#' @{\tt @}\verb@keywords internal@\\
+\mbox{}\verb@#' @{\tt @}\verb@name internal@\\
 \mbox{}\verb@.p.adjust.closed <- function (test, hypotheses, remove=FALSE, ...) @\\
 \mbox{}\verb@{@\\
 \mbox{}\verb@  N <- length(hypotheses)@\\
@@ -548,6 +561,7 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \mbox{}\verb@#' ## check@\\
 \mbox{}\verb@#' pchisq(qchisq(0.95, df=10), df=10, ncp=ncp)  ## 0.8@\\
 \mbox{}\verb@#'@{\tt @}\verb@export@\\
+\mbox{}\verb@#'@{\tt @}\verb@importFrom stats pchisq uniroot@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@cnonct <- function(x, p, df){@\\
 \mbox{}\verb@ @\\
@@ -604,7 +618,9 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \mbox{}\verb@#' Cochran-Armitage trend test or determine the sample size to obtain a target power. @\\
 \mbox{}\verb@#'@\\
 \mbox{}\verb@#'@{\tt @}\verb@details @\\
-\mbox{}\verb@#' The distribution of the outcomes can be specified in two ways: either the full matrix of #' outcome probabilities \code{pmatrix} can be specified, or exactly two of the parameters #' \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} must be specified, while #' #' the other two should be set to \code{NULL}.@\\
+\mbox{}\verb@#' The distribution of the outcomes can be specified in two ways: either the full matrix of @\\
+\mbox{}\verb@#' outcome probabilities \code{pmatrix} can be specified, or exactly two of the parameters @\\
+\mbox{}\verb@#' \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} must be specified, while @\\
 \mbox{}\verb@#' @\\
 \mbox{}\verb@#' @{\tt @}\verb@param N integer, the total sample size of the study. If \code{NULL} then \code{power} needs to be specified.@\\
 \mbox{}\verb@#' @{\tt @}\verb@param power target power. If \code{NULL} then \code{N} needs to be specified.@\\
@@ -632,6 +648,8 @@ A non-centrality parameter calculation function can be useful by itself. It calc
 \mbox{}\verb@#' strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)@\\
 \mbox{}\verb@#' power.multiCA.test(N=900, pmatrix=prop.table(strk.mat, margin=2))@\\
 \mbox{}\verb@#' @{\tt @}\verb@export@\\
+\mbox{}\verb@#' @{\tt @}\verb@importFrom stats pchisq qchisq weighted.mean@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@power.multiCA.test <- function(N=NULL, power=NULL, pmatrix=NULL, p.ave=NULL, p.start=NULL, @\\
 \mbox{}\verb@                               p.end=NULL, slopes=NULL, scores=1:G, n.prop=rep(1, G),@\\

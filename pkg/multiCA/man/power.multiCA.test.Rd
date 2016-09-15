@@ -42,7 +42,9 @@ Given the probabilities of outcomes, compute the power of the overall multinomia
 Cochran-Armitage trend test or determine the sample size to obtain a target power.
 }
 \details{
-The distribution of the outcomes can be specified in two ways: either the full matrix of #' outcome probabilities \code{pmatrix} can be specified, or exactly two of the parameters #' \code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} must be specified, while #' #' the other two should be set to \code{NULL}.
+The distribution of the outcomes can be specified in two ways: either the full matrix of 
+outcome probabilities \code{pmatrix} can be specified, or exactly two of the parameters 
+\code{p.ave}, \code{slopes}, \code{p.start}, and \code{p.end} must be specified, while
 }
 \examples{
 power.multiCA.test(power=0.8, p.start=c(0.1,0.2,0.3,0.4), p.end=c(0.4, 0.3, 0.2, 0.1), 

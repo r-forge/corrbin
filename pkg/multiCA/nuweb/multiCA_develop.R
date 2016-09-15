@@ -14,7 +14,7 @@ cov <- package_coverage(mc$path)
 shine(cov)
 
 
-check(mc, cleanup = FALSE, check_dir = "c:/RForge", check_version = TRUE, cran = TRUE)
+check(mc, check_dir = "c:/RForge", check_version = TRUE, cran = TRUE, manual=TRUE)
 install(mc)
 
 #create data set
