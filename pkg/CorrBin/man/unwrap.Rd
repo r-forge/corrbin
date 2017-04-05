@@ -17,7 +17,7 @@ unwrap(object, ...)
 \item{\dots}{other potential arguments; not currently used}
 }
 \value{
-For \code{uwrap.CBData}: a data frame with one row for each cluster element (having a binary
+For \code{unwrap.CBData}: a data frame with one row for each cluster element (having a binary
 outcome) with the following standardized column names
 
 \item{Trt}{factor, the treatment group}

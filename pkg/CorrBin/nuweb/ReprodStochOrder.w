@@ -1225,7 +1225,10 @@ SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections,
   }
  free(marg);
 
- 
+  if (asInteger(verbose)==1) 
+   Rprintf("Limit=%d; %d Iterations; Limit enforced %d times (%4.2f percent)\n", 
+           limit, niter, nenforced, nenforced*100.0/niter);
+
  PROTECT(res = allocVector(VECSXP,5));
   SET_VECTOR_ELT(res, 0, margSXP);
   SET_VECTOR_ELT(res, 1, Q);
@@ -1236,10 +1239,6 @@ SEXP ReprodISDM(SEXP Q, SEXP S, SEXP tab, SEXP MaxIter, SEXP MaxDirections,
    REAL(tmp)[1] = niter;
   SET_VECTOR_ELT(res, 4, tmp);
  UNPROTECT(4);   //tmp, res, margSXP, D
-
- if (asInteger(verbose)==1) 
-   Rprintf("Limit=%d; %d Iterations; Limit enforced %d times (%4.2f percent)\n", 
-           limit, niter, nenforced, nenforced*100.0/niter);
 
  return res;
 

@@ -28,7 +28,7 @@ sample sizes specified in the call
 }
 \description{
 Generates random exchangeably correlated multinomial data based on a parametric
-distribution or using resampling. The Dirichlet-Multinomial, Logistic-Normal mutlinomial,
+distribution or using resampling. The Dirichlet-Multinomial, Logistic-Normal multinomial,
 and discrete mixture multinomial parametric distributions are implemented.
 All observations will be assigned to the same treatment group, and there is no
 guarantee of a specific order of the observations in the output.
