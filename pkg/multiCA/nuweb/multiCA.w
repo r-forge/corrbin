@@ -68,6 +68,9 @@ The main \texttt{multiCA.test} function is a generic, with methods for a matrix 
 #'## using formula interface
 #'multiCA.test(Type ~ Year, weights=Freq, data=stroke)
 #'
+#'##using Westfall's multiple testing adjustment
+#'multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust.method="Westfall")
+#'
 #'## using matrix interface and testing only the first 3 outcomes
 #'strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)
 #'multiCA.test(strk.mat, outcomes=1:3)
@@ -78,7 +81,9 @@ multiCA.test <- function(x,...) UseMethod("multiCA.test")
  
 @}
 
-The actual calculation of the test statitistic, overall and unadjusted individual p-values is encapsulated in an internal function that operates on a matrix. No error control is provided here.
+The actual calculation of the test statitistic, overall and unadjusted individual p-values,
+and correlation/contrast matrices that will be useful for adjusted p-value calculation,
+ is encapsulated in an internal function that operates on a matrix. No error control is provided here.
 
 @O ../R/multiCA.R @{
 #' @@keywords internal
@@ -103,21 +108,25 @@ The actual calculation of the test statitistic, overall and unadjusted individua
   X <- x[outcomes, ,drop=FALSE] %*% (scores - cbar)
 
   #individual tests
-  CAT <- X[nonz]^2 / (pdot[nonz] * (1-pdot[nonz])) / s2 
+  Tt <-  X[nonz] / sqrt(pdot[nonz] * (1-pdot[nonz])* s2)
+  CAT <- Tt^2
   CAT.p.value <- pchisq(CAT, df=1, lower.tail=FALSE)
   
   #overall test
   if (full || sum(pdot) >= 1){
-    Tt <- ( sum(X[nonz]^2 / pdot[nonz])) / s2
+    W <- ( sum(X[nonz]^2 / pdot[nonz])) / s2
   } else {
-    Tt <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2
+    W <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2
   }
 
   df <- length(outcomes) - full
-  p.value <- pchisq(Tt, df=df, lower.tail=FALSE)
+  p.value <- pchisq(W, df=df, lower.tail=FALSE)
+  
+  @< Calculate correlation and contrast matrices @>
 
-  res <- list(statistic = Tt, parameter = df, p.value = p.value, 
-              indiv.statistics = CAT, indiv.p.value = CAT.p.value)
+  res <- list(statistic = W, parameter = df, p.value = p.value, 
+              indiv.statistics = Tt, indiv.p.value = CAT.p.value,
+              sigma0 = Sigma0, contrast = C)
   return(res)
 }
 @| .multiCA.test@}
@@ -132,9 +141,10 @@ The default method uses a two-dimensional contingency matrix with the outcomes a
 #'@@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "Holm-Shaffer" otherwise.
 #'@@export
 #' @@importFrom utils str
+#' @@importFrom multcomp glht adjusted parm
 
 multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
-  p.adjust.method=c("none","closed.set","Holm-Shaffer"),...){
+  p.adjust.method=c("none","closed.set","Holm-Shaffer", "single-step", "Westfall"),...){
   if (!is.matrix(x)) {
     cat(str(x))
     stop("x should be a two-dimensional matrix")
@@ -143,14 +153,14 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
 
   testres <- .multiCA.test(x=x, scores=scores, outcomes=outcomes)
  
-  Tt <- c(W = testres$statistic)
+  W <- c(W = testres$statistic)
   df <- c(df = testres$parameter)
 
   p.value <- testres$p.value
   null.value <- 0
   names(null.value) <- sprintf("slope for outcomes %s", deparse(substitute(outcomes)))
 
-  res <- list(statistic = Tt, parameter = df, p.value = p.value, 
+  res <- list(statistic = W, parameter = df, p.value = p.value, 
               method="Multinomial Cochran-Armitage trend test",
               alternative="two.sided",
               null.value=null.value,
@@ -237,7 +247,9 @@ multiCA.test.formula <- function(formula, data, subset, na.action,  weights, ...
     @< Closed set adjustment @>
   } else if (p.adjust.method=="Holm-Shaffer") {
     @< Holm-Shaffer adjustment @>
-  } 
+  } else if (p.adjust.method %in% c("single-step", "Westfall")) {
+    @< glht adjustment @>
+  }
   attr(indiv.res, "method") <- p.adjust.method
 @}
 
@@ -369,7 +381,35 @@ the $K-1$ element sets if the full set of hypotheses is being tested.
 }
 @}
 
+\subsection{Multivariate normal based adjustment}
+The ``single-step'' and ``Westfall'' adjustments are based on the (asympotic) multivariate normality of the test statistics, and
+are implemented in the \texttt{multcomp} package.
 
+@D glht adjustment @{
+    if (full.set) {
+        testparm <- parm(testres$indiv.statistics[-1], testres$sigma0[-1,-1])
+    } else {
+        testparm <-  parm(testres$indiv.statistics, testres$sigma0)                            
+        }
+    g1 <- glht(model = testparm,  linfct = testres$contrast)
+    indiv.res <- summary(g1, test=adjusted(type=p.adjust.method,...))$test$pvalues
+@}
+
+@D Calculate correlation and contrast matrices @{
+  # correlation of T
+  sqrt.or.pdot <- sqrt(pdot[nonz]/(1-pdot[nonz]))
+  Sigma0 <- -outer(sqrt.or.pdot, sqrt.or.pdot)
+  diag(Sigma0) <- 1
+
+  # contrast matrix
+  if (full){
+    coefs <- sqrt(pdot[nonz] * (1-pdot[nonz]))
+    C <- rbind(coefs[-1], diag(K-1))
+  } else {
+    C <- diag(length(nonz))
+  }
+@}
+ 
 \section{Power and sample size calculation}
 The calculation is based on the following result:
 Let $\nu_i=n_{i\cdot}/N$ denote the proportion

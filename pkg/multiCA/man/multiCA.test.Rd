@@ -9,7 +9,8 @@
 multiCA.test(x, ...)
 
 \method{multiCA.test}{default}(x, scores = 1:ncol(x), outcomes = 1:nrow(x),
-  p.adjust.method = c("none", "closed.set", "Holm-Shaffer"), ...)
+  p.adjust.method = c("none", "closed.set", "Holm-Shaffer", "single-step",
+  "Westfall"), ...)
 
 \method{multiCA.test}{formula}(formula, data, subset, na.action, weights, ...)
 }
@@ -48,6 +49,9 @@ Cochran-Armitage trend test.
 data(stroke)
 ## using formula interface
 multiCA.test(Type ~ Year, weights=Freq, data=stroke)
+
+##using Westfall's multiple testing adjustment
+multiCA.test(Type ~ Year, weights=Freq, data=stroke, p.adjust.method="Westfall")
 
 ## using matrix interface and testing only the first 3 outcomes
 strk.mat <- xtabs(Freq ~ Type + Year, data=stroke)

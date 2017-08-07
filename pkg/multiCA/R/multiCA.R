@@ -21,21 +21,38 @@
   X <- x[outcomes, ,drop=FALSE] %*% (scores - cbar)
 
   #individual tests
-  CAT <- X[nonz]^2 / (pdot[nonz] * (1-pdot[nonz])) / s2 
+  Tt <-  X[nonz] / sqrt(pdot[nonz] * (1-pdot[nonz])* s2)
+  CAT <- Tt^2
   CAT.p.value <- pchisq(CAT, df=1, lower.tail=FALSE)
   
   #overall test
   if (full || sum(pdot) >= 1){
-    Tt <- ( sum(X[nonz]^2 / pdot[nonz])) / s2
+    W <- ( sum(X[nonz]^2 / pdot[nonz])) / s2
   } else {
-    Tt <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2
+    W <- (sum(X)^2 / (1-sum(pdot)) + sum(X[nonz]^2 / pdot[nonz])) / s2
   }
 
   df <- length(outcomes) - full
-  p.value <- pchisq(Tt, df=df, lower.tail=FALSE)
+  p.value <- pchisq(W, df=df, lower.tail=FALSE)
+  
+  
+    # correlation of T
+    sqrt.or.pdot <- sqrt(pdot[nonz]/(1-pdot[nonz]))
+    Sigma0 <- -outer(sqrt.or.pdot, sqrt.or.pdot)
+    diag(Sigma0) <- 1
 
-  res <- list(statistic = Tt, parameter = df, p.value = p.value, 
-              indiv.statistics = CAT, indiv.p.value = CAT.p.value)
+    # contrast matrix
+    if (full){
+      coefs <- sqrt(pdot[nonz] * (1-pdot[nonz]))
+      C <- rbind(coefs[-1], diag(K-1))
+    } else {
+      C <- diag(length(nonz))
+    }
+  
+
+  res <- list(statistic = W, parameter = df, p.value = p.value, 
+              indiv.statistics = Tt, indiv.p.value = CAT.p.value,
+              sigma0 = Sigma0, contrast = C)
   return(res)
 }
 
@@ -46,9 +63,10 @@
 #'@param p.adjust.method character string defining the correction method for individual outcome p-values. Defaults to "closed.set" when \code{length(outcomes)<=3}, and "Holm-Shaffer" otherwise.
 #'@export
 #' @importFrom utils str
+#' @importFrom multcomp glht adjusted parm
 
 multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
-  p.adjust.method=c("none","closed.set","Holm-Shaffer"),...){
+  p.adjust.method=c("none","closed.set","Holm-Shaffer", "single-step", "Westfall"),...){
   if (!is.matrix(x)) {
     cat(str(x))
     stop("x should be a two-dimensional matrix")
@@ -57,14 +75,14 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
 
   testres <- .multiCA.test(x=x, scores=scores, outcomes=outcomes)
  
-  Tt <- c(W = testres$statistic)
+  W <- c(W = testres$statistic)
   df <- c(df = testres$parameter)
 
   p.value <- testres$p.value
   null.value <- 0
   names(null.value) <- sprintf("slope for outcomes %s", deparse(substitute(outcomes)))
 
-  res <- list(statistic = Tt, parameter = df, p.value = p.value, 
+  res <- list(statistic = W, parameter = df, p.value = p.value, 
               method="Multinomial Cochran-Armitage trend test",
               alternative="two.sided",
               null.value=null.value,
@@ -97,7 +115,17 @@ multiCA.test.default <- function(x, scores=1:ncol(x), outcomes=1:nrow(x),
           ro <- order(o)
           indiv.res <- pmin(1, cummax((length(outcomes) - s + 1L) * testres$indiv.p.value[o]))[ro]
       
-    } 
+    } else if (p.adjust.method %in% c("single-step", "Westfall")) {
+      
+          if (full.set) {
+              testparm <- parm(testres$indiv.statistics[-1], testres$sigma0[-1,-1])
+          } else {
+              testparm <-  parm(testres$indiv.statistics, testres$sigma0)                            
+              }
+          g1 <- glht(model = testparm,  linfct = testres$contrast)
+          indiv.res <- summary(g1, test=adjusted(type=p.adjust.method,...))$test$pvalues
+      
+    }
     attr(indiv.res, "method") <- p.adjust.method
   
 
