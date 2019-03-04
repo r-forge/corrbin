@@ -1547,7 +1547,7 @@ specifies the number of resamples, \texttt{method} could be either ``ISDM'' or
 #'
 #'data(shelltox)
 #'set.seed(45742)
-#'sh.test <- SO.trend.test(shelltox, R=10, control=soControl(eps=0.1, max.directions=25)) 
+#'sh.test <- SO.trend.test(shelltox, R=5, control=soControl(eps=0.1, max.directions=25)) 
 #'sh.test
 #'
 #'#a plot of the resampled LRT values
