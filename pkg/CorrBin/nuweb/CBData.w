@@ -92,6 +92,7 @@ assumed that each combination has frequency 1).
 #'group, clustersize and the number of responses.
 #'
 #'@@export
+#'@@importFrom stats aggregate
 #'@@param x a data frame with one row representing a cluster or potentially a
 #'set of clusters of the same size and number of responses
 #'@@param trt the name of the variable that defines treatment group
@@ -164,6 +165,7 @@ give the number of times the given combination occurs in the data.
 #'into a \code{CBData} object.
 #'
 #'@@export
+#'@@importFrom utils read.table
 #'@@param file name of file with data. The first column should contain the
 #'treatment group, the second the size of the cluster, the third the number of
 #'responses in the cluster. Optionally, a fourth column could give the number
@@ -379,6 +381,7 @@ RS.trend.test <- function(cbdata){
 #'
 #'@@export
 #'@@import geepack
+#'@@importFrom stats binomial pnorm
 #'@@param cbdata a \code{\link{CBData}} object
 #'@@param scale.method character string specifying the assumption about the
 #'change in the overdispersion (scale) parameter across the treatment groups:
@@ -445,6 +448,7 @@ cluster size \texttt{n}.
 #'represent the first group, 2 - the second group, etc.
 #'
 #'@@export
+#'@@importFrom stats rmultinom
 #'@@param sample.sizes a dataset with variables Trt, ClusterSize and Freq giving
 #'the number of clusters to be generated for each Trt/ClusterSize combination.
 #'@@param p.gen.fun a function of one parameter that generates the value of the

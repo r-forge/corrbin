@@ -85,10 +85,10 @@ The actual EM iterations are performed in \texttt{ReprodEstimates}.
 @{
 SEXP ReprodEstimates(SEXP nvec, SEXP rvec, SEXP freqvec)
 {
- double *theta, *thetanew, sqerror, **marg;
+ double *theta, *thetanew, abserror, **marg;
  int i, maxsize, nr, ntot, r, ri, ni, n, fri, start;
  SEXP res;
- const double eps=1e-8;
+ const double eps=1e-16;
  
  nr = LENGTH(nvec);
  maxsize = 0;
@@ -106,10 +106,10 @@ SEXP ReprodEstimates(SEXP nvec, SEXP rvec, SEXP freqvec)
  for (r=0; r<=maxsize; r++){
 	 theta[r] = 1.0/(maxsize+1);
  }
- sqerror = 1;
+ abserror = 1;
  //EM update
- while (sqerror>eps){
-	 sqerror = 0;
+ while (abserror>eps){
+	 abserror = 0;
 	 marg = Marginals(theta, maxsize);
 	 for (r=0; r<=maxsize; r++) thetanew[r] = 0;
 	 for (i=0; i<nr; i++){
@@ -118,12 +118,12 @@ SEXP ReprodEstimates(SEXP nvec, SEXP rvec, SEXP freqvec)
 		 fri = INTEGER(freqvec)[i];
 		 for (r=ri; r<=maxsize-ni+ri; r++){
 			 thetanew[r] += choose(ni,ri)*choose(maxsize-ni,r-ri)*theta[r]*fri*1.0/
-			                marg[ni][ri];
+			                marg[ni][ri] ;
 		 }
 	 }
 	 for (r=0; r<=maxsize; r++){
 		 thetanew[r] = thetanew[r]/(ntot*choose(maxsize,r)*1.0);
-		 sqerror += R_pow_di(thetanew[r]-theta[r],2);
+		 abserror += fabs(thetanew[r]-theta[r]);
 		 theta[r] = thetanew[r];
 	 }
 	 for(n = 0; n <= maxsize; n++) free(marg[n]);
@@ -172,7 +172,7 @@ treatment group. For the package the compiled library needs to be loaded.
 #'
 #'The EM algorithm given by Stefanescu and Turnbull (2003) is used for the binary data.
 #'
-#'@@useDynLib CorrBin
+#'@@useDynLib CorrBin, .registration=TRUE
 #'@@export
 #'@@param object a \code{\link{CBData}} or \code{\link{CMData}} object
 #'@@param \dots other potential arguments; not currently used
@@ -300,6 +300,7 @@ mc.test.chisq <- function(object,...) UseMethod("mc.test.chisq")
 #'@@rdname mc.test.chisq
 #'@@method mc.test.chisq CBData
 #'@@export
+#'@@importFrom stats pchisq
 
 mc.test.chisq.CBData <- function(object,...){
   cbdata <- object[object$Freq>0, ]
@@ -372,8 +373,9 @@ it changes $Q$ only multiplicatively.
 #'parameter. This is an experimental feature, and at this point none of the
 #'other functions can handle umbrella orderings.
 #'
-#'@@useDynLib CorrBin
+#'@@useDynLib CorrBin, .registration=TRUE
 #'@@export
+#'@@importFrom stats xtabs
 #'@@param cbdata an object of class \code{\link{CBData}}.
 #'@@param turn integer specifying the peak of the umbrella ordering (see
 #'Details). The default corresponds to a non-decreasing order.

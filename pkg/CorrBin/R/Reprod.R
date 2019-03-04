@@ -24,6 +24,7 @@ mc.est.CBData <- function(object, ...){
 #'@rdname mc.test.chisq
 #'@method mc.test.chisq CBData
 #'@export
+#'@importFrom stats pchisq
 
 mc.test.chisq.CBData <- function(object,...){
   cbdata <- object[object$Freq>0, ]
@@ -68,8 +69,9 @@ mc.test.chisq.CBData <- function(object,...){
 #'parameter. This is an experimental feature, and at this point none of the
 #'other functions can handle umbrella orderings.
 #'
-#'@useDynLib CorrBin
+#'@useDynLib CorrBin, .registration=TRUE
 #'@export
+#'@importFrom stats xtabs
 #'@param cbdata an object of class \code{\link{CBData}}.
 #'@param turn integer specifying the peak of the umbrella ordering (see
 #'Details). The default corresponds to a non-decreasing order.

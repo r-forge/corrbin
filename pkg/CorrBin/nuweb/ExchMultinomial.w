@@ -122,6 +122,7 @@ level uses a different sample-size distribution for averaging.
 #'ests <- as.data.frame(lapply(tau, function(x)x[,"1","0"]))
 #'matplot(ests, type="b")
 #'@@export
+#'@@importFrom stats xtabs
 
 jointprobs <- function(cmdata, type=c("averaged","cluster","mc")){
   type <- match.arg(type)
@@ -685,6 +686,7 @@ T^2=\sum_{g=1}^G T_g^2 \sim \chi^2_{G\,K} \text{ under }H_0.
 #'@@rdname mc.test.chisq
 #'@@method mc.test.chisq CMData
 #'@@export
+#'@@importFrom stats weighted.mean pchisq
 #'@@examples
 #'
 #'data(dehp)

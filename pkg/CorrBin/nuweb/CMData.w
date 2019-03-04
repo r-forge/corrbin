@@ -51,6 +51,7 @@ assumed that each combination has frequency 1.
 #'group, clustersize and the number of responses for each outcome type.
 #'
 #'@@export
+#'@@importFrom stats aggregate
 #'@@param x a data frame with one row representing a cluster or potentially a
 #'set of clusters of the same size and number of responses for each outcome
 #'@@param trt the name of the variable that defines treatment group
@@ -148,6 +149,7 @@ give the number of times the given combination occurs in the data.
 #'give the number of times the given combination occurs in the data.
 #'
 #'@@export
+#'@@importFrom utils read.table
 #'@@param file name of file with data. The data in the file should be structured as described above.
 #'@@param with.clustersize logical indicator of whether a cluster size variable is present
 #'in the file
@@ -214,6 +216,7 @@ to indicate clusters.
 #'@@rdname unwrap
 #'@@method unwrap CMData
 #'@@export
+#'@@importFrom stats reshape
 #'@@return For \code{unwrap.CMData}: a data frame with one row for each cluster element (having a multinomial
 #'outcome) with the following standardized column names
 #'@@return \item{Trt}{factor, the treatment group}
@@ -353,6 +356,7 @@ NULL
 #'@@details For \bold{mg.Resample}: the \code{param} list should be \code{list(param=...)}, in which
 #' the CMData object to be resampled is passed.
 #'@@export
+#'@@importFrom stats rmultinom
 #'@@rdname multinom.gen 
 #'
 @}

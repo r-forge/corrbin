@@ -8,7 +8,7 @@
 #'
 #'The EM algorithm given by Stefanescu and Turnbull (2003) is used for the binary data.
 #'
-#'@useDynLib CorrBin
+#'@useDynLib CorrBin, .registration=TRUE
 #'@export
 #'@param object a \code{\link{CBData}} or \code{\link{CMData}} object
 #'@param \dots other potential arguments; not currently used
