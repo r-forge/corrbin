@@ -272,8 +272,9 @@ by the \texttt{mc.est.raw} function, which returns a list of matrices with  $\pi
 #'@@return \item{NResp.1 - NResp.K}{numeric, the number of responses of each type}
 #'
 #'@@note
-#'For multinomial data, the implementation is curerntly written in R, so it is not very fast.
+#'For multinomial data, the implementation is currently written in R, so it is not very fast.
 #'
+#'@@references George EO, Cheon K, Yuan Y, Szabo A (2016)  On Exchangeable Multinomial Distributions. #'\emph{Biometrika} 103(2), 397-408.
 #'@@examples
 #'data(dehp)
 #'dehp.mc <- mc.est(subset(dehp, Trt=="0"))
