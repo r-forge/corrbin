@@ -1,0 +1,8 @@
+\documentclass{article}
+\usepackage{pdfpages}
+%\VignetteIndexEntry{OncotreeIntro}
+
+\begin{document}
+\includepdf[pages=-, fitpaper=true]{Oncotree.pdf}
+\end{document}
+

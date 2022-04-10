@@ -22,3 +22,10 @@ export(pstree.oncotree)
 
 # Import required packages
 import(boot)
+
+# Import required functions
+importFrom("grDevices", "dev.interactive")
+importFrom("graphics", "lines", "mtext", "par", "rect", "strheight",
+     "strwidth", "text", "xinch", "yinch")
+importFrom("stats", "na.omit", "optim", "rbinom")
+
