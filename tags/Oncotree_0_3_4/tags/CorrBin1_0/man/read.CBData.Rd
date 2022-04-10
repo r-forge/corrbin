@@ -1,0 +1,25 @@
+\name{read.CBData}
+\alias{read.CBData}
+\title{Read data from external file into a CBData object}
+\description{
+A convinience function to read data from specially structured file directly
+into a \code{CBData} object.}
+\usage{
+read.CBData(file, with.freq = TRUE, ...)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{file}{name of file with data. The first column should contain the treatment group, the second the size of the cluster,
+the third the number of responses in the cluster. Optionally, a fourth column could
+give the number of times the given combination occurs in the data.}
+  \item{with.freq}{logical indicator of whether a frequency variable is present in the file}
+  \item{...}{additonal arguments passed to \code{\link[utils]{read.table}}}
+}
+\value{
+  a \code{CBData} object 
+}
+\author{Aniko Szabo}
+
+\seealso{\code{\link{CBData}} }
+\keyword{ IO }
+\keyword{ file }

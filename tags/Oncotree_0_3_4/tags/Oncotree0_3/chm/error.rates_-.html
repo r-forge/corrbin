@@ -1,0 +1,62 @@
+<html><head><title>Set the error rates of an oncotree manually</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>error.rates<-(Oncotree)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   error.rates<-">
+<param name="keyword" value=" Set the error rates of an oncotree manually">
+</object>
+
+
+<h2>Set the error rates of an oncotree manually</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Allows to set the false positive and false negative error rate associated with an object of class <code>oncotree</code> to values other than those found by the optimization in <code><a href="oncotree.fit.html">oncotree.fit</a></code>. The estimated edge transition probabilities are updated appropriately.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+error.rates(x) &lt;- value
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+An object of class <code>oncotree</code>.</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+A numeric vector of length 2. The false positive error rate will be set to <code>value[1]</code>, while the false negative error rate to <code>value[2]</code>.</td></tr>
+</table>
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="oncotree.fit.html">oncotree.fit</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  data(ov.cgh)
+  ov.tree &lt;- oncotree.fit(ov.cgh)
+  ov.tree
+  error.rates(ov.tree) &lt;- c(0,0)
+  ov.tree
+</pre>
+
+
+
+<hr><div align="center">[Package <em>Oncotree</em> version 0.3 <a href="00Index.html">Index]</a></div>
+
+</body></html>

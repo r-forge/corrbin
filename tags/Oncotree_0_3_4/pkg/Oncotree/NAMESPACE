@@ -1,0 +1,31 @@
+#Declare S3 methods
+S3method(plot, oncotree)
+S3method(print, oncotree)
+S3method(plot, boottree)
+S3method(print, boottree)
+
+# Export public functions and data
+export(ancestors)
+export(bootstrap.oncotree)
+export(distribution.oncotree)
+export("error.rates<-")
+export(generate.data)
+export(least.common.ancestor)
+export(marginal.distr)
+export(oncotree.fit)
+export(plot.boottree)
+export(plot.oncotree)
+export(print.boottree)
+export(print.oncotree)
+export(pstree.oncotree)
+
+
+# Import required packages
+import(boot)
+
+# Import required functions
+importFrom("grDevices", "dev.interactive")
+importFrom("graphics", "lines", "mtext", "par", "rect", "strheight",
+     "strwidth", "text", "xinch", "yinch")
+importFrom("stats", "na.omit", "optim", "rbinom")
+
