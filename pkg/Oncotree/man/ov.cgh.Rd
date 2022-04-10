@@ -32,7 +32,7 @@ say, -3q denotes abnormally low DNA copy number on the q arm of
 the 3rd chromosome.
 }
 \source{
-  \url{http://www.ncbi.nlm.nih.gov/sky/}
+  NCBI's SKY-CGH database
 }
 \examples{
   data(ov.cgh)
