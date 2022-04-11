@@ -7,6 +7,7 @@ Author: Aniko Szabo, Lisa Pappas
 Maintainer: Aniko Szabo <aszabo@mcw.edu>
 Depends: R (>= 2.3.1), boot
 Suggests: lattice
-Description: Contains functions to construct and evaluate directed tree structures that
+Description: Construct and evaluate directed tree structures that
    model the process of occurrence of genetic alterations during carcinogenesis.
+   Szabo, A. and Boucher, K (2002)  <doi:10.1016/S0025-5564(02)00086-X>
 License: GPL (>=2)
